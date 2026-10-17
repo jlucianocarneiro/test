@@ -112,6 +112,31 @@ a{color:var(--accent);text-decoration:none}
 #ttsBar button{width:44px;height:44px;border:none;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:1rem;cursor:pointer}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(132px + env(safe-area-inset-bottom,0px));width:calc(100% - 32px);max-width:488px;background:var(--text);color:var(--bg);padding:12px 14px;border-radius:12px;font-size:.8rem;z-index:120;box-shadow:var(--shadow)}
 #toast[hidden]{display:none}
+.tkchip{display:inline-flex;align-items:center;min-height:32px;margin:6px 0 0 4px;padding:4px 12px;border-radius:16px;border:1px dashed var(--muted);background:var(--card);color:var(--muted);font-size:.72rem;font-weight:700;cursor:pointer;vertical-align:middle}
+.tkchip.has{border:1px solid var(--green);background:var(--green-l);color:var(--green)}
+#tkZoom{position:fixed;inset:0;z-index:140;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#tkZoom[hidden]{display:none}
+#tkZoom img{max-width:100vw;max-height:100vh}
+#tkZoom img.rot{max-width:none;max-height:none;width:calc(100vh - 24px);height:auto;max-height:calc(100vw - 12px);object-fit:contain;transform:rotate(90deg)}
+#tkZoom span{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;font-size:.72rem;color:#666}
+#tkView{position:fixed;inset:0;z-index:125;background:var(--bg);display:flex;flex-direction:column;max-width:520px;margin:0 auto}
+#tkView[hidden]{display:none}
+.tk-head{display:flex;align-items:flex-start;gap:10px;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 10px;border-bottom:1px solid var(--border);background:var(--card)}
+.tk-head div{flex:1}.tk-head h3{font-size:1rem}.tk-head p{font-size:.76rem;color:var(--muted)}
+.tk-head button{width:44px;height:44px;border:none;border-radius:50%;background:var(--bg);color:var(--text);font-size:1.1rem;cursor:pointer}
+#tkBody{flex:1;overflow-y:auto;padding:12px 12px 0}
+.tk-file{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:10px;margin-bottom:12px}
+.tk-file img{display:block;width:100%;background:#fff;border-radius:8px;margin-bottom:8px}
+.tk-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.74rem;color:var(--muted)}
+.tk-meta span{flex:1;min-width:120px;word-break:break-all}
+.tk-meta button{min-height:40px;padding:0 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.74rem;font-weight:600;cursor:pointer}
+.tk-meta button.del.confirm{background:#b3261e;border-color:#b3261e;color:#fff}
+.tk-empty{text-align:center;color:var(--muted);font-size:.84rem;padding:28px 12px;line-height:1.6}
+.tk-foot{padding:10px 12px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);background:var(--card)}
+.tk-add{width:100%;min-height:52px;border:none;border-radius:12px;background:var(--brand);color:#fff;font-size:.9rem;font-weight:700;cursor:pointer}
+.tkrow{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:10px 12px;margin-bottom:6px;border:none;border-radius:10px;background:var(--card);box-shadow:var(--shadow);color:var(--text);text-align:left;cursor:pointer;font:inherit}
+.tkrow div{flex:1}.tkrow strong{display:block;font-size:.82rem}.tkrow small{font-size:.72rem;color:var(--muted)}
+.tkrow em{font-style:normal;font-size:.72rem;font-weight:700;color:var(--muted)}.tkrow em.ok{color:var(--green)}
 #sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:130;display:flex;align-items:flex-end;justify-content:center}
 #sheet[hidden]{display:none}
 .sheet-box{background:var(--card);color:var(--text);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));font-size:.84rem;line-height:1.5}
@@ -209,6 +234,9 @@ a{color:var(--accent);text-decoration:none}
     <li><a href="tel:05436861463">054 3686-1463</a> — Hospital Gramado</li>
     <li><a href="tel:05436862100">054 3686-2100</a> — Turismo Gramado</li>
   </ul></div>
+  <div class="st">Meus ingressos</div>
+  <div id="tkList"></div>
+  <p class="cfg-hint">Os arquivos ficam guardados só neste celular e funcionam sem internet. Nada é enviado para o site.</p>
   <div id="fullSite"></div>
   <div class="st">Configurações</div>
   <div class="cfg-row"><label>Provedor IA</label>
@@ -241,6 +269,15 @@ a{color:var(--accent);text-decoration:none}
   <button onclick="ttsStop()" aria-label="Parar">⏹</button>
 </div>
 <div id="toast" role="status" hidden></div>
+<div id="tkView" hidden role="dialog" aria-modal="true" aria-labelledby="tkTitle">
+  <div class="tk-head"><div><h3 id="tkTitle"></h3><p id="tkSub"></p></div><button onclick="closeTickets()" aria-label="Fechar">✕</button></div>
+  <div id="tkBody"></div>
+  <div class="tk-foot">
+    <button class="tk-add" onclick="document.getElementById('tkFile').click()">＋ Anexar PDF ou foto do ingresso</button>
+    <input type="file" id="tkFile" accept="application/pdf,image/*" multiple hidden onchange="addTicketFiles(this)">
+  </div>
+</div>
+<div id="tkZoom" hidden onclick="this.hidden=true" role="dialog" aria-label="Ingresso em tela cheia"><img alt="Ingresso"><span>Toque para fechar</span></div>
 <div id="sheet" hidden><div class="sheet-box" role="dialog" aria-modal="true" aria-labelledby="sheetT">
   <h3 id="sheetT"></h3><p id="sheetP"></p>
   <div class="copy"><input id="sheetIn" readonly aria-label="Texto para copiar"><button onclick="sheetCopy()">Copiar</button></div>
@@ -296,16 +333,28 @@ const CHECKS=[
   "Conferir funcionamento: Château (dom 25), Snowland (seg 26)",
 ];
 
+// Ticket slots: files live only on this phone (IndexedDB), never in the published site.
+const TICKETS={
+  'voo-ida':{n:'✈️ Voo LATAM BSB → POA',d:'24/10 · cartão de embarque'},
+  'citral-ida':{n:'🚌 Citral POA → Gramado',d:'24/10 14:00 · poltronas 3 e 4'},
+  'hotel':{n:'🏨 Bellagio Mini Resort',d:'24 → 31/10 · Booking 5024.178.207'},
+  'snowland':{n:'❄️ Snowland',d:'26/10 · 2 ingressos'},
+  'jolimont':{n:'🍷 Jolimont + 🍺 Felsen Beer',d:'29/10 · LB32077972 · LB32078275'},
+  'nativitaten':{n:'🎄 Nativitaten',d:'29/10 20:00 · Setor Ouro'},
+  'caramau':{n:'🍷 Cara de Mau',d:'30/10 21:30 · Ambiente Porto'},
+  'citral-volta':{n:'🚌 Citral Gramado → POA',d:'31/10 12:15 · poltronas 5 e 6'},
+  'voo-volta':{n:'✈️ Voo GOL G3 1795 POA → BSB',d:'31/10 17:30 · cartão de embarque'},
+};
 // Itinerary data
 const DAYS = {
   24: {
     title:"🛬 Sábado 24/10 — Chegada",
     sub:"BSB → POA → Gramado · Check-in Bellagio",
     items:[
-      {t:"05:00",n:"Despertar + aeroporto BSB",d:"Documentos e bagagens.",c:"transport",x:"Check-in online LATAM 48h antes. Priority Pass / Dragon Pass para salas VIP no BSB.",h:"O Aeroporto de Brasília (BSB) é o 3º mais movimentado do Brasil. Inaugurado em 1957 junto com a capital."},
-      {t:"12:05",n:"✈️ Pouso em Porto Alegre",d:"Voo LATAM. Desembarque doméstico.",c:"transport",tags:["c"],x:"Ir à loja Citral Serra no desembarque doméstico até ~13:30. Salas VIP: Ambaar Club (Priority Pass), W Premium Lounge (Dragon Pass) — embarque doméstico.",h:"O Aeroporto Salgado Filho foi inaugurado em 1940. Passou por reforma após enchentes de 2024."},
-      {t:"14:00–16:30",n:"🚌 Citral → Gramado",d:"Poltronas 3-4 · Linha 0692 · ~2h15",c:"transport",tags:["c"],x:"Embarque ~14:15 no aeroporto. R$84,85×2 (pago). Paisagens lindas na subida da serra — câmera pronta!",h:"A Serra Gaúcha tem altitude média de 800m. Gramado está a 830m. A vegetação muda de planície para Mata Atlântica com araucárias."},
-      {p:"Hotel Bellagio",t:"16:30–17:30",n:"🏨 Check-in Bellagio",d:"Centro de Gramado · Booking 5024.178.207",tags:["c"],x:"Café incluso. Perguntar sobre mapa turístico e Natal Luz na recepção."},
+      {tk:"voo-ida",t:"05:00",n:"Despertar + aeroporto BSB",d:"Documentos e bagagens.",c:"transport",x:"Check-in online LATAM 48h antes. Priority Pass / Dragon Pass para salas VIP no BSB.",h:"O Aeroporto de Brasília (BSB) é o 3º mais movimentado do Brasil. Inaugurado em 1957 junto com a capital."},
+      {tk:"voo-ida",t:"12:05",n:"✈️ Pouso em Porto Alegre",d:"Voo LATAM. Desembarque doméstico.",c:"transport",tags:["c"],x:"Ir à loja Citral Serra no desembarque doméstico até ~13:30. Salas VIP: Ambaar Club (Priority Pass), W Premium Lounge (Dragon Pass) — embarque doméstico.",h:"O Aeroporto Salgado Filho foi inaugurado em 1940. Passou por reforma após enchentes de 2024."},
+      {tk:"citral-ida",t:"14:00–16:30",n:"🚌 Citral → Gramado",d:"Poltronas 3-4 · Linha 0692 · ~2h15",c:"transport",tags:["c"],x:"Embarque ~14:15 no aeroporto. R$84,85×2 (pago). Paisagens lindas na subida da serra — câmera pronta!",h:"A Serra Gaúcha tem altitude média de 800m. Gramado está a 830m. A vegetação muda de planície para Mata Atlântica com araucárias."},
+      {tk:"hotel",p:"Hotel Bellagio",t:"16:30–17:30",n:"🏨 Check-in Bellagio",d:"Centro de Gramado · Booking 5024.178.207",tags:["c"],x:"Café incluso. Perguntar sobre mapa turístico e Natal Luz na recepção."},
       {p:"Rua Coberta",t:"17:30–19:00",n:"🚶 Passeio pelo Centro",d:"Rua Coberta, Praça das Etnias, chocolates.",x:"Rua Coberta: lojas, cafés, chocolaterias. Prawer (a mais antiga!), Lugano, Caracol, Florybal — degustação gratuita.",h:"Gramado foi colonizada por alemães (1875) e italianos (1890). A tradição do chocolate começou nos anos 1970. Hoje são 50+ fábricas artesanais."},
       {p:"Rua Coberta",t:"19:30",n:"🍽️ Colosseo",d:"Italiano · ~R$90/pp · Rua Coberta",c:"meal",tags:["p"],x:"Prime 2×1. Massas e risotos. Peça vinho local (Miolo, Aurora)."},
     ]
@@ -329,7 +378,7 @@ const DAYS = {
     items:[
       {t:"8:00",n:"☕ Café reforçado",d:"Dia intenso — coma bem!"},
       {p:"Snowland",t:"9:30",n:"🚗 Uber → Snowland",d:"RS-235 Km 31 · ~15 min",c:"transport",x:"Abre 10:00. Chegar antes para lockers."},
-      {p:"Snowland",t:"10:00–16:00",n:"❄️ Snowland",d:"Neve real -5°C! Esqui, patinação, tobogã.",c:"nature",tags:["p","c"],x:"2 ingressos Prime 2×1. Roupa de neve inclusa. Leve meias grossas! Restaurante interno (~R$50-70/pp).",h:"Único parque de neve indoor das Américas (2013). Neve real a -5°C, tecnologia austríaca. 16.000m²."},
+      {tk:"snowland",p:"Snowland",t:"10:00–16:00",n:"❄️ Snowland",d:"Neve real -5°C! Esqui, patinação, tobogã.",c:"nature",tags:["p","c"],x:"2 ingressos Prime 2×1. Roupa de neve inclusa. Leve meias grossas! Restaurante interno (~R$50-70/pp).",h:"Único parque de neve indoor das Américas (2013). Neve real a -5°C, tecnologia austríaca. 16.000m²."},
       {p:"Hotel Bellagio",t:"16:30",n:"🚗 Volta ao hotel",d:"Descanso e banho quente!",c:"transport"},
       {t:"19:30",n:"🍽️ Jantar livre",d:"Mamma Tchê, Cantina 28, ou leve.",c:"meal",x:"Mamma Tchê (~R$80/pp): galeto gaúcho. Cantina 28 (~R$90/pp): massas artesanais."},
     ]
@@ -364,8 +413,8 @@ const DAYS = {
     items:[
       {t:"7:30",n:"⏰ Acordar cedo!",d:"Café reforçado às 8:00. Dia cheio."},
       {p:"Vinícola Jolimont",t:"8:45",n:"🚗 Uber → Jolimont",d:"~20 min de Gramado",c:"transport"},
-      {p:"Vinícola Jolimont",t:"9:00–10:30",n:"🍷 Tour Jolimont",d:"Ingressos comprados · combo com Felsen Beer",c:"nature",tags:["c"],x:"Combo Beer Tour Felsen + Tour Jolimont + taça de vidro, 2 pessoas. Localizadores LB32077972 e LB32078275 (ingressos no e-mail). Tour Jolimont vale das 9h às 16h45: chegar 9h para fazer primeiro. Levar documento. O ingresso LB32077972 está sem nome de visitante: se o site permitir, preencher antes.",h:"Fundada 1948 pela família Luchese (italianos). Canela, Serra Gaúcha. Merlot, Cabernet, espumantes Champenoise. Nome homenageia Château de Jolimont na Suíça."},
-      {p:"Vinícola Jolimont",t:"10:30–11:30",n:"🍺 Felsen Beer Tour",d:"No complexo da Jolimont · incluso no combo",c:"nature",tags:["c"],x:"Mesmo local da vinícola (segundo o ingresso: Vitivinícola Jolimont - Felsen Beer). Janela de visita das 10h às 17h, então dá para emendar logo após o tour do vinho. Duração estimada ~1h; confirmar na chegada. Depois de vinho e cerveja, beber água antes do Caracol.",h:"Felsen é a cervejaria que funciona junto à Jolimont, em Canela. Combina a visita de vinho com a de cerveja no mesmo endereço."},
+      {tk:"jolimont",p:"Vinícola Jolimont",t:"9:00–10:30",n:"🍷 Tour Jolimont",d:"Ingressos comprados · combo com Felsen Beer",c:"nature",tags:["c"],x:"Combo Beer Tour Felsen + Tour Jolimont + taça de vidro, 2 pessoas. Localizadores LB32077972 e LB32078275 (ingressos no e-mail). Tour Jolimont vale das 9h às 16h45: chegar 9h para fazer primeiro. Levar documento. O ingresso LB32077972 está sem nome de visitante: se o site permitir, preencher antes.",h:"Fundada 1948 pela família Luchese (italianos). Canela, Serra Gaúcha. Merlot, Cabernet, espumantes Champenoise. Nome homenageia Château de Jolimont na Suíça."},
+      {tk:"jolimont",p:"Vinícola Jolimont",t:"10:30–11:30",n:"🍺 Felsen Beer Tour",d:"No complexo da Jolimont · incluso no combo",c:"nature",tags:["c"],x:"Mesmo local da vinícola (segundo o ingresso: Vitivinícola Jolimont - Felsen Beer). Janela de visita das 10h às 17h, então dá para emendar logo após o tour do vinho. Duração estimada ~1h; confirmar na chegada. Depois de vinho e cerveja, beber água antes do Caracol.",h:"Felsen é a cervejaria que funciona junto à Jolimont, em Canela. Combina a visita de vinho com a de cerveja no mesmo endereço."},
       {p:"Parque do Caracol",t:"11:30",n:"🚗 Uber → Caracol",d:"~15 min",c:"transport"},
       {p:"Parque do Caracol",t:"11:45–13:30",n:"🌊 Parque do Caracol",d:"Cascata 130m, teleférico, trilhas",c:"nature",tags:["w"],x:"Elevador panorâmico (80m), teleférico, Trilha da Cascata (700 degraus). ~R$60-190/pp. FECHA TER/QUA — por isso quinta!",h:"Cascata descoberta por colonos alemães em 1912. Nome vem do formato espiralado do rio. Mata Atlântica com araucárias centenárias. 800 mil visitantes/ano."},
       {p:"Container Bistrot",t:"13:45",n:"🚗 Uber → Centro Canela",d:"~10 min",c:"transport"},
@@ -374,7 +423,7 @@ const DAYS = {
       {p:"Hotel Bellagio",t:"16:30",n:"🚗 Volta a Gramado",d:"~30 min. Hotel, descanso (sem Skyglass, dá para voltar às 15:15).",c:"transport"},
       {t:"18:30",n:"🥪 Lanche leve",d:"Algo rápido antes do show.",c:"meal"},
       {p:"Serra Park",t:"19:15",n:"🚗 Uber → Serra Park",d:"~10 min. Chegar 19:30.",c:"transport"},
-      {p:"Serra Park",t:"20:00–21:30",n:"🎄 Nativitaten",d:"Espetáculo principal · Setor Ouro",tags:["c"],x:"Música ao vivo, projeções a laser, pirotecnia, neve artificial. ~1h30. Leve agasalho (8-10°C à noite!).",h:"Herdeiro do 'Grande Desfile de Natal'. Desde 2017 no Serra Park, investimento milionário em efeitos especiais."},
+      {tk:"nativitaten",p:"Serra Park",t:"20:00–21:30",n:"🎄 Nativitaten",d:"Espetáculo principal · Setor Ouro",tags:["c"],x:"Música ao vivo, projeções a laser, pirotecnia, neve artificial. ~1h30. Leve agasalho (8-10°C à noite!).",h:"Herdeiro do 'Grande Desfile de Natal'. Desde 2017 no Serra Park, investimento milionário em efeitos especiais."},
       {p:"Hotel Bellagio",t:"21:45",n:"Uber de volta. Descanso!",d:"Dia intenso. Merecido."},
     ]
   },
@@ -388,7 +437,7 @@ const DAYS = {
       {p:"Lago Negro",t:"14:30–17:00",n:"🌄 Passeio livre",d:"Lago, mirantes, despedida.",x:"Mirante do Vale do Quilombo: pôr-do-sol espetacular. Le Jardin: lavandas (~R$60/pp, checar Prime). Lago Negro: pedalinhos (~R$30-50/casal).",h:"O Lago Negro (1953) surgiu após incêndio. Mudas de hortênsias vieram da Floresta Negra alemã. Águas escuras pelo reflexo das árvores."},
       {t:"18:00",n:"🧥 Arrumar-se",d:"Último jantar especial!"},
       {p:"Rua Coberta",t:"20:30",n:"🚶 Caminhar ao Centro",d:"Última vez pelo Natal Luz."},
-      {p:"Cara de Mau",t:"21:30",n:"🍷 Cara de Mau",d:"Ambiente Porto · Reserva confirmada",c:"meal",tags:["c"],x:"Reserva 21:30, 2 adultos. Carnes nobres (tomahawk, ancho, costela), risotos. Carta ampla de vinhos. ~R$130-160/pp. Verificar Prime.",h:"Referência em carnes na Serra Gaúcha. 'Gaúcho bravo'. Ambiente Porto: tijolos aparentes, iluminação intimista."},
+      {tk:"caramau",p:"Cara de Mau",t:"21:30",n:"🍷 Cara de Mau",d:"Ambiente Porto · Reserva confirmada",c:"meal",tags:["c"],x:"Reserva 21:30, 2 adultos. Carnes nobres (tomahawk, ancho, costela), risotos. Carta ampla de vinhos. ~R$130-160/pp. Verificar Prime.",h:"Referência em carnes na Serra Gaúcha. 'Gaúcho bravo'. Ambiente Porto: tijolos aparentes, iluminação intimista."},
     ]
   },
   31: {
@@ -398,8 +447,8 @@ const DAYS = {
       {t:"8:00",n:"☕ Último café no Bellagio",d:"Aproveite! Último com vista para a serra."},
       {t:"9:00–11:00",n:"🧳 Malas + check-out",d:"Chocolates/vinhos na mala despachada!",x:"Checklist: armários, banheiro, embalar chocolates/vinhos (proteção), líquidos >100ml na despachada, carregar celulares."},
       {t:"11:00–12:00",n:"🚶 Último passeio",d:"Despedida, últimas fotos."},
-      {p:"Rodoviária Gramado",t:"12:15",n:"🚌 Citral → POA",d:"Poltronas 5-6 · Linha 0962 · Chega 14:45",c:"transport",tags:["c"],x:"Rodoviária Gramado, 12:15 pontual. R$84,85×2 (pago)."},
-      {t:"14:45–17:30",n:"✈️ Aeroporto POA",d:"Check-in, mala, sala VIP, embarque.",x:"GOL G3 1795, 17:30. Salas: Ambaar Club (Priority Pass) / W Premium Lounge (Dragon Pass). LATAM Platinum NÃO funciona voando GOL."},
+      {tk:"citral-volta",p:"Rodoviária Gramado",t:"12:15",n:"🚌 Citral → POA",d:"Poltronas 5-6 · Linha 0962 · Chega 14:45",c:"transport",tags:["c"],x:"Rodoviária Gramado, 12:15 pontual. R$84,85×2 (pago)."},
+      {tk:"voo-volta",t:"14:45–17:30",n:"✈️ Aeroporto POA",d:"Check-in, mala, sala VIP, embarque.",x:"GOL G3 1795, 17:30. Salas: Ambaar Club (Priority Pass) / W Premium Lounge (Dragon Pass). LATAM Platinum NÃO funciona voando GOL."},
       {t:"17:30",n:"✈️ Decolagem!",d:"POA → BSB. Até a próxima, Serra! 🏔️",c:"transport",tags:["c"]},
     ]
   }
@@ -456,7 +505,8 @@ function renderDays(){
       const acts = it.p ? '<div class="acts"></div>' : '';
       const hint = it.p && it.c==='transport' ? ' <span class="tg tg-f">🚗 Toque: Uber e rota</span>' : '';
       const detail = (it.x||it.h||it.p) ? `<div class="tx">${acts}${it.x?it.x.replace(/\n/g,'<br>'):''}${it.h?`<div class="hist">📜 ${it.h}</div>`:''}</div>` : '';
-      html += `<div class="ti ${cls}" data-i="${i}" onclick="tog(this,event)"><div class="tt">${it.t}</div><div class="tn">${it.n}</div><div class="td">${it.d}</div>${tags}${hint}${detail}</div>`;
+      const tk = it.tk ? `<button class="tkchip" data-slot="${it.tk}" onclick="openTickets('${it.tk}')">🎫 Ingresso</button>` : '';
+      html += `<div class="ti ${cls}" data-i="${i}" onclick="tog(this,event)"><div class="tt">${it.t}</div><div class="tn">${it.n}</div><div class="td">${it.d}</div>${tags}${hint}${tk}${detail}</div>`;
     });
     html += '</div></div>';
   }
@@ -1280,6 +1330,171 @@ function addBubble(text,type,src){
 }
 
 // ===========================
+// TICKETS (IndexedDB on the device)
+// ===========================
+let tkDBp=null;
+function tkDB(){
+  if(!tkDBp)tkDBp=new Promise((res,rej)=>{
+    let rq;
+    try{rq=indexedDB.open('gramado-tickets',1);}catch(e){return rej(e);}
+    rq.onupgradeneeded=()=>{const st=rq.result.createObjectStore('files',{keyPath:'id',autoIncrement:true});st.createIndex('slot','slot');};
+    rq.onsuccess=()=>res(rq.result);
+    rq.onerror=()=>rej(rq.error);
+  });
+  return tkDBp;
+}
+async function tkTx(mode,fn){
+  const db=await tkDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction('files',mode),st=tx.objectStore('files');
+    const out=fn(st);
+    tx.oncomplete=()=>res(out&&out.result!==undefined?out.result:undefined);
+    tx.onerror=()=>rej(tx.error);tx.onabort=()=>rej(tx.error||new Error('abort'));
+  });
+}
+const tkAll=()=>tkTx('readonly',st=>st.getAll());
+const tkBySlot=slot=>tkTx('readonly',st=>st.index('slot').getAll(slot));
+let tkCounts={};
+async function refreshTicketBadges(){
+  try{
+    const all=await tkAll();
+    tkCounts={};all.forEach(f=>{tkCounts[f.slot]=(tkCounts[f.slot]||0)+1;});
+  }catch(e){tkCounts={};}
+  document.querySelectorAll('.tkchip').forEach(b=>{
+    const n=tkCounts[b.dataset.slot]||0;
+    b.classList.toggle('has',n>0);
+    b.textContent=n?`🎫 Ver ingresso${n>1?` (${n})`:''}`:'🎫 Anexar ingresso';
+  });
+  document.getElementById('tkList').innerHTML=Object.entries(TICKETS).map(([id,t])=>{
+    const n=tkCounts[id]||0;
+    return `<button class="tkrow" onclick="openTickets('${id}')"><div><strong>${t.n}</strong><small>${t.d}</small></div><em class="${n?'ok':''}">${n?`✓ ${n} arquivo${n>1?'s':''}`:'anexar'}</em></button>`;
+  }).join('');
+}
+
+// pdf.js is loaded only when a PDF is attached; pages become PNGs so the ticket shows instantly offline.
+let pdfjsP=null;
+function loadPdfjs(){
+  if(!pdfjsP)pdfjsP=new Promise((res,rej)=>{
+    const sc=document.createElement('script');sc.src='./lib/pdf.min.js';
+    sc.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='./lib/pdf.worker.min.js';res(window.pdfjsLib);};
+    sc.onerror=()=>{pdfjsP=null;rej(new Error('Não consegui carregar o leitor de PDF. Conecte-se à internet e tente de novo.'));};
+    document.head.appendChild(sc);
+  });
+  return pdfjsP;
+}
+async function pdfPages(file){
+  const lib=await loadPdfjs();
+  const pdf=await lib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+  const out=[];
+  for(let i=1;i<=Math.min(pdf.numPages,6);i++){
+    const page=await pdf.getPage(i),vp=page.getViewport({scale:1});
+    const scale=Math.min(3,1400/vp.width),v=page.getViewport({scale});
+    const c=document.createElement('canvas');c.width=Math.round(v.width);c.height=Math.round(v.height);
+    const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+    await page.render({canvasContext:ctx,viewport:v}).promise;
+    const cut=trimWhite(c);
+    if(cut)out.push(await new Promise(r=>cut.toBlob(r,'image/png')));
+  }
+  return out;
+}
+
+// Crop to the main block of the page (the ticket and its QR code), dropping blank
+// margins and stray footer lines, so the code fills the screen width.
+function trimWhite(c){
+  const w=c.width,h=c.height,d=c.getContext('2d').getImageData(0,0,w,h).data;
+  const ink=new Array(h).fill(0);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x+=2){const k=(y*w+x)*4;if(d[k]<235||d[k+1]<235||d[k+2]<235)ink[y]++;}
+  // bands of rows with ink, split by gaps taller than 60 px
+  const bands=[];let cur=null,gap=0;
+  for(let y=0;y<h;y++){
+    if(ink[y]){if(!cur||gap>60){cur={t:y,b:y,sum:0};bands.push(cur);}cur.b=y;cur.sum+=ink[y];gap=0;}
+    else gap++;
+  }
+  if(!bands.length)return null; // blank page
+  const best=bands.reduce((m,x)=>x.sum>m.sum?x:m);
+  let left=w,right=-1;
+  for(let y=best.t;y<=best.b;y++)for(let x=0;x<w;x+=2){const k=(y*w+x)*4;if(d[k]<235||d[k+1]<235||d[k+2]<235){if(x<left)left=x;if(x>right)right=x;}}
+  const pad=16,top=Math.max(0,best.t-pad),bottom=Math.min(h-1,best.b+pad);
+  left=Math.max(0,left-pad);right=Math.min(w-1,right+pad);
+  const o=document.createElement('canvas');o.width=right-left+1;o.height=bottom-top+1;
+  o.getContext('2d').drawImage(c,left,top,o.width,o.height,0,0,o.width,o.height);
+  return o;
+}
+let tkSlot=null,tkUrls=[];
+function freeTkUrls(){tkUrls.forEach(u=>URL.revokeObjectURL(u));tkUrls=[];}
+function tkUrl(blob){const u=URL.createObjectURL(blob);tkUrls.push(u);return u;}
+async function openTickets(slot){
+  tkSlot=slot;
+  const t=TICKETS[slot];
+  document.getElementById('tkTitle').textContent=t.n;
+  document.getElementById('tkSub').textContent=t.d;
+  document.getElementById('tkView').hidden=false;
+  document.body.style.overflow='hidden';
+  await renderTickets();
+}
+// Full screen for the gate; a wide ticket is turned sideways to use the phone's height.
+function zoomTicket(src,w,h){
+  const z=document.getElementById('tkZoom'),im=z.querySelector('img');
+  im.src=src;im.className=w>h*1.3?'rot':'';
+  z.hidden=false;
+}
+function closeTickets(){
+  document.getElementById('tkView').hidden=true;
+  document.body.style.overflow='';
+  freeTkUrls();
+}
+async function renderTickets(){
+  const body=document.getElementById('tkBody');
+  freeTkUrls();
+  let files;
+  try{files=await tkBySlot(tkSlot);}
+  catch(e){body.innerHTML='<div class="tk-empty">Este navegador não deixa guardar arquivos aqui. Abra o guia no Chrome (ou Safari) para guardar os ingressos.</div>';return;}
+  if(!files.length){
+    body.innerHTML='<div class="tk-empty">🎫 Nenhum ingresso anexado.<br>Toque no botão abaixo e escolha o PDF (do e-mail ou Downloads) ou um print do ingresso.<br><br>Ele fica guardado só neste celular e abre mesmo sem internet.</div>';
+    return;
+  }
+  body.textContent='';
+  files.sort((a,b)=>a.added-b.added).forEach(f=>{
+    const box=document.createElement('div');box.className='tk-file';
+    const imgs=f.pages&&f.pages.length?f.pages:(f.type.startsWith('image/')?[f.blob]:[]);
+    imgs.forEach((bl,i)=>{const im=document.createElement('img');im.alt=`${f.name} · página ${i+1}`;im.src=tkUrl(bl);im.onclick=()=>zoomTicket(im.src,im.naturalWidth,im.naturalHeight);box.appendChild(im);});
+    const meta=document.createElement('div');meta.className='tk-meta';
+    const nm=document.createElement('span');nm.textContent=f.name;meta.appendChild(nm);
+    const op=document.createElement('button');op.textContent='Abrir original';
+    op.onclick=()=>{const u=tkUrl(f.blob);const w=window.open(u,'_blank');if(!w){const a=document.createElement('a');a.href=u;a.download=f.name;a.click();}};
+    const del=document.createElement('button');del.className='del';del.textContent='Remover';
+    del.onclick=async()=>{
+      if(!del.classList.contains('confirm')){del.classList.add('confirm');del.textContent='Toque de novo para remover';setTimeout(()=>{del.classList.remove('confirm');del.textContent='Remover';},4000);return;}
+      await tkTx('readwrite',st=>st.delete(f.id));await renderTickets();refreshTicketBadges();
+    };
+    meta.appendChild(op);meta.appendChild(del);box.appendChild(meta);
+    body.appendChild(box);
+  });
+  body.insertAdjacentHTML('afterbegin','<p class="go-note" style="margin:0 0 8px">Na entrada: toque no ingresso para abrir em tela cheia e aumente o brilho da tela.</p>');
+}
+async function addTicketFiles(input){
+  const files=[...input.files];input.value='';
+  if(!files.length||!tkSlot)return;
+  const slot=tkSlot;
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+  for(const f of files){
+    toast(`Guardando ${f.name}…`,8000);
+    try{
+      const isPdf=f.type==='application/pdf'||/\.pdf$/i.test(f.name);
+      if(!isPdf&&!f.type.startsWith('image/'))throw new Error('Use um PDF ou uma imagem.');
+      const pages=isPdf?await pdfPages(f):[];
+      const rec={slot,name:f.name,type:isPdf?'application/pdf':f.type,size:f.size,added:Date.now(),blob:f,pages};
+      await tkTx('readwrite',st=>st.add(rec));
+      toast(`✓ ${f.name} guardado neste celular.`,3000);
+    }catch(e){
+      toast(`Não consegui guardar ${f.name}: ${e.message||e}`,7000);
+    }
+  }
+  if(tkSlot===slot&&!document.getElementById('tkView').hidden)await renderTickets();
+  refreshTicketBadges();
+}
+
+// ===========================
 // INIT
 // ===========================
 importHash();
@@ -1290,6 +1505,7 @@ renderChk();
 renderLocPick();
 loadConfig();
 updateAIStatus();
+refreshTicketBadges();
 if(!onSite&&(!geoAllowed||!micAllowed))document.getElementById('fullSite').innerHTML='<div class="st">Versão completa</div>'+handoffHTML('GPS e voz');
 
 // Service Worker
