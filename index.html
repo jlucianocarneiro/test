@@ -683,7 +683,7 @@ function getLoc(){
     const lat=p.coords.latitude,lng=p.coords.longitude,near=findN(lat,lng);
     locMsg(`Perto de: ${near.name}`,`${near.dist} de distância · precisão ~${fD(p.coords.accuracy/1000)}`);
     document.getElementById('locSel').value='';
-    here={lat,lng,label:'GPS'};
+    here={lat,lng,label:'GPS',acc:p.coords.accuracy,ts:Date.now()};
     renderDist(lat,lng);
   };
   const fail=err=>{
@@ -887,11 +887,43 @@ function updateAIStatus(){
 
 // Where the traveller is, for context in prompts
 let here=null;
+// Ask the phone for a position before every AI question. Never blocks for long:
+// a slow fix or an unanswered permission prompt falls back to the last known place.
+let locAsk=null,locHintShown=false;
+function freshLocation(){
+  if(locAsk)return locAsk;
+  if(!navigator.geolocation||!geoAllowed||!window.isSecureContext)return Promise.resolve(here);
+  locAsk=new Promise(res=>{
+    const done=()=>{clearTimeout(t);locAsk=null;res(here);};
+    const t=setTimeout(done,7000);
+    navigator.geolocation.getCurrentPosition(p=>{
+      here={lat:p.coords.latitude,lng:p.coords.longitude,label:'GPS',acc:p.coords.accuracy,ts:Date.now()};
+      document.getElementById('locSel').value='';
+      if(document.getElementById('sec-local').classList.contains('active'))renderDist(here.lat,here.lng);
+      done();
+    },done,{enableHighAccuracy:false,timeout:6000,maximumAge:60000});
+  });
+  return locAsk;
+}
+function nearestList(n){
+  return POINTS.map(p=>({p,d:hav(here.lat,here.lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d).slice(0,n);
+}
+function locLabel(){
+  if(!here)return '📍 sem localização';
+  const n=nearestList(1)[0];
+  return here.label==='GPS'?`📍 GPS · perto de ${n.p.name}`:`📍 ${here.label} (escolhido)`;
+}
 function placeContext(){
   const now=new Date(),d=now.getDate();
   const inTrip=now.getFullYear()===2026&&now.getMonth()===9&&d>=24&&d<=31;
-  let s=here?`Local atual do viajante: ${here.label} (perto de ${findN(here.lat,here.lng).name}).`
-    :'Local atual do viajante: não informado (provavelmente Gramado ou Canela).';
+  let s;
+  if(here){
+    const age=here.ts?Math.round((Date.now()-here.ts)/60000):null;
+    const src=here.label==='GPS'
+      ?`GPS do celular${age!==null?(age<1?' agora':` há ${age} min`):''}${here.acc?`, precisão ~${fD(here.acc/1000)}`:''}`
+      :`ponto escolhido pelo viajante na lista: ${here.label}`;
+    s=`LOCALIZAÇÃO DO VIAJANTE (${src}): ${here.lat.toFixed(5)}, ${here.lng.toFixed(5)}. Pontos do roteiro mais próximos: ${nearestList(3).map(x=>`${x.p.name} a ${fD(x.d)}`).join('; ')}. Use essa localização sempre que a pergunta depender de onde ele está (o que tem perto, como chegar, quanto falta, onde comer). Para deslocamentos acima de 1,2 km, sugira Uber; abaixo, ir a pé.`;
+  } else s='LOCALIZAÇÃO DO VIAJANTE: indisponível agora (GPS negado ou bloqueado). Provavelmente está em Gramado ou Canela; se a pergunta depender do local, peça para ele dizer onde está.';
   if(inTrip){
     const nowMin=now.getHours()*60+now.getMinutes();
     let cur=null;DAYS[d].items.forEach(it=>{const m=startMin(it.t);if(m!==null&&m<=nowMin)cur=it;});
@@ -971,9 +1003,12 @@ function setBusy(b){
 
 async function askAI(q,image,speakIt){
   const engine=aiEngine();
-  const bubble=addBubble(image?'🔎 Analisando a foto…':'Pensando…','ai','');
+  const bubble=addBubble('📍 Verificando sua localização…','ai','');
   setBusy(true);
   try{
+    await freshLocation();
+    if(!here&&!locHintShown){locHintShown=true;toast('📍 Sem localização: permita o acesso ao GPS (ou escolha o local na aba Local) para respostas sobre onde vocês estão.',6000);}
+    setBubble(bubble,image?'🔎 Analisando a foto…':'Pensando…',locLabel());
     let text,src;
     if(engine==='sample'){
       const opts={modelTier:'default',cache:false,onText:({text})=>setBubble(bubble,text,'Claude · escrevendo…')};
@@ -987,7 +1022,7 @@ async function askAI(q,image,speakIt){
       text=await callAPI([...chatHistory.slice(-8),{role:'user',content}],image);
       src=engine==='anthropic'?'Claude API':'OpenAI API';
     }
-    setBubble(bubble,text,src,true);
+    setBubble(bubble,text,`${src} · ${locLabel()}`,true);
     chatHistory.push({role:'user',content:image?`[Foto enviada] ${q||'O que é isto?'}`:q},{role:'assistant',content:text});
     if(speakIt)speak(text);
   }catch(e){
@@ -1003,6 +1038,15 @@ async function askAI(q,image,speakIt){
   }
 }
 
+const NEARBY_RE=/onde (eu )?estou|onde estamos|perto (daqui|de mim|de nos)|aqui perto|mais proxim|como (eu )?cheg|quanto (falta|tempo)|distancia/;
+function nearbyAnswer(){
+  if(!here)return 'Não consegui sua localização agora. Ligue a localização do celular e permita o acesso, ou escolha onde vocês estão na aba Local.';
+  const list=nearestList(4);
+  const first=list[0];
+  let a=here.label==='GPS'?`Pelo GPS, vocês estão perto de ${first.p.name} (${fD(first.d)}).`:`Vocês marcaram que estão em ${here.label}.`;
+  a+=' Pontos do roteiro mais próximos: '+list.map(x=>`${x.p.name}, ${fD(x.d)} (${x.d<WALK_KM?'a pé, uns '+walkMin(x.d)+' min':'melhor de Uber'})`).join('; ')+'.';
+  return a+' Na aba Local há os botões de rota e de Uber para cada lugar.';
+}
 async function sendChat(fromVoice){
   const input=document.getElementById('chatIn');
   const q=input.value.trim();
@@ -1014,6 +1058,16 @@ async function sendChat(fromVoice){
 
   if(aiEngine()!=='local')return askAI(q,null,speakIt);
 
+  if(NEARBY_RE.test(q.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase())){
+    const b=addBubble('📍 Verificando sua localização…','ai','');
+    setBusy(true);
+    try{await freshLocation();}finally{setBusy(false);}
+    const a=nearbyAnswer();
+    setBubble(b,a,`IA local · ${locLabel()}`,true);
+    chatHistory.push({role:'user',content:q},{role:'assistant',content:a});
+    if(speakIt)speak(a);
+    return;
+  }
   const local=localAI(q);
   if(local){
     setBubble(addBubble('','ai'),local,'IA local · sem custo',true);
