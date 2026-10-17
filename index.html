@@ -1467,7 +1467,9 @@ async function renderTickets(){
       if(!del.classList.contains('confirm')){del.classList.add('confirm');del.textContent='Toque de novo para remover';setTimeout(()=>{del.classList.remove('confirm');del.textContent='Remover';},4000);return;}
       await tkTx('readwrite',st=>st.delete(f.id));await renderTickets();refreshTicketBadges();
     };
-    meta.appendChild(op);meta.appendChild(del);box.appendChild(meta);
+    // The Claude viewer blocks downloads; the rendered pages above are what counts there.
+    if(!inSandbox)meta.appendChild(op);
+    meta.appendChild(del);box.appendChild(meta);
     body.appendChild(box);
   });
   body.insertAdjacentHTML('afterbegin','<p class="go-note" style="margin:0 0 8px">Na entrada: toque no ingresso para abrir em tela cheia e aumente o brilho da tela.</p>');
