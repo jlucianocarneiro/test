@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#8b2635">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,12 +11,12 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <title>Guia Gramado 2026</title>
 <style>
-:root{--bg:#faf8f5;--card:#fff;--text:#2c2420;--muted:#7a6e64;--accent:#8b2635;--accent-l:#f3e8ea;--green:#2d6a4f;--green-l:#e8f5ee;--border:#e8e2dc;--shadow:0 2px 12px rgba(44,36,32,.08);--r:14px;--gold:#b8860b;--gold-l:#fdf6e3;--blue:#2563eb;--blue-l:#eff6ff;--chat-user:#e8f5ee;--chat-ai:#f3e8ea}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1614;--card:#262220;--text:#e8e0d8;--muted:#9a8e84;--accent:#d4606e;--accent-l:#3a2028;--green:#52b788;--green-l:#1a2e22;--border:#3a3430;--shadow:0 2px 12px rgba(0,0,0,.3);--gold:#daa520;--gold-l:#2a2410;--blue:#60a5fa;--blue-l:#1e2a3a;--chat-user:#1a2e22;--chat-ai:#3a2028}}
-:root[data-theme="dark"]{--bg:#1a1614;--card:#262220;--text:#e8e0d8;--muted:#9a8e84;--accent:#d4606e;--accent-l:#3a2028;--green:#52b788;--green-l:#1a2e22;--border:#3a3430;--shadow:0 2px 12px rgba(0,0,0,.3);--gold:#daa520;--gold-l:#2a2410;--blue:#60a5fa;--blue-l:#1e2a3a;--chat-user:#1a2e22;--chat-ai:#3a2028}
+:root{--brand:#8b2635;--bg:#faf8f5;--card:#fff;--text:#2c2420;--muted:#7a6e64;--accent:#8b2635;--accent-l:#f3e8ea;--green:#2d6a4f;--green-l:#e8f5ee;--border:#e8e2dc;--shadow:0 2px 12px rgba(44,36,32,.08);--r:14px;--gold:#8a6100;--gold-l:#fdf6e3;--blue:#2563eb;--blue-l:#eff6ff;--chat-user:#e8f5ee;--chat-ai:#f3e8ea}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1614;--card:#262220;--text:#e8e0d8;--muted:#9a8e84;--accent:#e07a86;--accent-l:#3a2028;--green:#52b788;--green-l:#1a2e22;--border:#3a3430;--shadow:0 2px 12px rgba(0,0,0,.3);--gold:#daa520;--gold-l:#2a2410;--blue:#60a5fa;--blue-l:#1e2a3a;--chat-user:#1a2e22;--chat-ai:#3a2028}}
+:root[data-theme="dark"]{--bg:#1a1614;--card:#262220;--text:#e8e0d8;--muted:#9a8e84;--accent:#e07a86;--accent-l:#3a2028;--green:#52b788;--green-l:#1a2e22;--border:#3a3430;--shadow:0 2px 12px rgba(0,0,0,.3);--gold:#daa520;--gold-l:#2a2410;--blue:#60a5fa;--blue-l:#1e2a3a;--chat-user:#1a2e22;--chat-ai:#3a2028}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;max-width:520px;margin:0 auto;padding-bottom:72px;overflow-x:hidden}
-header{background:linear-gradient(135deg,var(--accent) 0%,#6b1d2a 100%);color:#fff;padding:24px 16px 14px;text-align:center}
+header{background:linear-gradient(135deg,var(--brand) 0%,#6b1d2a 100%);color:#fff;padding:24px 16px 14px;text-align:center}
 header h1{font-size:1.3rem;font-weight:700}
 header p{font-size:.78rem;opacity:.85;margin-top:2px}
 #wBanner{background:rgba(255,255,255,.15);backdrop-filter:blur(6px);border-radius:10px;padding:8px 12px;margin:10px 0 0;font-size:.8rem;display:flex;align-items:center;gap:8px;justify-content:center}
@@ -45,10 +45,12 @@ header p{font-size:.78rem;opacity:.85;margin-top:2px}
 .tg-c{background:var(--green-l);color:var(--green)}
 .tg-w{background:var(--accent-l);color:var(--accent)}
 .tg-f{background:var(--blue-l);color:var(--blue)}
+.tg-now{background:var(--brand);color:#fff;vertical-align:1px;margin-top:0}
+.ti.now{box-shadow:0 0 0 2px var(--accent),var(--shadow)}
 .tx{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:.78rem;color:var(--muted);line-height:1.6}
 .tx.open{display:block}
 .tx strong{color:var(--text)}
-.hist{font-style:italic;margin-top:6px;padding:8px;background:var(--accent-l);border-radius:8px;font-size:.76rem}
+.hist{color:var(--text);font-style:italic;margin-top:6px;padding:8px;background:var(--accent-l);border-radius:8px;font-size:.76rem}
 .sec{display:none;padding:14px}.sec.active{display:block}
 .ic{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
 .ic h3{font-size:.85rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
@@ -66,9 +68,11 @@ a{color:var(--accent);text-decoration:none}
 #locS .em{font-size:1.8rem;margin-bottom:6px}
 #locS p{font-size:.8rem;color:var(--muted)}
 #locS .pl{font-size:.95rem;font-weight:700;color:var(--text)}
-.locBtn{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:.88rem;font-weight:600;cursor:pointer;margin-bottom:14px}
+.locBtn{width:100%;min-height:48px;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:var(--r);font-size:.88rem;font-weight:600;cursor:pointer;margin-bottom:14px}
 .di{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--card);border-radius:10px;margin-bottom:6px;box-shadow:var(--shadow)}
-.di .dn{font-size:.82rem;font-weight:600}.di .dv{font-size:.76rem;color:var(--accent);font-weight:600}
+.di{flex-wrap:wrap;gap:6px}.di .dn{font-size:.82rem;font-weight:600;flex:1}.di .dv{font-size:.76rem;color:var(--accent);font-weight:700}
+.go{display:flex;gap:6px;width:100%}
+.go a{flex:1;display:flex;align-items:center;justify-content:center;min-height:40px;border-radius:10px;font-size:.74rem;font-weight:600;border:1px solid var(--border);color:var(--text);background:var(--bg)}
 /* Checklist */
 .ci{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--card);border-radius:10px;margin-bottom:6px;box-shadow:var(--shadow);font-size:.82rem;cursor:pointer}
 .cb{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:1px}
@@ -76,17 +80,29 @@ a{color:var(--accent);text-decoration:none}
 .ci.done .cb::after{content:'✓';font-size:.72rem}
 .ci.done .ct{text-decoration:line-through;color:var(--muted)}
 /* Chat */
-.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 140px)}
-.chat-msgs{flex:1;overflow-y:auto;padding:8px 0}
+.chat-msgs{padding:8px 0 76px}
 .chat-bubble{max-width:85%;padding:10px 14px;border-radius:16px;margin-bottom:8px;font-size:.82rem;line-height:1.5;word-wrap:break-word}
 .chat-bubble.user{background:var(--chat-user);margin-left:auto;border-bottom-right-radius:4px}
 .chat-bubble.ai{background:var(--chat-ai);margin-right:auto;border-bottom-left-radius:4px}
 .chat-bubble .src{font-size:.68rem;color:var(--muted);margin-top:4px;font-style:italic}
-.chat-input-wrap{display:flex;gap:8px;padding:8px 0}
-.chat-input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:24px;font-size:.85rem;background:var(--card);color:var(--text);outline:none}
+.chat-input-wrap{display:flex;gap:8px;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(58px + env(safe-area-inset-bottom,0px));width:100%;max-width:520px;padding:8px 12px;background:var(--bg);border-top:1px solid var(--border);z-index:95}
+.chat-input{flex:1;min-width:0;min-height:44px;padding:10px 14px;font-size:16px;border:1px solid var(--border);border-radius:24px;font-size:.85rem;background:var(--card);color:var(--text);outline:none}
 .chat-input:focus{border-color:var(--accent)}
-.chat-send{width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.chat-send:disabled{opacity:.4}
+.chat-send{width:44px;height:44px;flex-shrink:0;border-radius:50%;background:var(--brand);color:#fff;border:none;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.chat-send:disabled,.chat-tool:disabled{opacity:.4}
+.chat-tool{width:44px;height:44px;flex-shrink:0;border-radius:50%;border:1px solid var(--border);background:var(--card);font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.chat-tool.rec{background:var(--brand);border-color:var(--brand);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(139,38,53,.25)}}
+.chat-input-wrap{align-items:center;gap:6px}
+.ai-status{font-size:.7rem;color:var(--muted);text-align:center;padding:2px 0 6px}
+.chat-bubble img.shot{display:block;width:100%;max-width:240px;border-radius:10px;margin-bottom:6px}
+.chat-bubble .say{display:inline-flex;align-items:center;gap:4px;margin-top:8px;min-height:36px;padding:4px 12px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:.74rem;font-weight:600;cursor:pointer}
+#ttsBar{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));width:calc(100% - 24px);max-width:496px;display:flex;align-items:center;gap:8px;background:var(--brand);color:#fff;border-radius:14px;padding:6px 8px 6px 14px;box-shadow:0 4px 18px rgba(0,0,0,.25);z-index:110}
+#ttsBar[hidden]{display:none}
+#ttsBar .tts-lb{flex:1;font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ttsBar button{width:44px;height:44px;border:none;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:1rem;cursor:pointer}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(132px + env(safe-area-inset-bottom,0px));width:calc(100% - 32px);max-width:488px;background:var(--text);color:var(--bg);padding:12px 14px;border-radius:12px;font-size:.8rem;z-index:120;box-shadow:var(--shadow)}
+#toast[hidden]{display:none}
 /* Settings */
 .cfg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card);border-radius:10px;margin-bottom:8px;box-shadow:var(--shadow)}
 .cfg-row label{font-size:.82rem;font-weight:600}
@@ -103,14 +119,14 @@ a{color:var(--accent);text-decoration:none}
 
 <header>
   <h1>🎄 Guia Gramado 2026</h1>
-  <p>24–31 Out · Roteiro Interativo</p>
-  <div id="wBanner"><span id="wIcon">🌤️</span><span id="wText">Carregando clima…</span><button id="wRetry" style="display:none;background:rgba(255,255,255,.25);border:none;color:#fff;padding:3px 10px;border-radius:8px;font-size:.72rem;font-weight:600;cursor:pointer;margin-left:4px" onclick="fetchWeather()">↻ Tentar</button></div>
+  <p id="hdrSub">24–31 Out · Roteiro Interativo</p>
+  <div id="wBanner"><span id="wIcon">🌤️</span><span id="wText">Carregando clima…</span><button id="wRetry" style="display:none;background:rgba(255,255,255,.25);border:none;color:#fff;min-height:36px;padding:6px 12px;border-radius:8px;font-size:.72rem;font-weight:600;cursor:pointer;margin-left:4px" onclick="weatherRetries=0;fetchWeather()">↻ Tentar</button></div>
 </header>
 
 <div class="tab-bar" id="tabBar">
-  <button class="tb" data-day="24" onclick="showDay(24)">Sex 24</button>
-  <button class="tb" data-day="25" onclick="showDay(25)">Sáb 25</button>
-  <button class="tb" data-day="26" onclick="showDay(26)">Dom 26</button>
+  <button class="tb" data-day="24" onclick="showDay(24)">Sáb 24</button>
+  <button class="tb" data-day="25" onclick="showDay(25)">Dom 25</button>
+  <button class="tb" data-day="26" onclick="showDay(26)">Seg 26</button>
   <button class="tb" data-day="27" onclick="showDay(27)">Ter 27</button>
   <button class="tb" data-day="28" onclick="showDay(28)">Qua 28</button>
   <button class="tb" data-day="29" onclick="showDay(29)">Qui 29</button>
@@ -124,12 +140,16 @@ a{color:var(--accent);text-decoration:none}
 <!-- ============ CHAT ============ -->
 <div id="sec-chat" class="sec">
   <div class="chat-wrap">
+    <div class="ai-status" id="aiStatus">IA local · sem custo</div>
     <div class="chat-msgs" id="chatMsgs">
-      <div class="chat-bubble ai">Olá! 👋 Sou seu guia virtual de Gramado. Pergunte sobre qualquer ponto turístico, restaurante, história local ou dica prática!<div class="src">IA local · sem custo</div></div>
+      <div class="chat-bubble ai">Olá! 👋 Sou seu guia de Gramado.<br>📷 <strong>Fotografe</strong> algo (um prato, uma construção, um objeto típico) e eu conto o que é e a história dele.<br>🎤 <strong>Pergunte falando</strong> e eu respondo em voz alta, para você seguir olhando a paisagem.<div class="src">Guia IA</div></div>
     </div>
     <div class="chat-input-wrap">
-      <input class="chat-input" id="chatIn" placeholder="Pergunte sobre Gramado…" onkeydown="if(event.key==='Enter')sendChat()">
-      <button class="chat-send" onclick="sendChat()" id="chatBtn">➤</button>
+      <button class="chat-tool" id="photoBtn" onclick="pickPhoto()" aria-label="Fotografar e identificar">📷</button>
+      <button class="chat-tool" id="micBtn" onclick="toggleMic()" aria-label="Perguntar por voz">🎤</button>
+      <input class="chat-input" id="chatIn" placeholder="Pergunte algo…" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()" id="chatBtn" aria-label="Enviar">➤</button>
+      <input type="file" id="photoIn" accept="image/*" capture="environment" hidden onchange="onPhoto(this)">
     </div>
   </div>
 </div>
@@ -137,12 +157,12 @@ a{color:var(--accent);text-decoration:none}
 <!-- ============ LOCATION ============ -->
 <div id="sec-local" class="sec">
   <div id="locS"><div class="em">📍</div><p class="pl" id="locPl">Ative a localização</p><p id="locDt">Toque abaixo para ver distâncias até cada ponto.</p></div>
-  <button class="locBtn" onclick="getLoc()">📍 Atualizar localização</button>
+  <button class="locBtn" onclick="getLoc()">📍 Usar meu GPS</button>
+  <div id="locPick" class="cfg-row"><label for="locSel">Ou estou em</label><select id="locSel" onchange="pickLoc(this.value)"></select></div>
   <div id="locHelp" style="display:none;background:var(--gold-l);border:1px solid var(--gold);border-radius:var(--r);padding:14px;margin-bottom:14px;font-size:.8rem;line-height:1.6">
     <strong style="color:var(--gold)">📱 Como liberar a localização:</strong>
     <div id="locHelpTxt"></div>
   </div>
-  <div id="locPick" class="cfg-row" style="display:none"><label>Estou em</label><select id="locSel" onchange="pickLoc(this.value)"></select></div>
   <div class="st">Distâncias</div>
   <div id="distL"></div>
 </div>
@@ -155,8 +175,8 @@ a{color:var(--accent);text-decoration:none}
     <li><strong>Volta:</strong> GOL G3 1795 · POA → BSB · 17:30 (31/10)</li>
   </ul></div>
   <div class="ic"><h3>🚌 Citral</h3><ul>
-    <li><strong>Ida:</strong> 24/10 14:00 → Gramado 16:30 · Poltronas 3-4</li>
-    <li><strong>Volta:</strong> 31/10 12:15 → POA 14:45 · Poltronas 5-6</li>
+    <li><strong>Ida:</strong> 24/10 14:00 → Gramado 16:30 · <span style="white-space:nowrap">Poltronas 3-4</span></li>
+    <li><strong>Volta:</strong> 31/10 12:15 → POA 14:45 · <span style="white-space:nowrap">Poltronas 5-6</span></li>
   </ul></div>
   <div class="ic"><h3>🏨 Bellagio Mini Resort</h3><ul>
     <li>24→31/10 · 7 noites · Café incluso</li>
@@ -182,6 +202,11 @@ a{color:var(--accent);text-decoration:none}
   </div>
   <div class="cfg-row"><label>Chave API</label><input type="password" id="cfgKey" placeholder="sk-... ou sk-ant-..." onchange="saveConfig()"></div>
   <p class="cfg-hint">Sua chave fica salva APENAS no seu celular (localStorage). Nunca é compartilhada.</p>
+  <div class="cfg-row"><label>Ler respostas em voz alta</label><div class="toggle" id="cfgSpeak" role="switch" tabindex="0" onclick="this.classList.toggle('on');saveConfig()"></div></div>
+  <p class="cfg-hint">Respostas de foto e de perguntas por voz são sempre lidas. Ligue para ler também as perguntas digitadas.</p>
+  <div class="cfg-row"><label>Velocidade da voz</label>
+    <select id="cfgRate" onchange="saveConfig()"><option value="0.9">Calma</option><option value="1" selected>Normal</option><option value="1.15">Rápida</option></select>
+  </div>
   <div class="cfg-row"><label>Seu nome</label><input id="cfgName" placeholder="Viajante" onchange="saveConfig()"></div>
 </div>
 
@@ -190,6 +215,14 @@ a{color:var(--accent);text-decoration:none}
   <div class="st">Antes da viagem</div>
   <div id="checkL"></div>
 </div>
+
+<!-- Reading player: stays visible on every tab -->
+<div id="ttsBar" hidden>
+  <span class="tts-ic">🔊</span><span id="ttsLabel" class="tts-lb">Lendo resposta…</span>
+  <button id="ttsPause" onclick="ttsToggle()" aria-label="Pausar">⏸</button>
+  <button onclick="ttsStop()" aria-label="Parar">⏹</button>
+</div>
+<div id="toast" role="status" hidden></div>
 
 <!-- Bottom nav -->
 <nav class="bn">
@@ -241,7 +274,7 @@ const CHECKS=[
 // Itinerary data
 const DAYS = {
   24: {
-    title:"🛬 Sexta 24/10 — Chegada",
+    title:"🛬 Sábado 24/10 — Chegada",
     sub:"BSB → POA → Gramado · Check-in Bellagio",
     items:[
       {t:"05:00",n:"Despertar + aeroporto BSB",d:"Documentos, bagagens, funcional PCDF.",c:"transport",x:"Check-in online LATAM 48h antes. Priority Pass / Dragon Pass para salas VIP no BSB.",h:"O Aeroporto de Brasília (BSB) é o 3º mais movimentado do Brasil. Inaugurado em 1957 junto com a capital."},
@@ -253,7 +286,7 @@ const DAYS = {
     ]
   },
   25: {
-    title:"🧀 Sábado 25/10 — Fondue + Natal Luz",
+    title:"🧀 Domingo 25/10 — Fondue + Natal Luz",
     sub:"Manhã livre · Château D'Geneve · Iluminação",
     items:[
       {t:"8:30",n:"☕ Café no hotel",d:"Incluso. Sem pressa!"},
@@ -266,7 +299,7 @@ const DAYS = {
     ]
   },
   26: {
-    title:"❄️ Domingo 26/10 — Snowland",
+    title:"❄️ Segunda 26/10 — Snowland",
     sub:"Dia inteiro no parque de neve",
     items:[
       {t:"8:00",n:"☕ Café reforçado",d:"Dia intenso — coma bem!"},
@@ -373,7 +406,7 @@ const KB = [
   {k:["emergência","hospital","polícia","bombeiro"],a:"Emergência: PM 190, SAMU 192, Bombeiros 193. Hospital de Gramado: (054) 3686-1463. Prefeitura/Turismo: (054) 3686-2100. Citral: (054) 3473-5800."},
   {k:["mini mundo","miniatura"],a:"O Mini Mundo existe desde 1983 com 160+ miniaturas na escala 1:24. Construções europeias típicas, trenzinhos, moinhos. Feito artesanalmente por 3 gerações de uma família de origem alemã. ~R$60/pp. No Centro de Gramado."},
   {k:["aldeia","papai noel"],a:"A Aldeia do Papai Noel foi o primeiro parque temático de Natal do Brasil (1940). Fábrica de brinquedos, casa do Papai Noel, trenó que 'voa' por trilhos sobre a cidade, neve artificial. ~R$80/pp. Checar Prime 2×1."},
-  {k:["texas","gramado","churrasco"],a:"O Texas Gramado fica na Av. Borges de Medeiros. Carnes nobres na brasa: ancho, bife de chorizo, costela. Prime 2×1. ~R$100/pp. Harmonize com Tannat ou Malbec. Vocês vão dia 27/10 à noite."},
+  {k:["texas","churrasco"],a:"O Texas Gramado fica na Av. Borges de Medeiros. Carnes nobres na brasa: ancho, bife de chorizo, costela. Prime 2×1. ~R$100/pp. Harmonize com Tannat ou Malbec. Vocês vão dia 27/10 à noite."},
   {k:["policial","funcional","pcdf","desconto policial"],a:"Instrução permanente: sempre perguntar por desconto para policiais (funcional PCDF) antes de cada compra! Não encontramos descontos formais nos parques de Canela, mas vale perguntar em bilheterias, restaurantes e lojas — alguns lugares oferecem cortesia para forças de segurança."},
   {k:["mala","bagagem","embalagem","o que levar"],a:"Dicas de mala: meias grossas para Snowland, agasalhos para noites frias (5-10°C), protetor solar (altitude!), power bank. Na volta: chocolates e vinhos na mala despachada (embrulhar bem!), líquidos >100ml na despachada. Carregar celulares 100%. Funcional PCDF à mão."},
 ];
@@ -425,12 +458,14 @@ function showSec(name){
   if(btns[map[name]])btns[map[name]].classList.add('active');
   const tb=document.getElementById('tabBar');
   tb.style.display=name==='roteiro'?'flex':'none';
+  window.scrollTo(0,name==='chat'?document.body.scrollHeight:0);
   // Auto-request location on first visit to Local tab
-  if(name==='local'&&!locRequested){locRequested=true;getLoc();}
+  if(name==='local'&&!locRequested){locRequested=true;if(geoAllowed||document.getElementById('locSel').value==='')getLoc();}
 }
 
 function tog(el){const d=el.querySelector('.tx');if(d)d.classList.toggle('open');}
 
+function startMin(t){const m=String(t).match(/^(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null;}
 function initToday(){
   const now=new Date();
   const d=now.getDate(),m=now.getMonth(),y=now.getFullYear();
@@ -438,7 +473,21 @@ function initToday(){
     const b=document.querySelector(`.tb[data-day="${d}"]`);
     if(b)b.classList.add('today');
     showDay(d);
-  } else showDay(24);
+    // Highlight the activity happening now
+    const nowMin=now.getHours()*60+now.getMinutes();
+    let idx=-1;
+    DAYS[d].items.forEach((it,i)=>{const s=startMin(it.t);if(s!==null&&s<=nowMin)idx=i;});
+    const el=document.querySelectorAll(`.dp[data-day="${d}"] .ti`)[idx];
+    if(el){
+      el.classList.add('now');
+      el.querySelector('.tt').insertAdjacentHTML('beforeend',' <span class="tg tg-now">▶ Agora</span>');
+      setTimeout(()=>el.scrollIntoView({block:'center'}),300);
+    }
+  } else {
+    showDay(24);
+    const days=Math.ceil((new Date(2026,9,24)-new Date(y,m,d))/86400000);
+    if(days>0)document.getElementById('hdrSub').textContent=`24–31 Out · faltam ${days} dia${days>1?'s':''}`;
+  }
 }
 
 // ===========================
@@ -460,11 +509,11 @@ function showTypicalWeather(){
   document.getElementById('wRetry').style.display='inline-block';
 }
 let weatherRetries=0;
-async function fetchWeather(){
+async function fetchWeather(silent){
   const wText=document.getElementById('wText');
   const wIcon=document.getElementById('wIcon');
   const wRetry=document.getElementById('wRetry');
-  wText.textContent='Carregando clima…';
+  if(!silent)wText.textContent='Carregando clima…';
   wRetry.style.display='none';
   try{
     const ctrl=new AbortController();
@@ -478,14 +527,12 @@ async function fetchWeather(){
     wIcon.textContent=wCodeIcon(d.current.weather_code);
     weatherRetries=0;
   }catch(e){
+    showTypicalWeather();
     weatherRetries++;
     if(!inSandbox&&weatherRetries<=2){
-      wText.textContent='Conectando ao serviço de clima…';
-      setTimeout(fetchWeather,3000);
-    } else {
-      showTypicalWeather();
-      weatherRetries=0;
-    }
+      wRetry.style.display='none';
+      setTimeout(()=>fetchWeather(true),3000);
+    } else weatherRetries=0;
   }
 }
 function wCodeIcon(c){if(c===0)return'☀️';if(c<=3)return'⛅';if(c<=48)return'🌫️';if(c<=67)return'🌧️';if(c<=77)return'🌨️';if(c<=82)return'🌧️';return'⛈️';}
@@ -493,96 +540,62 @@ function wCodeIcon(c){if(c===0)return'☀️';if(c<=3)return'⛅';if(c<=48)retur
 // ===========================
 // LOCATION
 // ===========================
+const GPS_GUIDE={
+  ios:`<p style="margin-top:8px"><strong>No iPhone/iPad:</strong></p>
+<p>1. <strong>Ajustes</strong> → <strong>Privacidade e Segurança</strong> → <strong>Serviços de Localização</strong> (ligado)</p>
+<p>2. Role até <strong>Safari</strong> (ou o navegador que usa) → <strong>"Ao Usar o App"</strong></p>
+<p>3. Volte aqui e toque "<strong>Usar meu GPS</strong>"</p>`,
+  android:`<p style="margin-top:8px"><strong>No Android:</strong></p>
+<p>1. Toque no <strong>cadeado 🔒</strong> ao lado do endereço → <strong>Permissões</strong> → <strong>Localização</strong> → <strong>Permitir</strong></p>
+<p>2. Confira se a <strong>Localização</strong> do celular está ligada (puxe a barra de notificações)</p>
+<p>3. Volte aqui e toque "<strong>Usar meu GPS</strong>"</p>`,
+  other:`<p style="margin-top:8px"><strong>No navegador:</strong> clique no <strong>cadeado 🔒</strong> na barra de endereço → <strong>Localização</strong> → <strong>Permitir</strong>, recarregue e toque "<strong>Usar meu GPS</strong>".</p>`
+};
+const EMBED_HINT='<p style="margin-top:6px">Se abriu o guia <strong>dentro do app do Claude</strong>, o GPS não é liberado lá: abra o link no <strong>Safari/Chrome</strong>.</p>';
+function locMsg(title,msg,help){
+  document.getElementById('locPl').textContent=title;
+  document.getElementById('locDt').textContent=msg;
+  const box=document.getElementById('locHelp');
+  if(help){document.getElementById('locHelpTxt').innerHTML=help;box.style.display='block';}
+  else box.style.display='none';
+}
 function getLoc(){
-  const pl=document.getElementById('locPl');
-  const dt=document.getElementById('locDt');
-  const help=document.getElementById('locHelp');
-  const helpTxt=document.getElementById('locHelpTxt');
-  help.style.display='none';
+  if(!navigator.geolocation)
+    return locMsg('Navegador sem GPS','Escolha abaixo onde vocês estão para ver as distâncias.');
+  if(!geoAllowed)
+    return locMsg('📲 GPS bloqueado nesta visualização','Escolha abaixo onde vocês estão para ver as distâncias.',
+      '<p style="margin-top:8px">O visualizador do Claude não libera o GPS. Para usar o GPS de verdade, abra o guia pelo <strong>GitHub Pages</strong> no Safari/Chrome e adicione à Tela Inicial.</p>');
+  if(!window.isSecureContext)
+    return locMsg('⚠️ GPS requer HTTPS','Escolha abaixo onde vocês estão para ver as distâncias.',
+      '<p style="margin-top:8px">O GPS só funciona em páginas <strong>HTTPS</strong>. Abra pelo GitHub Pages em vez do arquivo local.</p>');
 
-  if(!navigator.geolocation){
-    pl.textContent='Navegador sem suporte a GPS';
-    dt.textContent='Use um navegador moderno (Chrome, Safari, Firefox).';
-    return;
-  }
-
-  if(!geoAllowed){
-    pl.textContent='📲 GPS disponível na versão instalada';
-    dt.textContent='Nesta visualização o GPS fica bloqueado. Escolha abaixo onde vocês estão para ver as distâncias.';
-    helpTxt.innerHTML='<p style="margin-top:8px">Para usar o GPS de verdade, abra o guia pelo endereço do <strong>GitHub Pages</strong> no navegador do celular e adicione à Tela Inicial (Safari: Compartilhar → <strong>Adicionar à Tela de Início</strong>; Chrome: ⋮ → <strong>Instalar app</strong>).</p>';
-    help.style.display='block';
-    document.getElementById('locPick').style.display='block';
-    return;
-  }
-
-  // Check if page is on HTTPS (required for geolocation)
-  if(location.protocol!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){
-    pl.textContent='⚠️ Localização requer HTTPS';
-    dt.textContent='Acesse o site via HTTPS para usar o GPS.';
-    helpTxt.innerHTML='<p style="margin-top:8px">Este recurso só funciona em páginas servidas via <strong>HTTPS</strong>. Se está abrindo por arquivo local, hospede o site no GitHub Pages ou outro servidor seguro.</p>';
-    help.style.display='block';
-    return;
-  }
-
-  pl.textContent='Localizando…';
-  dt.textContent='Aguarde ou permita o acesso quando solicitado.';
-
-  navigator.geolocation.getCurrentPosition(
-    p=>{
-      const lat=p.coords.latitude,lng=p.coords.longitude,near=findN(lat,lng);
-      pl.textContent=`📍 Perto de: ${near.name}`;
-      dt.textContent=near.dist+' de distância';
-      help.style.display='none';
-      renderDist(lat,lng);
-    },
-    err=>{
-      if(err.code===1){
-        // PERMISSION_DENIED
-        pl.textContent='🚫 Acesso à localização negado';
-        dt.textContent='Você precisa permitir o acesso nas configurações.';
-        const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
-        const isAndroid=/Android/.test(navigator.userAgent);
-        let guide='';
-        if(isIOS){
-          guide=`<p style="margin-top:8px"><strong>No iPhone/iPad:</strong></p>
-<p>1. Abra <strong>Ajustes</strong> → <strong>Privacidade</strong> → <strong>Serviços de Localização</strong></p>
-<p>2. Ative os Serviços de Localização</p>
-<p>3. Role até <strong>Safari</strong> (ou o navegador que usa) → selecione <strong>"Ao Usar o App"</strong></p>
-<p>4. Volte aqui e toque "<strong>Atualizar localização</strong>" de novo</p>
-<p style="margin-top:6px;font-size:.72rem;color:var(--muted)">Se adicionou à Tela Inicial: Ajustes → Privacidade → Serviços de Localização → role até "Guia Gramado 2026"</p>`;
-        } else if(isAndroid){
-          guide=`<p style="margin-top:8px"><strong>No Android:</strong></p>
-<p>1. Toque no <strong>cadeado 🔒</strong> (ou ícone ao lado da URL) na barra de endereço</p>
-<p>2. Toque em <strong>Permissões</strong> → <strong>Localização</strong> → <strong>Permitir</strong></p>
-<p>3. Ou: <strong>Configurações do celular</strong> → <strong>Apps</strong> → <strong>Chrome</strong> → <strong>Permissões</strong> → <strong>Localização</strong> → Permitir</p>
-<p>4. Volte e toque "<strong>Atualizar localização</strong>"</p>`;
-        } else {
-          guide=`<p style="margin-top:8px"><strong>No navegador:</strong></p>
-<p>1. Clique no <strong>cadeado 🔒</strong> na barra de endereço</p>
-<p>2. Em <strong>Localização</strong>, mude para <strong>Permitir</strong></p>
-<p>3. Recarregue a página e toque "<strong>Atualizar localização</strong>"</p>`;
-        }
-        helpTxt.innerHTML=guide;
-        help.style.display='block';
-      } else if(err.code===2){
-        // POSITION_UNAVAILABLE
-        pl.textContent='📡 Posição indisponível';
-        dt.textContent='GPS não conseguiu determinar sua localização.';
-        helpTxt.innerHTML=`<p style="margin-top:8px">Dicas:</p>
-<p>• Verifique se o <strong>GPS do celular</strong> está ligado (Configurações → Localização)</p>
-<p>• Saia de ambientes fechados — o GPS precisa ver o céu</p>
-<p>• Aguarde alguns segundos e tente novamente</p>`;
-        help.style.display='block';
-      } else {
-        // TIMEOUT
-        pl.textContent='⏱️ Tempo esgotado';
-        dt.textContent='A localização demorou demais. Tente novamente.';
-        helpTxt.innerHTML=`<p style="margin-top:8px">Dicas: ative o <strong>Wi-Fi</strong> ou <strong>dados móveis</strong> para localização mais rápida, e tente em área aberta.</p>`;
-        help.style.display='block';
-      }
-    },
-    {enableHighAccuracy:true,timeout:15000,maximumAge:60000}
-  );
+  locMsg('Localizando…','Permita o acesso se o celular perguntar.');
+  const ok=p=>{
+    const lat=p.coords.latitude,lng=p.coords.longitude,near=findN(lat,lng);
+    locMsg(`Perto de: ${near.name}`,`${near.dist} de distância · precisão ~${fD(p.coords.accuracy/1000)}`);
+    document.getElementById('locSel').value='';
+    here={lat,lng,label:'GPS'};
+    renderDist(lat,lng);
+  };
+  const fail=err=>{
+    const tail=' Enquanto isso, escolha abaixo onde vocês estão.';
+    if(err.code===1){
+      const g=/iPad|iPhone|iPod/.test(navigator.userAgent)?GPS_GUIDE.ios:/Android/.test(navigator.userAgent)?GPS_GUIDE.android:GPS_GUIDE.other;
+      locMsg('🚫 Acesso à localização negado','O celular ou o app bloqueou o GPS.'+tail,g+EMBED_HINT);
+    } else if(err.code===2){
+      locMsg('📡 Posição indisponível','O aparelho não informou a posição.'+tail,
+        '<p style="margin-top:8px">• Ligue a <strong>Localização</strong> do celular<br>• Ative Wi-Fi ou dados móveis<br>• Toque "Usar meu GPS" de novo</p>'+EMBED_HINT);
+    } else {
+      locMsg('⏱️ Tempo esgotado','A localização demorou demais.'+tail,
+        '<p style="margin-top:8px">Ative Wi-Fi ou dados móveis e toque "Usar meu GPS" de novo, de preferência perto de uma janela.</p>');
+    }
+  };
+  // Precise fix first; indoors that often fails, so retry with a coarse Wi-Fi/cell fix.
+  navigator.geolocation.getCurrentPosition(ok,err=>{
+    if(err.code===1)return fail(err);
+    document.getElementById('locDt').textContent='Tentando localização aproximada (Wi-Fi/rede)…';
+    navigator.geolocation.getCurrentPosition(ok,fail,{enableHighAccuracy:false,timeout:10000,maximumAge:300000});
+  },{enableHighAccuracy:true,timeout:8000,maximumAge:60000});
 }
 
 // Auto-request location when visiting the tab
@@ -592,16 +605,26 @@ function findN(lat,lng){let b={name:'—',dist:'—'},m=Infinity;POINTS.forEach(
 function fD(k){return k<1?`${Math.round(k*1000)}m`:`${k.toFixed(1)}km`;}
 function pickLoc(i){
   const p=POINTS[i];if(!p)return;
-  document.getElementById('locPl').textContent=`📍 Em: ${p.name}`;
-  document.getElementById('locDt').textContent='Distâncias em linha reta a partir deste ponto.';
+  locMsg(`Em: ${p.name}`,'Distâncias em linha reta a partir deste ponto.');
+  try{localStorage.setItem('gramado-loc',String(i));}catch(e){}
+  here={lat:p.lat,lng:p.lng,label:p.name};
   renderDist(p.lat,p.lng);
 }
 function renderLocPick(){
-  document.getElementById('locSel').innerHTML='<option value="">Escolha um ponto…</option>'+POINTS.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
+  const sel=document.getElementById('locSel');
+  sel.innerHTML='<option value="">Escolha um ponto…</option>'+POINTS.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
+  let saved=null;
+  try{saved=localStorage.getItem('gramado-loc');}catch(e){}
+  if(saved!==null&&POINTS[saved]){sel.value=saved;pickLoc(saved);}
 }
 function renderDist(lat,lng){
   const s=POINTS.map(p=>({...p,d:hav(lat,lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d);
-  document.getElementById('distL').innerHTML=s.map(p=>`<div class="di"><span class="dn">${p.name}</span><span class="dv">${fD(p.d)}</span></div>`).join('');
+  document.getElementById('distL').innerHTML=s.map(p=>{
+    const walk=p.d<1.5;
+    const maps=`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=${walk?'walking':'driving'}`;
+    const uber=`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${p.lat}&dropoff[longitude]=${p.lng}&dropoff[nickname]=${encodeURIComponent(p.name)}`;
+    return `<div class="di"><span class="dn">${p.name}</span><span class="dv">${fD(p.d)}${walk?' · a pé':''}</span><div class="go"><a href="${maps}" target="_blank" rel="noopener">🗺️ ${walk?'Ir a pé':'Mapa'}</a><a href="${uber}" target="_blank" rel="noopener">🚗 Uber</a></div></div>`;
+  }).join('');
 }
 
 // ===========================
@@ -627,15 +650,20 @@ function saveConfig(){
   const cfg={
     provider:document.getElementById('cfgProvider').value,
     key:document.getElementById('cfgKey').value,
-    name:document.getElementById('cfgName').value
+    name:document.getElementById('cfgName').value,
+    speak:document.getElementById('cfgSpeak').classList.contains('on'),
+    rate:document.getElementById('cfgRate').value
   };
   try{localStorage.setItem('gramado-cfg',JSON.stringify(cfg));}catch(e){}
+  updateAIStatus();
 }
 function loadConfig(){
   const cfg=getConfig();
   if(cfg.provider)document.getElementById('cfgProvider').value=cfg.provider;
   if(cfg.key)document.getElementById('cfgKey').value=cfg.key;
   if(cfg.name)document.getElementById('cfgName').value=cfg.name;
+  if(cfg.speak)document.getElementById('cfgSpeak').classList.add('on');
+  if(cfg.rate)document.getElementById('cfgRate').value=cfg.rate;
 }
 
 // Local AI: keyword matching
@@ -687,10 +715,70 @@ RESERVAS CONFIRMADAS:
 - Nativitaten 29/10 20:00 (Setor Ouro)
 - Cara de Mau 30/10 21:30 (Porto, 2 adultos)
 
-Responda de forma concisa, prática e amigável. Dê informações históricas e culturais quando relevante. Sugira alternativas se o clima estiver ruim. Lembre sempre do Prime 2×1 e descontos para policiais.`;
+Responda de forma concisa, prática e amigável, em texto simples (sem markdown, listas com asteriscos ou emojis), porque a resposta pode ser lida em voz alta. Dê informações históricas e culturais quando relevante. Sugira alternativas se o clima estiver ruim. Lembre sempre do Prime 2×1 e descontos para policiais.`;
 }
 
-async function callAPI(messages){
+function apiError(status,msg){
+  if(status===401||status===403)return 'Chave de API inválida. Confira em Info → Configurações.';
+  if(status===429)return 'Limite de uso da API atingido. Tente mais tarde ou verifique créditos da conta.';
+  if(status>=500)return 'Serviço de IA sobrecarregado no momento. Tente de novo em instantes.';
+  return 'Erro na API'+(msg?': '+msg:'')+'.';
+}
+
+// ===========================
+// AI ENGINE: Claude via claude.ai (sample) → own API key → local KB
+// ===========================
+let sampleFn=null,sampleImages=false;
+(async()=>{
+  try{
+    if(!window.claude||typeof window.claude.use!=='function')return;
+    const s=await window.claude.use('sample');
+    if(!s)return;
+    const lim=await s.limits().catch(()=>null);
+    sampleFn=s;sampleImages=!!(lim&&lim.images);
+  }catch(e){}
+  updateAIStatus();
+})();
+function aiEngine(){
+  if(sampleFn)return 'sample';
+  const c=getConfig();
+  return c.provider&&c.provider!=='local'&&c.key?c.provider:'local';
+}
+function canSeePhotos(){const e=aiEngine();return e==='sample'?sampleImages:e!=='local';}
+function updateAIStatus(){
+  const e=aiEngine();
+  const name={sample:'Claude (sua conta)',anthropic:'Claude API',openai:'OpenAI API',local:'IA local · sem custo'}[e];
+  document.getElementById('aiStatus').textContent=e==='local'
+    ?'IA local · fotos exigem o Claude ou uma chave de API'
+    :`🤖 ${name} · ${canSeePhotos()?'📷 fotos ✓':'fotos indisponíveis'}`;
+}
+
+// Where the traveller is, for context in prompts
+let here=null;
+function placeContext(){
+  const now=new Date(),d=now.getDate();
+  const inTrip=now.getFullYear()===2026&&now.getMonth()===9&&d>=24&&d<=31;
+  let s=here?`Local atual do viajante: ${here.label} (perto de ${findN(here.lat,here.lng).name}).`
+    :'Local atual do viajante: não informado (provavelmente Gramado ou Canela).';
+  if(inTrip){
+    const nowMin=now.getHours()*60+now.getMinutes();
+    let cur=null;DAYS[d].items.forEach(it=>{const m=startMin(it.t);if(m!==null&&m<=nowMin)cur=it;});
+    s+=` Hoje: ${DAYS[d].title}.`+(cur?` Atividade do roteiro agora: ${cur.n}.`:'');
+  }
+  return s;
+}
+const SPOKEN='Responda em português do Brasil, em texto corrido para ser OUVIDO: sem markdown, sem listas, sem asteriscos, sem emojis e sem títulos.';
+function photoPrompt(q){
+  return `Você é um guia turístico local de Gramado e Canela (Serra Gaúcha, RS), falando com um casal de Brasília em viagem de 24 a 31 de outubro de 2026, durante o Natal Luz. A foto anexa foi tirada agora pelo viajante.
+${placeContext()}
+${q?`Pergunta do viajante sobre a foto: ${q}`:'O viajante quer saber o que é isto.'}
+
+Identifique o que aparece na foto: objeto, prato, bebida, construção, monumento, planta, obra de arte, decoração ou produto típico. Se não tiver certeza, diga o mais provável e uma alternativa. Não invente nomes próprios, datas nem números: se não souber, diga isso.
+${SPOKEN}
+Escreva 4 parágrafos curtos, sem numerá-los, com no máximo 220 palavras no total: o que é; a definição e a história ou origem; a ligação com Gramado, a Serra Gaúcha e a cultura local (imigração alemã e italiana, tradição gaúcha), se houver; e uma dica prática para a viagem (onde ver, provar ou comprar).`;
+}
+
+async function callAPI(messages,image){
   const cfg=getConfig();
   const provider=cfg.provider||'local';
   const key=cfg.key||'';
@@ -698,96 +786,279 @@ async function callAPI(messages){
   if(provider==='local'||!key){
     return null; // fallback to local
   }
+  const last=messages[messages.length-1];
 
   if(provider==='anthropic'){
+    const msgs=image?[...messages.slice(0,-1),{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:'image/jpeg',data:image.dataUrl.split(',')[1]}},
+      {type:'text',text:last.content}]}]:messages;
     const r=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:buildSystemPrompt(),messages:messages})
+      body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:1024,system:buildSystemPrompt(),messages:msgs})
     });
-    const d=await r.json();
-    if(d.error) throw new Error(d.error.message);
-    return d.content[0].text;
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||d.error) throw new Error(apiError(r.status,d.error&&d.error.message));
+    const text=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+    if(!text) throw new Error('A IA respondeu vazio. Tente reformular a pergunta.');
+    return d.stop_reason==='max_tokens'?text+'\n\n(resposta cortada — peça "continue")':text;
   }
 
   if(provider==='openai'){
+    const msgs=messages.map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}));
+    if(image)msgs[msgs.length-1].content=[{type:'text',text:last.content},{type:'image_url',image_url:{url:image.dataUrl}}];
     const r=await fetch('https://api.openai.com/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:800,messages:[{role:'system',content:buildSystemPrompt()},...messages.map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))]})
+      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:1024,messages:[{role:'system',content:buildSystemPrompt()},...msgs]})
     });
-    const d=await r.json();
-    if(d.error) throw new Error(d.error.message);
-    return d.choices[0].message.content;
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||d.error) throw new Error(apiError(r.status,d.error&&d.error.message));
+    const c=d.choices&&d.choices[0];
+    const text=(c&&c.message&&c.message.content||'').trim();
+    if(!text) throw new Error('A IA respondeu vazio. Tente reformular a pergunta.');
+    return c.finish_reason==='length'?text+'\n\n(resposta cortada — peça "continue")':text;
   }
   return null;
 }
 
-let chatHistory=[];
-async function sendChat(){
-  const input=document.getElementById('chatIn');
-  const q=input.value.trim();
-  if(!q)return;
-  input.value='';
+const SAMPLE_MSG={
+  rate_limited:'Limite de uso do Claude atingido por agora. Tente de novo mais tarde.',
+  session_expired:'Sua sessão do Claude expirou. Entre de novo no claude.ai.',
+  image_rejected:'O Claude não aceitou essa imagem. Tente outra foto (JPG ou PNG).',
+  refused:'O Claude preferiu não responder a isso. Tente perguntar de outro jeito.',
+  empty_completion:'O Claude não conseguiu responder. Tente uma pergunta mais simples.',
+};
+const SAMPLE_GONE=['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'];
 
-  // Add user bubble
-  addBubble(q,'user');
-  chatHistory.push({role:'user',content:q});
+let chatHistory=[],busy=false;
+function setBusy(b){
+  busy=b;
+  ['chatBtn','photoBtn','micBtn'].forEach(id=>{document.getElementById(id).disabled=b;});
+}
 
-  const cfg=getConfig();
-  const provider=cfg.provider||'local';
-  const key=cfg.key||'';
-
-  // Try local first if no API configured
-  if(provider==='local'||!key){
-    const local=localAI(q);
-    if(local){
-      addBubble(local,'ai','IA local · sem custo');
-      chatHistory.push({role:'assistant',content:local});
-    } else {
-      addBubble('Não tenho informação específica sobre isso no meu banco local. Configure uma chave de API (Anthropic ou OpenAI) nas configurações para respostas mais completas! Ou tente perguntar sobre: pontos turísticos, restaurantes, clima, transporte, hotéis, chocolates, vinícolas…','ai','IA local');
-    }
-    return;
-  }
-
-  // Try local first, fallback to API
-  const local=localAI(q);
-  if(local){
-    addBubble(local,'ai','IA local · sem custo');
-    chatHistory.push({role:'assistant',content:local});
-    return;
-  }
-
-  // API call
-  addBubble('Pensando…','ai','');
-  const msgs=document.getElementById('chatMsgs');
-  const thinking=msgs.lastElementChild;
-
+async function askAI(q,image,speakIt){
+  const engine=aiEngine();
+  const bubble=addBubble(image?'🔎 Analisando a foto…':'Pensando…','ai','');
+  setBusy(true);
   try{
-    const apiMsgs=chatHistory.filter(m=>m.role).slice(-10);
-    const answer=await callAPI(apiMsgs);
-    if(answer){
-      thinking.remove();
-      addBubble(answer,'ai',provider==='anthropic'?'Claude API':'OpenAI API');
-      chatHistory.push({role:'assistant',content:answer});
+    let text,src;
+    if(engine==='sample'){
+      const opts={modelTier:'default',cache:false,onText:({text})=>setBubble(bubble,text,'Claude · escrevendo…')};
+      let input;
+      if(image){input=photoPrompt(q);opts.images=[image.blob];}
+      else input=[...chatHistory.slice(-8),{role:'user',content:`${buildSystemPrompt()}\n\n${placeContext()}\n\nPergunta do viajante: ${q}`}];
+      const r=await sampleFn(input,opts);
+      text=r.truncated?r.text+'\n\n(resposta cortada)':r.text;src='Claude';
     } else {
-      thinking.querySelector('.chat-bubble')?.remove();
-      thinking.remove();
-      addBubble('Erro na API. Verifique sua chave nas configurações.','ai','erro');
+      const content=image?photoPrompt(q):`${placeContext()}\n\n${q}`;
+      text=await callAPI([...chatHistory.slice(-8),{role:'user',content}],image);
+      src=engine==='anthropic'?'Claude API':'OpenAI API';
     }
+    setBubble(bubble,text,src,true);
+    chatHistory.push({role:'user',content:image?`[Foto enviada] ${q||'O que é isto?'}`:q},{role:'assistant',content:text});
+    if(speakIt)speak(text);
   }catch(e){
-    thinking.remove();
-    addBubble(`Erro: ${e.message}. Verifique sua chave API.`,'ai','erro');
+    if(SAMPLE_GONE.includes(e&&e.code)){sampleFn=null;updateAIStatus();}
+    if(e&&e.code==='images_unavailable'){sampleImages=false;updateAIStatus();}
+    let msg=SAMPLE_MSG[e&&e.code]||(e instanceof TypeError?'Sem conexão com o serviço de IA. Verifique a internet.':(e&&e.message)||'Erro inesperado.');
+    if(SAMPLE_GONE.includes(e&&e.code))msg='O uso do Claude não foi liberado nesta página. '+(image?'Para fotos, configure uma chave de API em Info → Configurações.':'Vou responder com a base local.');
+    const local=!image&&localAI(q);
+    if(local){setBubble(bubble,local,'IA local · sem custo',true);chatHistory.push({role:'user',content:q},{role:'assistant',content:local});if(speakIt)speak(local);}
+    else setBubble(bubble,msg,'erro');
+  }finally{
+    setBusy(false);
   }
 }
 
+async function sendChat(fromVoice){
+  const input=document.getElementById('chatIn');
+  const q=input.value.trim();
+  if(!q||busy)return;
+  input.value='';
+  unlockTTS();
+  addBubble(q,'user',fromVoice===true?'🎤 por voz':'');
+  const speakIt=fromVoice===true||getConfig().speak;
+
+  if(aiEngine()!=='local')return askAI(q,null,speakIt);
+
+  const local=localAI(q);
+  if(local){
+    setBubble(addBubble('','ai'),local,'IA local · sem custo',true);
+    chatHistory.push({role:'user',content:q},{role:'assistant',content:local});
+    if(speakIt)speak(local);
+  } else {
+    addBubble('Não tenho essa informação no banco local. Tente perguntar sobre: pontos turísticos, restaurantes, clima, transporte, hotel, chocolates, vinícolas… Para respostas livres e fotos, abra o guia pelo Claude ou configure uma chave de API em Info → Configurações.','ai','IA local');
+  }
+}
+
+// ===========================
+// PHOTO
+// ===========================
+function pickPhoto(){
+  unlockTTS();
+  if(busy)return;
+  if(!canSeePhotos()){
+    addBubble('Para identificar fotos eu preciso de uma IA com visão. Abra o guia pelo link do Claude (usa a sua conta) ou configure uma chave da Anthropic ou OpenAI em Info → Configurações.','ai','Guia IA');
+    return;
+  }
+  document.getElementById('photoIn').click();
+}
+// Downscale on the phone: faster upload, fewer tokens, EXIF orientation applied by <img>.
+function prepImage(file){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file),img=new Image();
+    img.onload=()=>{
+      const k=Math.min(1,1280/Math.max(img.naturalWidth,img.naturalHeight));
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);
+      const dataUrl=c.toDataURL('image/jpeg',0.85);
+      c.toBlob(blob=>blob?res({blob,dataUrl}):rej(new Error('Não consegui preparar a foto.')),'image/jpeg',0.85);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('Não consegui abrir essa imagem. Tente uma foto JPG ou PNG.'));};
+    img.src=url;
+  });
+}
+async function onPhoto(el){
+  const f=el.files&&el.files[0];
+  el.value='';
+  if(!f||busy)return;
+  const input=document.getElementById('chatIn');
+  const q=input.value.trim();input.value='';
+  let image;
+  setBusy(true);toast('📷 Preparando a foto…',1500);
+  try{image=await prepImage(f);}catch(e){setBusy(false);addBubble(e.message,'ai','erro');return;}
+  setBusy(false);document.getElementById('toast').hidden=true;
+  const b=addBubble(q||'O que é isto?','user','📷 foto');
+  const im=document.createElement('img');im.className='shot';im.alt='Foto enviada';im.src=image.dataUrl;
+  b.insertBefore(im,b.firstChild);
+  window.scrollTo(0,document.body.scrollHeight);
+  askAI(q,image,true);
+}
+
+// ===========================
+// VOICE INPUT (Web Speech) — falls back to the keyboard's own dictation
+// ===========================
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null;
+function toggleMic(){
+  unlockTTS();
+  if(busy)return;
+  const input=document.getElementById('chatIn'),btn=document.getElementById('micBtn');
+  if(rec){rec.stop();return;}
+  if(!SR){toast('Ditado indisponível aqui. Toque na caixa de texto e use o 🎤 do teclado do celular.');input.focus();return;}
+  ttsStop();
+  let heard='',failed=false;
+  rec=new SR();rec.lang='pt-BR';rec.interimResults=true;rec.continuous=false;
+  rec.onresult=e=>{heard=[...e.results].map(r=>r[0].transcript).join('');input.value=heard;};
+  rec.onerror=e=>{
+    failed=true;
+    if(e.error==='not-allowed'||e.error==='service-not-allowed')toast('Microfone bloqueado aqui. Use o 🎤 do teclado do celular, ou abra o guia no Safari/Chrome.');
+    else if(e.error==='no-speech')toast('Não ouvi nada. Toque no 🎤 e fale de novo.');
+    else if(e.error!=='aborted')toast('Não consegui ouvir. Tente de novo ou digite.');
+  };
+  rec.onend=()=>{
+    rec=null;btn.classList.remove('rec');btn.setAttribute('aria-label','Perguntar por voz');
+    if(!failed&&heard.trim())sendChat(true);
+  };
+  try{rec.start();btn.classList.add('rec');btn.setAttribute('aria-label','Parar de ouvir');toast('Ouvindo… fale sua pergunta.',2500);}
+  catch(e){rec=null;toast('Não consegui abrir o microfone. Use o 🎤 do teclado.');}
+}
+
+// ===========================
+// READ ALOUD (speechSynthesis) with a player that stays on screen
+// ===========================
+const TTS={voice:null,chunks:[],idx:0,run:0,paused:false,lock:null,unlocked:false};
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  TTS.voice=vs.find(v=>/pt[-_]BR/i.test(v.lang)&&/google|luciana|natural|premium|enhanced/i.test(v.name))
+    ||vs.find(v=>/pt[-_]BR/i.test(v.lang))||vs.find(v=>/^pt/i.test(v.lang))||null;
+}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.addEventListener('voiceschanged',pickVoice);}
+// iOS only lets speech start inside a tap: prime it on the first one.
+function unlockTTS(){
+  if(TTS.unlocked||!('speechSynthesis' in window))return;
+  TTS.unlocked=true;
+  const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);
+}
+function speechText(t){
+  return String(t)
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu,'')
+    .replace(/[*_#`>|]/g,'').replace(/\/pp\b/g,' por pessoa').replace(/(\d)\s?×\s?(\d)/g,'$1 por $2')
+    .replace(/\(resposta cortada[^)]*\)/,'').replace(/\s+/g,' ').trim();
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){toast('Leitura em voz alta indisponível neste navegador.');return;}
+  ttsStop();
+  // Short chunks: Chrome drops utterances longer than ~15 s.
+  const sentences=speechText(text).match(/[^.!?…]+[.!?…]*/g)||[];
+  const chunks=[];let cur='';
+  sentences.forEach(s=>{if((cur+s).length>220&&cur){chunks.push(cur);cur=s;}else cur+=s;});
+  if(cur.trim())chunks.push(cur);
+  if(!chunks.length)return;
+  Object.assign(TTS,{chunks,idx:0,paused:false,run:TTS.run+1});
+  document.getElementById('ttsBar').hidden=false;
+  document.getElementById('ttsPause').textContent='⏸';
+  document.getElementById('ttsLabel').textContent='Lendo resposta… pode guardar o celular no bolso';
+  if(navigator.wakeLock)navigator.wakeLock.request('screen').then(l=>{TTS.lock=l;}).catch(()=>{});
+  speakChunk(TTS.run);
+}
+function speakChunk(run){
+  if(run!==TTS.run||TTS.paused)return;
+  if(TTS.idx>=TTS.chunks.length)return ttsStop();
+  const u=new SpeechSynthesisUtterance(TTS.chunks[TTS.idx]);
+  u.lang='pt-BR';if(TTS.voice)u.voice=TTS.voice;u.rate=parseFloat(getConfig().rate)||1;
+  u.onend=()=>{if(run===TTS.run&&!TTS.paused){TTS.idx++;speakChunk(run);}};
+  u.onerror=e=>{if(run===TTS.run&&!TTS.paused&&e.error!=='interrupted'&&e.error!=='canceled'){TTS.idx++;speakChunk(run);}};
+  speechSynthesis.speak(u);
+}
+// Pause = cancel and remember the chunk: speechSynthesis.pause() is unreliable on Android.
+function ttsToggle(){
+  if(!TTS.chunks.length)return;
+  TTS.paused=!TTS.paused;
+  document.getElementById('ttsPause').textContent=TTS.paused?'▶':'⏸';
+  document.getElementById('ttsLabel').textContent=TTS.paused?'Leitura pausada':'Lendo resposta…';
+  if(TTS.paused)speechSynthesis.cancel();else{TTS.run++;speakChunk(TTS.run);}
+}
+function ttsStop(){
+  TTS.run++;TTS.chunks=[];TTS.paused=false;
+  if('speechSynthesis' in window)speechSynthesis.cancel();
+  document.getElementById('ttsBar').hidden=true;
+  if(TTS.lock){TTS.lock.release().catch(()=>{});TTS.lock=null;}
+}
+
+let toastT=0;
+function toast(msg,ms){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.hidden=false;clearTimeout(toastT);
+  toastT=setTimeout(()=>{t.hidden=true;},ms||4500);
+}
+
+// Text only: AI answers are untrusted and must never be parsed as HTML.
+function setBubble(div,text,src,withSpeak){
+  if(div.classList.contains('ai'))text=String(text).replace(/\*\*(.+?)\*\*/g,'$1').replace(/^#{1,4}\s+/gm,'');
+  div.textContent='';
+  String(text).split('\n').forEach((line,i)=>{
+    if(i)div.appendChild(document.createElement('br'));
+    div.appendChild(document.createTextNode(line));
+  });
+  if(withSpeak&&'speechSynthesis' in window){
+    const b=document.createElement('button');b.className='say';b.textContent='🔊 Ouvir';
+    b.onclick=()=>{unlockTTS();speak(text);};
+    div.appendChild(document.createElement('br'));div.appendChild(b);
+  }
+  if(src){const s=document.createElement('div');s.className='src';s.textContent=src;div.appendChild(s);}
+  if(document.getElementById('sec-chat').classList.contains('active'))window.scrollTo(0,document.body.scrollHeight);
+}
 function addBubble(text,type,src){
   const msgs=document.getElementById('chatMsgs');
   const div=document.createElement('div');
   div.className='chat-bubble '+type;
-  div.innerHTML=text.replace(/\n/g,'<br>')+(src?`<div class="src">${src}</div>`:'');
   msgs.appendChild(div);
-  msgs.scrollTop=msgs.scrollHeight;
+  setBubble(div,text,src);
+  return div;
 }
 
 // ===========================
@@ -799,6 +1070,7 @@ fetchWeather();
 renderChk();
 renderLocPick();
 loadConfig();
+updateAIStatus();
 
 // Service Worker
 if('serviceWorker' in navigator){

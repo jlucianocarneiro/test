@@ -1,4 +1,4 @@
-const CACHE = 'gramado-v2';
+const CACHE = 'gramado-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -23,29 +23,35 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Fetch: cache-first for assets, network-first for API
+// Fetch: network-first for pages (so fixes arrive), cache-first for static assets
 self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
 
-  // Always go to network for API calls and weather
-  if (url.hostname === 'api.anthropic.com' ||
-      url.hostname === 'api.openai.com' ||
-      url.hostname === 'api.open-meteo.com') {
-    e.respondWith(fetch(e.request));
+  // APIs and weather always go to the network, never cached
+  if (url.origin !== self.location.origin) return;
+
+  if (e.request.mode === 'navigate' || url.pathname.endsWith('.html')) {
+    // no-cache: revalidate with the server (cheap 304) instead of trusting the HTTP cache
+    e.respondWith(
+      fetch(e.request.url, { cache: 'no-cache', credentials: 'same-origin' }).then(resp => {
+        if (resp.ok) {
+          const clone = resp.clone();
+          caches.open(CACHE).then(c => c.put('./index.html', clone));
+        }
+        return resp;
+      }).catch(() => caches.match('./index.html'))
+    );
     return;
   }
 
-  // Cache-first for everything else
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(resp => {
-        if (resp.ok) {
-          const clone = resp.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
-        return resp;
-      });
-    }).catch(() => caches.match('./index.html'))
+    caches.match(e.request).then(cached => cached || fetch(e.request).then(resp => {
+      if (resp.ok) {
+        const clone = resp.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+      }
+      return resp;
+    }))
   );
 });
