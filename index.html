@@ -112,6 +112,14 @@ a{color:var(--accent);text-decoration:none}
 #ttsBar button{width:44px;height:44px;border:none;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:1rem;cursor:pointer}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(132px + env(safe-area-inset-bottom,0px));width:calc(100% - 32px);max-width:488px;background:var(--text);color:var(--bg);padding:12px 14px;border-radius:12px;font-size:.8rem;z-index:120;box-shadow:var(--shadow)}
 #toast[hidden]{display:none}
+#sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:130;display:flex;align-items:flex-end;justify-content:center}
+#sheet[hidden]{display:none}
+.sheet-box{background:var(--card);color:var(--text);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));font-size:.84rem;line-height:1.5}
+.sheet-box h3{font-size:1rem;margin-bottom:6px}
+.sheet-box .copy{display:flex;gap:6px;margin:12px 0 6px}
+.sheet-box .copy input{flex:1;min-width:0;min-height:48px;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.8rem}
+.sheet-box .copy button{min-height:48px;padding:0 16px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+.sheet-close{width:100%;min-height:48px;margin-top:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);font-weight:600;cursor:pointer}
 /* Settings */
 .cfg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card);border-radius:10px;margin-bottom:8px;box-shadow:var(--shadow)}
 .cfg-row label{font-size:.82rem;font-weight:600}
@@ -233,6 +241,12 @@ a{color:var(--accent);text-decoration:none}
   <button onclick="ttsStop()" aria-label="Parar">⏹</button>
 </div>
 <div id="toast" role="status" hidden></div>
+<div id="sheet" hidden><div class="sheet-box" role="dialog" aria-modal="true" aria-labelledby="sheetT">
+  <h3 id="sheetT"></h3><p id="sheetP"></p>
+  <div class="copy"><input id="sheetIn" readonly aria-label="Texto para copiar"><button onclick="sheetCopy()">Copiar</button></div>
+  <p id="sheetHint" class="go-note"></p>
+  <button class="sheet-close" onclick="closeSheet()">Fechar</button>
+</div></div>
 
 <!-- Bottom nav -->
 <nav class="bn">
@@ -542,17 +556,52 @@ function siteLink(){
 }
 function handoffHTML(what){
   return `<div class="handoff"><strong>📲 ${what} funciona no navegador.</strong> Dentro do Claude o celular não libera esse acesso. Continue o guia no Chrome (ou Safari):
-<a class="open" href="${siteLink()}" target="_blank" rel="noopener" onclick="this.href=siteLink()">🌐 Abrir o guia no navegador</a>
+<a class="open" href="${siteLink()}" target="_blank" rel="noopener" data-kind="site">🌐 Abrir o guia no navegador</a>
 <div class="copy"><input readonly value="${SITE_URL}" aria-label="Endereço do guia"><button onclick="copySite(this)">Copiar</button></div>
 <div class="go-note">O checklist e o local escolhido vão junto. Depois, no Chrome: ⋮ → Instalar app.</div></div>`;
 }
 function copySite(btn){
   const inp=btn.previousElementSibling;
   const done=()=>{btn.textContent='Copiado ✓';};
-  if(navigator.clipboard)navigator.clipboard.writeText(SITE_URL).then(done,()=>{inp.select();toast('Toque e segure no endereço para copiar.');});
+  if(navigator.clipboard)navigator.clipboard.writeText(siteLink()).then(done,()=>{inp.select();toast('Toque e segure no endereço para copiar.');});
   else{inp.select();toast('Toque e segure no endereço para copiar.');}
 }
 const isIdx=(k,arr)=>/^\d+$/.test(String(k))&&+k<arr.length;
+// Inside the Claude viewer a tap on a new-window link may be silently blocked.
+// Try to open it; if the viewer refuses, show what to copy instead of doing nothing.
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a[target="_blank"]');
+  if(!a)return;
+  if(a.dataset.kind==='site')a.href=siteLink();
+  if(!inSandbox)return;
+  e.preventDefault();
+  let w=null;
+  try{w=window.open(a.href,'_blank');}catch(err){}
+  if(w){try{w.opener=null;}catch(err){}return;}
+  linkBlocked(a);
+});
+function linkBlocked(a){
+  const k=a.dataset.kind,dest=a.dataset.dest||'';
+  if(k==='uber')openSheet('O Claude bloqueou a abertura do Uber','Copie o destino, abra o app do Uber e cole em "Para onde?".',dest,
+    onSite?'':'No navegador os botões do Uber abrem direto. Toque em Fechar e use "Abrir o guia no navegador" na aba Info.');
+  else if(k==='maps')openSheet('O Claude bloqueou a abertura do mapa','Copie o destino e cole no Google Maps.',dest,'');
+  else openSheet('O Claude bloqueou a abertura do link','Copie o endereço abaixo e cole na barra de endereço do Chrome (ou Safari).',k==='site'?siteLink():a.href,
+    k==='site'?'O link leva junto o checklist e o local escolhido.':'');
+}
+function openSheet(title,text,value,hint){
+  document.getElementById('sheetT').textContent=title;
+  document.getElementById('sheetP').textContent=text;
+  document.getElementById('sheetIn').value=value;
+  document.getElementById('sheetHint').textContent=hint;
+  document.getElementById('sheet').hidden=false;
+}
+function closeSheet(){document.getElementById('sheet').hidden=true;}
+function sheetCopy(){
+  const inp=document.getElementById('sheetIn'),btn=inp.nextElementSibling;
+  const ok=()=>{btn.textContent='Copiado ✓';setTimeout(()=>{btn.textContent='Copiar';},2000);};
+  const manual=()=>{inp.focus();inp.select();toast('Toque e segure no texto para copiar.');};
+  if(navigator.clipboard)navigator.clipboard.writeText(inp.value).then(ok,manual);else manual();
+}
 // State sent along by siteLink(): #loc=3&chk=0.2.5
 function importHash(){
   if(!location.hash||location.hash.length<2)return;
@@ -685,8 +734,8 @@ function goLinks(p,km){
   const walk=km<WALK_KM,dest=encodeURIComponent(p.addr||p.name);
   const maps=`https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=${walk?'walking':'driving'}`;
   const uber=`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${p.lat}&dropoff[longitude]=${p.lng}&dropoff[nickname]=${encodeURIComponent(p.name)}&dropoff[formatted_address]=${dest}`;
-  const ub=`<a class="${walk?'':'pri'}" href="${uber}" target="_blank" rel="noopener">🚗 ${walk?'Uber':'Chamar Uber'}</a>`;
-  const mp=`<a class="${walk?'pri':''}" href="${maps}" target="_blank" rel="noopener">${walk?`🚶 Ir a pé · ~${walkMin(km)} min`:'🗺️ Mapa'}</a>`;
+  const ub=`<a class="${walk?'':'pri'}" href="${uber}" target="_blank" rel="noopener" data-kind="uber" data-dest="${(p.addr||p.name).replace(/"/g,'&quot;')}">🚗 ${walk?'Uber':'Chamar Uber'}</a>`;
+  const mp=`<a class="${walk?'pri':''}" href="${maps}" target="_blank" rel="noopener" data-kind="maps" data-dest="${(p.addr||p.name).replace(/"/g,'&quot;')}">${walk?`🚶 Ir a pé · ~${walkMin(km)} min`:'🗺️ Mapa'}</a>`;
   return `<div class="go">${walk?mp+ub:ub+mp}</div>`+(walk?'':'<div class="go-note">Uber sugerido pela distância · confira o destino no app antes de confirmar</div>');
 }
 // Origin: where the traveller is, else the previous place in the day's plan, else the hotel.
