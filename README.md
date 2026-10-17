@@ -19,6 +19,19 @@ Qual IA responde:
 2. **GitHub Pages**: configure uma chave Anthropic ou OpenAI em Info → Configurações (fica só no aparelho).
 3. Sem nenhuma das duas: base local (texto), sem fotos.
 
+## Rotas e Uber
+
+Toque num item do roteiro (ou veja a aba Local) para abrir a rota até o lugar:
+- até 1,2 km: **🚶 Ir a pé** (Google Maps, com tempo estimado);
+- acima disso: **🚗 Chamar Uber** em destaque, já com o destino preenchido.
+
+A origem considerada é o local atual (GPS ou "Ou estou em"); sem isso, o lugar anterior do roteiro do dia ou o hotel.
+Os links do Uber usam coordenadas aproximadas: abra cada um antes da viagem e confira o pino (item do checklist).
+
+## Versão completa (GPS e voz)
+
+Dentro do Claude (artefato) o celular não libera GPS nem microfone. O guia então mostra **🌐 Abrir o guia no navegador**, que leva para https://jlucianocarneiro.github.io/test/ levando junto o checklist e o local escolhido. Para esse endereço funcionar, ative o GitHub Pages neste repositório.
+
 ## Clima e GPS
 
 No GitHub Pages (HTTPS próprio) clima e GPS funcionam normalmente. Se o GPS falhar ou for bloqueado (por exemplo, dentro do artefato do claude.ai), escolha o ponto atual na lista "Ou estou em" para ver as distâncias; a escolha fica salva. Sem previsão online, o clima mostra a média típica de outubro (8°–18°C).

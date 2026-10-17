@@ -72,7 +72,16 @@ a{color:var(--accent);text-decoration:none}
 .di{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--card);border-radius:10px;margin-bottom:6px;box-shadow:var(--shadow)}
 .di{flex-wrap:wrap;gap:6px}.di .dn{font-size:.82rem;font-weight:600;flex:1}.di .dv{font-size:.76rem;color:var(--accent);font-weight:700}
 .go{display:flex;gap:6px;width:100%}
-.go a{flex:1;display:flex;align-items:center;justify-content:center;min-height:40px;border-radius:10px;font-size:.74rem;font-weight:600;border:1px solid var(--border);color:var(--text);background:var(--bg)}
+.go a{flex:1;display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:10px;font-size:.76rem;font-weight:600;border:1px solid var(--border);color:var(--text);background:var(--bg)}
+.go a.pri{background:#000;border-color:#000;color:#fff}
+.go-head{font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.go-note{font-size:.7rem;color:var(--muted);margin-top:4px;width:100%}
+.acts{margin-bottom:10px}
+.handoff{background:var(--card);border:2px solid var(--brand);border-radius:var(--r);padding:14px;margin:8px 0;font-size:.8rem;line-height:1.5}
+.handoff a.open{display:flex;align-items:center;justify-content:center;min-height:48px;margin:10px 0 8px;border-radius:12px;background:var(--brand);color:#fff;font-weight:700;font-size:.88rem}
+.handoff .copy{display:flex;gap:6px}
+.handoff .copy input{flex:1;min-width:0;min-height:44px;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.74rem}
+.handoff .copy button{min-height:44px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-weight:600;cursor:pointer}
 /* Checklist */
 .ci{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--card);border-radius:10px;margin-bottom:6px;box-shadow:var(--shadow);font-size:.82rem;cursor:pointer}
 .cb{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:1px}
@@ -192,6 +201,7 @@ a{color:var(--accent);text-decoration:none}
     <li><a href="tel:05436861463">054 3686-1463</a> — Hospital Gramado</li>
     <li><a href="tel:05436862100">054 3686-2100</a> — Turismo Gramado</li>
   </ul></div>
+  <div id="fullSite"></div>
   <div class="st">Configurações</div>
   <div class="cfg-row"><label>Provedor IA</label>
     <select id="cfgProvider" onchange="saveConfig()">
@@ -239,20 +249,20 @@ a{color:var(--accent);text-decoration:none}
 // ===========================
 const G={lat:-29.3773,lng:-50.8764};
 const POINTS=[
-  {name:"Hotel Bellagio",lat:-29.3755,lng:-50.8762},
-  {name:"Rua Coberta",lat:-29.3769,lng:-50.8761},
-  {name:"Snowland",lat:-29.3936,lng:-50.8391},
-  {name:"Château D'Geneve",lat:-29.3688,lng:-50.8535},
-  {name:"Vinícola Jolimont",lat:-29.3420,lng:-50.8480},
-  {name:"Parque do Caracol",lat:-29.3169,lng:-50.8546},
-  {name:"Skyglass Canela",lat:-29.2890,lng:-50.8365},
-  {name:"Serra Park",lat:-29.3911,lng:-50.8750},
-  {name:"Lago J. R. Bier",lat:-29.3803,lng:-50.8740},
-  {name:"Lago Negro",lat:-29.3853,lng:-50.8710},
-  {name:"Cara de Mau",lat:-29.3768,lng:-50.8725},
-  {name:"Café Colonial Bela Vista",lat:-29.3670,lng:-50.8310},
-  {name:"Rodoviária Gramado",lat:-29.3790,lng:-50.8700},
-  {name:"Container Bistrot",lat:-29.3635,lng:-50.8115},
+  {name:"Hotel Bellagio",lat:-29.3755,lng:-50.8762,addr:"Bellagio Mini Resort, Gramado - RS"},
+  {name:"Rua Coberta",lat:-29.3769,lng:-50.8761,addr:"Rua Coberta, Gramado - RS"},
+  {name:"Snowland",lat:-29.3936,lng:-50.8391,addr:"Snowland, RS-235, 9009, Gramado - RS"},
+  {name:"Château D'Geneve",lat:-29.3688,lng:-50.8535,addr:"Château D'Geneve, Gramado - RS"},
+  {name:"Vinícola Jolimont",lat:-29.3420,lng:-50.8480,addr:"Vinícola Jolimont, Estrada Morro Calçado, 1420, Canela - RS"},
+  {name:"Parque do Caracol",lat:-29.3169,lng:-50.8546,addr:"Parque do Caracol, Canela - RS"},
+  {name:"Skyglass Canela",lat:-29.2890,lng:-50.8365,addr:"Skyglass Canela, Estrada Municipal CNL 350, 9800, Canela - RS"},
+  {name:"Serra Park",lat:-29.3911,lng:-50.8750,addr:"Serra Park, Gramado - RS"},
+  {name:"Lago J. R. Bier",lat:-29.3803,lng:-50.8740,addr:"Lago Joaquina Rita Bier, Gramado - RS"},
+  {name:"Lago Negro",lat:-29.3853,lng:-50.8710,addr:"Lago Negro, Gramado - RS"},
+  {name:"Cara de Mau",lat:-29.3768,lng:-50.8725,addr:"Cara de Mau, Gramado - RS"},
+  {name:"Café Colonial Bela Vista",lat:-29.3670,lng:-50.8310,addr:"Café Colonial Bela Vista, Av. das Hortênsias, 3500, Gramado - RS"},
+  {name:"Rodoviária Gramado",lat:-29.3790,lng:-50.8700,addr:"Rodoviária de Gramado, Gramado - RS"},
+  {name:"Container Bistrot",lat:-29.3635,lng:-50.8115,addr:"Container Bistrot, Canela - RS"},
 ];
 const CHECKS=[
   "Comprar ingressos Parque do Caracol (online)",
@@ -269,6 +279,8 @@ const CHECKS=[
   "Protetor solar (altitude!)",
   "Confirmar reserva Cara de Mau",
   "Conferir horários Nativitaten",
+  "Abrir cada link de Uber do roteiro e conferir o pino do destino",
+  "Conferir funcionamento: Château (dom 25), Snowland (seg 26)",
 ];
 
 // Itinerary data
@@ -280,9 +292,9 @@ const DAYS = {
       {t:"05:00",n:"Despertar + aeroporto BSB",d:"Documentos, bagagens, funcional PCDF.",c:"transport",x:"Check-in online LATAM 48h antes. Priority Pass / Dragon Pass para salas VIP no BSB.",h:"O Aeroporto de Brasília (BSB) é o 3º mais movimentado do Brasil. Inaugurado em 1957 junto com a capital."},
       {t:"12:05",n:"✈️ Pouso em Porto Alegre",d:"Voo LATAM. Desembarque doméstico.",c:"transport",tags:["c"],x:"Ir à loja Citral Serra no desembarque doméstico até ~13:30. Salas VIP: Ambaar Club (Priority Pass), W Premium Lounge (Dragon Pass) — embarque doméstico.",h:"O Aeroporto Salgado Filho foi inaugurado em 1940. Passou por reforma após enchentes de 2024."},
       {t:"14:00–16:30",n:"🚌 Citral → Gramado",d:"Poltronas 3-4 · Linha 0692 · ~2h15",c:"transport",tags:["c"],x:"Embarque ~14:15 no aeroporto. R$84,85×2 (pago). Paisagens lindas na subida da serra — câmera pronta!",h:"A Serra Gaúcha tem altitude média de 800m. Gramado está a 830m. A vegetação muda de planície para Mata Atlântica com araucárias."},
-      {t:"16:30–17:30",n:"🏨 Check-in Bellagio",d:"Centro de Gramado · Booking 5024.178.207",tags:["c"],x:"Café incluso. Perguntar sobre mapa turístico e Natal Luz na recepção."},
-      {t:"17:30–19:00",n:"🚶 Passeio pelo Centro",d:"Rua Coberta, Praça das Etnias, chocolates.",x:"Rua Coberta: lojas, cafés, chocolaterias. Prawer (a mais antiga!), Lugano, Caracol, Florybal — degustação gratuita.",h:"Gramado foi colonizada por alemães (1875) e italianos (1890). A tradição do chocolate começou nos anos 1970. Hoje são 50+ fábricas artesanais."},
-      {t:"19:30",n:"🍽️ Colosseo",d:"Italiano · ~R$90/pp · Rua Coberta",c:"meal",tags:["p"],x:"Prime 2×1. Massas e risotos. Peça vinho local (Miolo, Aurora)."},
+      {p:"Hotel Bellagio",t:"16:30–17:30",n:"🏨 Check-in Bellagio",d:"Centro de Gramado · Booking 5024.178.207",tags:["c"],x:"Café incluso. Perguntar sobre mapa turístico e Natal Luz na recepção."},
+      {p:"Rua Coberta",t:"17:30–19:00",n:"🚶 Passeio pelo Centro",d:"Rua Coberta, Praça das Etnias, chocolates.",x:"Rua Coberta: lojas, cafés, chocolaterias. Prawer (a mais antiga!), Lugano, Caracol, Florybal — degustação gratuita.",h:"Gramado foi colonizada por alemães (1875) e italianos (1890). A tradição do chocolate começou nos anos 1970. Hoje são 50+ fábricas artesanais."},
+      {p:"Rua Coberta",t:"19:30",n:"🍽️ Colosseo",d:"Italiano · ~R$90/pp · Rua Coberta",c:"meal",tags:["p"],x:"Prime 2×1. Massas e risotos. Peça vinho local (Miolo, Aurora)."},
     ]
   },
   25: {
@@ -293,8 +305,8 @@ const DAYS = {
       {t:"10:00–12:00",n:"🚶 Mini Mundo + Dream Cars",d:"A pé pelo Centro. Programas leves.",x:"Mini Mundo: miniaturas 1:24 (~R$60). Dream Cars: carros clássicos do cinema (~R$60). Checar Prime 2×1.",h:"O Mini Mundo existe desde 1983, 160+ miniaturas artesanais feitas por 3 gerações de uma família alemã."},
       {t:"12:30",n:"🍽️ Almoço leve",d:"Lanche rápido — fondue à noite!",c:"meal",x:"Empório Canela, Mamma Tchê ou café com torta na Rua Coberta."},
       {t:"14:00–16:30",n:"🎄 Decoração + compras",d:"Rua Torta, chocolates, lembranças.",x:"Rua Torta: piso sinuoso, lojas charmosas. Compras: chocolates, malhas, queijos, vinhos."},
-      {t:"17:40",n:"🚗 Uber → Château D'Geneve",d:"Av. Hortênsias · ~10 min",c:"transport",x:"NÃO aceita reserva! Ordem de chegada. Sair 17:40, chegar ~17:50, antes das 18:00."},
-      {t:"18:00–20:30",n:"🧀🍫🍖 Fondue Château D'Geneve",d:"Sequência: queijo → carne → chocolate",c:"meal",tags:["p"],x:"Prime 2×1! Sequência: gruyère+emmental → filé com molhos → chocolate belga com frutas. ~R$180/pp (com Prime ~R$90/pp).",h:"O fondue originou nos Alpes Suíços — pastores derretiam restos de queijo. Gramado adotou pela herança europeia e clima frio."},
+      {p:"Château D'Geneve",t:"17:40",n:"🚗 Uber → Château D'Geneve",d:"Av. Hortênsias · ~10 min",c:"transport",x:"NÃO aceita reserva! Ordem de chegada. Sair 17:40, chegar ~17:50, antes das 18:00."},
+      {p:"Château D'Geneve",t:"18:00–20:30",n:"🧀🍫🍖 Fondue Château D'Geneve",d:"Sequência: queijo → carne → chocolate",c:"meal",tags:["p"],x:"Prime 2×1! Sequência: gruyère+emmental → filé com molhos → chocolate belga com frutas. ~R$180/pp (com Prime ~R$90/pp).",h:"O fondue originou nos Alpes Suíços — pastores derretiam restos de queijo. Gramado adotou pela herança europeia e clima frio."},
       {t:"21:00",n:"🌟 Iluminação Natal Luz",d:"Centro iluminado. Fotos noturnas.",x:"Melhores pontos: Praça Major Nicoletti, Lago J.R. Bier, Igreja São Pedro.",h:"O Natal Luz começou em 1986. Hoje é o maior evento natalino das Américas, 2M+ visitantes/temporada."},
     ]
   },
@@ -303,9 +315,9 @@ const DAYS = {
     sub:"Dia inteiro no parque de neve",
     items:[
       {t:"8:00",n:"☕ Café reforçado",d:"Dia intenso — coma bem!"},
-      {t:"9:30",n:"🚗 Uber → Snowland",d:"RS-235 Km 31 · ~15 min",c:"transport",x:"Abre 10:00. Chegar antes para lockers."},
-      {t:"10:00–16:00",n:"❄️ Snowland",d:"Neve real -5°C! Esqui, patinação, tobogã.",c:"nature",tags:["p","c"],x:"2 ingressos Prime 2×1. Roupa de neve inclusa. Leve meias grossas! Restaurante interno (~R$50-70/pp).",h:"Único parque de neve indoor das Américas (2013). Neve real a -5°C, tecnologia austríaca. 16.000m²."},
-      {t:"16:30",n:"🚗 Volta ao hotel",d:"Descanso e banho quente!",c:"transport"},
+      {p:"Snowland",t:"9:30",n:"🚗 Uber → Snowland",d:"RS-235 Km 31 · ~15 min",c:"transport",x:"Abre 10:00. Chegar antes para lockers."},
+      {p:"Snowland",t:"10:00–16:00",n:"❄️ Snowland",d:"Neve real -5°C! Esqui, patinação, tobogã.",c:"nature",tags:["p","c"],x:"2 ingressos Prime 2×1. Roupa de neve inclusa. Leve meias grossas! Restaurante interno (~R$50-70/pp).",h:"Único parque de neve indoor das Américas (2013). Neve real a -5°C, tecnologia austríaca. 16.000m²."},
+      {p:"Hotel Bellagio",t:"16:30",n:"🚗 Volta ao hotel",d:"Descanso e banho quente!",c:"transport"},
       {t:"19:30",n:"🍽️ Jantar livre",d:"Mamma Tchê, Cantina 28, ou leve.",c:"meal",x:"Mamma Tchê (~R$80/pp): galeto gaúcho. Cantina 28 (~R$90/pp): massas artesanais."},
     ]
   },
@@ -316,7 +328,7 @@ const DAYS = {
       {t:"8:30",n:"☕ Café no hotel",d:"Dia de caminhar pelo centro."},
       {t:"10:00–12:30",n:"🍫 Tour Fábricas de Chocolate",d:"Prawer, Lugano, Florybal — degustação!",x:"Prawer (1975, a mais antiga). Lugano (trufas finas). Florybal (chocolate com pimenta!). Pedir desconto funcional em compras maiores.",h:"A Prawer foi a primeira fábrica (1975), casal Jayme e Telma Prawer. Gramado produz 7M kg de chocolate/ano."},
       {t:"12:30",n:"🍽️ Almoço leve",d:"Josephina Café ou Empório Canela.",c:"meal",x:"Josephina (~R$50/pp): sanduíches, quiches. Empório Canela (~R$60/pp): café colonial light."},
-      {t:"14:00–17:00",n:"🛍️ Compras + Lago J.R. Bier",d:"Rua Coberta, Rua Torta, Lago — a pé.",x:"Pedalinhos (~R$40/casal). Igreja São Pedro: pedra basáltica, 1942. Gratuito.",h:"Igreja São Pedro (1942), estilo gótico em pedra basáltica. O lago (1950) leva o nome de uma das primeiras moradoras."},
+      {p:"Lago J. R. Bier",t:"14:00–17:00",n:"🛍️ Compras + Lago J.R. Bier",d:"Rua Coberta, Rua Torta, Lago — a pé.",x:"Pedalinhos (~R$40/casal). Igreja São Pedro: pedra basáltica, 1942. Gratuito.",h:"Igreja São Pedro (1942), estilo gótico em pedra basáltica. O lago (1950) leva o nome de uma das primeiras moradoras."},
       {t:"19:30",n:"🥩 Texas Gramado",d:"Carnes nobres · ~R$100/pp",c:"meal",tags:["p"],x:"Prime 2×1. Ancho, chorizo, costela na brasa. Harmonize com Tannat ou Malbec. Perguntar desconto funcional."},
     ]
   },
@@ -327,9 +339,9 @@ const DAYS = {
       {t:"9:00",n:"☕ Café LEVE no hotel",d:"Coma pouco! Café Colonial é banquete."},
       {t:"10:00–12:00",n:"🎡 Aldeia do Papai Noel ou Zoo",d:"Escolha conforme o humor.",x:"Aldeia: parque natalino, trenó, neve artificial (~R$80/pp). GramadoZoo: animais em ambientes imersivos (~R$80/pp). Ou manhã livre!",h:"A Aldeia do Papai Noel foi o 1º parque de Natal do Brasil (1940). O trenó 'voa' por trilhos sobre a cidade."},
       {t:"12:30",n:"🥗 Almoço BEM leve",d:"Só sopa ou salada!",c:"meal",x:"O Café Colonial tem 80+ itens. Chegar com fome!"},
-      {t:"14:30",n:"🚗 Uber → Bela Vista",d:"RS-235 · ~10 min",c:"transport"},
-      {t:"15:00–17:00",n:"🧁 Café Colonial Bela Vista",d:"80+ itens · ~R$130/pp",c:"meal",x:"Cucas alemãs, strudel, pão de queijo, galeto, waffles, sopas, queijos coloniais, bolos, tortas. Reservar 1h30. Perguntar desconto policial.",h:"O Café Colonial vem dos colonos alemães: 'Kaffee und Kuchen'. Geleias, pães de forno a lenha, linguiça, schmier. Tradição turística desde os anos 1980."},
-      {t:"18:00",n:"🌆 Volta + descanso",d:"Após o banquete, noite livre."},
+      {p:"Café Colonial Bela Vista",t:"14:30",n:"🚗 Uber → Bela Vista",d:"RS-235 · ~10 min",c:"transport"},
+      {p:"Café Colonial Bela Vista",t:"15:00–17:00",n:"🧁 Café Colonial Bela Vista",d:"80+ itens · ~R$130/pp",c:"meal",x:"Cucas alemãs, strudel, pão de queijo, galeto, waffles, sopas, queijos coloniais, bolos, tortas. Reservar 1h30. Perguntar desconto policial.",h:"O Café Colonial vem dos colonos alemães: 'Kaffee und Kuchen'. Geleias, pães de forno a lenha, linguiça, schmier. Tradição turística desde os anos 1980."},
+      {p:"Hotel Bellagio",t:"18:00",n:"🌆 Volta + descanso",d:"Após o banquete, noite livre."},
       {t:"20:00",n:"🌙 Noite livre",d:"Ruas iluminadas ou descanso.",x:"Provavelmente sem fome. Opções: passear no Natal Luz, vinho/chocolate quente na Rua Coberta, ou descanso para Canela amanhã."},
     ]
   },
@@ -338,18 +350,18 @@ const DAYS = {
     sub:"Jolimont · Caracol · Nativitaten à noite",
     items:[
       {t:"7:30",n:"⏰ Acordar cedo!",d:"Café reforçado às 8:00. Dia cheio."},
-      {t:"8:45",n:"🚗 Uber → Jolimont",d:"~20 min de Gramado",c:"transport"},
-      {t:"9:00–10:30",n:"🍷 Vinícola Jolimont",d:"Tour + degustação · R$149/pp antecipado",c:"nature",tags:["p"],x:"Tour ~1h30. Vinhedos, cave, 5-6 rótulos + espumantes. R$149/pp online (R$189 bilheteria). Prime 2×1! Cupom AVENTURANDO 10%. Funciona 9h–16h45. Perguntar desconto funcional.",h:"Fundada 1948 pela família Luchese (italianos). Vale dos Vinhedos, 600m altitude. Merlot, Cabernet, espumantes Champenoise. Nome homenageia Château de Jolimont na Suíça."},
-      {t:"10:45",n:"🚗 Uber → Caracol",d:"~20 min",c:"transport"},
-      {t:"11:00–13:00",n:"🌊 Parque do Caracol",d:"Cascata 130m, teleférico, trilhas",c:"nature",tags:["w"],x:"Elevador panorâmico (80m), teleférico, Trilha da Cascata (700 degraus). ~R$60-190/pp. FECHA TER/QUA — por isso quinta! Perguntar desconto funcional.",h:"Cascata descoberta por colonos alemães em 1912. Nome vem do formato espiralado do rio. Mata Atlântica com araucárias centenárias. 800 mil visitantes/ano."},
-      {t:"13:15",n:"🚗 Uber → Centro Canela",d:"~10 min",c:"transport"},
-      {t:"13:30",n:"🍽️ Container Bistrot",d:"Gastronomia criativa · ~R$80/pp",c:"meal",x:"Restaurante em containers. Pratos criativos com ingredientes locais. Boa carta de vinhos da Serra.",h:"Canela (fundada 1944): nome de uma caneleira na atual Praça João Corrêa. 837m altitude."},
-      {t:"14:45",n:"🔭 (Opcional) Skyglass",d:"Plataforma vidro 360m · R$99-159/pp",x:"Passarela de vidro sobre o Vale da Ferradura. Sky bike, mirante 360°. Avaliar cansaço."},
-      {t:"16:00",n:"🚗 Volta a Gramado",d:"~30 min. Hotel, descanso.",c:"transport"},
+      {p:"Vinícola Jolimont",t:"8:45",n:"🚗 Uber → Jolimont",d:"~20 min de Gramado",c:"transport"},
+      {p:"Vinícola Jolimont",t:"9:00–10:30",n:"🍷 Vinícola Jolimont",d:"Tour + degustação · R$149/pp antecipado",c:"nature",tags:["p"],x:"Tour ~1h30. Vinhedos, cave, 5-6 rótulos + espumantes. R$149/pp online (R$189 bilheteria). Prime 2×1! Cupom AVENTURANDO 10%. Funciona 9h–16h45. Perguntar desconto funcional.",h:"Fundada 1948 pela família Luchese (italianos). Vale dos Vinhedos, 600m altitude. Merlot, Cabernet, espumantes Champenoise. Nome homenageia Château de Jolimont na Suíça."},
+      {p:"Parque do Caracol",t:"10:45",n:"🚗 Uber → Caracol",d:"~20 min",c:"transport"},
+      {p:"Parque do Caracol",t:"11:00–13:00",n:"🌊 Parque do Caracol",d:"Cascata 130m, teleférico, trilhas",c:"nature",tags:["w"],x:"Elevador panorâmico (80m), teleférico, Trilha da Cascata (700 degraus). ~R$60-190/pp. FECHA TER/QUA — por isso quinta! Perguntar desconto funcional.",h:"Cascata descoberta por colonos alemães em 1912. Nome vem do formato espiralado do rio. Mata Atlântica com araucárias centenárias. 800 mil visitantes/ano."},
+      {p:"Container Bistrot",t:"13:15",n:"🚗 Uber → Centro Canela",d:"~10 min",c:"transport"},
+      {p:"Container Bistrot",t:"13:30",n:"🍽️ Container Bistrot",d:"Gastronomia criativa · ~R$80/pp",c:"meal",x:"Restaurante em containers. Pratos criativos com ingredientes locais. Boa carta de vinhos da Serra.",h:"Canela (fundada 1944): nome de uma caneleira na atual Praça João Corrêa. 837m altitude."},
+      {p:"Skyglass Canela",t:"14:45",n:"🔭 (Opcional) Skyglass",d:"Plataforma vidro 360m · R$99-159/pp",x:"Passarela de vidro sobre o Vale da Ferradura. Sky bike, mirante 360°. Avaliar cansaço."},
+      {p:"Hotel Bellagio",t:"16:00",n:"🚗 Volta a Gramado",d:"~30 min. Hotel, descanso.",c:"transport"},
       {t:"18:30",n:"🥪 Lanche leve",d:"Algo rápido antes do show.",c:"meal"},
-      {t:"19:15",n:"🚗 Uber → Serra Park",d:"~10 min. Chegar 19:30.",c:"transport"},
-      {t:"20:00–21:30",n:"🎄 Nativitaten",d:"Espetáculo principal · Setor Ouro",tags:["c"],x:"Música ao vivo, projeções a laser, pirotecnia, neve artificial. ~1h30. Leve agasalho (8-10°C à noite!).",h:"Herdeiro do 'Grande Desfile de Natal'. Desde 2017 no Serra Park, investimento milionário em efeitos especiais."},
-      {t:"21:45",n:"Uber de volta. Descanso!",d:"Dia intenso. Merecido."},
+      {p:"Serra Park",t:"19:15",n:"🚗 Uber → Serra Park",d:"~10 min. Chegar 19:30.",c:"transport"},
+      {p:"Serra Park",t:"20:00–21:30",n:"🎄 Nativitaten",d:"Espetáculo principal · Setor Ouro",tags:["c"],x:"Música ao vivo, projeções a laser, pirotecnia, neve artificial. ~1h30. Leve agasalho (8-10°C à noite!).",h:"Herdeiro do 'Grande Desfile de Natal'. Desde 2017 no Serra Park, investimento milionário em efeitos especiais."},
+      {p:"Hotel Bellagio",t:"21:45",n:"Uber de volta. Descanso!",d:"Dia intenso. Merecido."},
     ]
   },
   30: {
@@ -359,10 +371,10 @@ const DAYS = {
       {t:"9:00",n:"☕ Café tranquilo",d:"Dia mais livre da viagem."},
       {t:"10:30–12:30",n:"🛍️ Compras finais",d:"Chocolates, queijos, vinhos, malhas.",x:"Kits-presente da Prawer e Florybal. Vinhos: despachar na mala, embrulhar bem! Líquidos >100ml → mala despachada."},
       {t:"13:00",n:"🍽️ Almoço livre",d:"Último almoço em Gramado!",c:"meal",x:"Josephina Café (~R$60/pp) ou La Caceria (fondue de almoço ~R$110/pp)."},
-      {t:"14:30–17:00",n:"🌄 Passeio livre",d:"Lago, mirantes, despedida.",x:"Mirante do Vale do Quilombo: pôr-do-sol espetacular. Le Jardin: lavandas (~R$60/pp, checar Prime). Lago Negro: pedalinhos (~R$30-50/casal).",h:"O Lago Negro (1953) surgiu após incêndio. Mudas de hortênsias vieram da Floresta Negra alemã. Águas escuras pelo reflexo das árvores."},
+      {p:"Lago Negro",t:"14:30–17:00",n:"🌄 Passeio livre",d:"Lago, mirantes, despedida.",x:"Mirante do Vale do Quilombo: pôr-do-sol espetacular. Le Jardin: lavandas (~R$60/pp, checar Prime). Lago Negro: pedalinhos (~R$30-50/casal).",h:"O Lago Negro (1953) surgiu após incêndio. Mudas de hortênsias vieram da Floresta Negra alemã. Águas escuras pelo reflexo das árvores."},
       {t:"18:00",n:"🧥 Arrumar-se",d:"Último jantar especial!"},
-      {t:"20:30",n:"🚶 Caminhar ao Centro",d:"Última vez pelo Natal Luz."},
-      {t:"21:30",n:"🍷 Cara de Mau",d:"Ambiente Porto · Reserva confirmada",c:"meal",tags:["c"],x:"Reserva 21:30, 2 adultos. Carnes nobres (tomahawk, ancho, costela), risotos. Carta ampla de vinhos. ~R$130-160/pp. Verificar desconto funcional e Prime.",h:"Referência em carnes na Serra Gaúcha. 'Gaúcho bravo'. Ambiente Porto: tijolos aparentes, iluminação intimista."},
+      {p:"Rua Coberta",t:"20:30",n:"🚶 Caminhar ao Centro",d:"Última vez pelo Natal Luz."},
+      {p:"Cara de Mau",t:"21:30",n:"🍷 Cara de Mau",d:"Ambiente Porto · Reserva confirmada",c:"meal",tags:["c"],x:"Reserva 21:30, 2 adultos. Carnes nobres (tomahawk, ancho, costela), risotos. Carta ampla de vinhos. ~R$130-160/pp. Verificar desconto funcional e Prime.",h:"Referência em carnes na Serra Gaúcha. 'Gaúcho bravo'. Ambiente Porto: tijolos aparentes, iluminação intimista."},
     ]
   },
   31: {
@@ -372,7 +384,7 @@ const DAYS = {
       {t:"8:00",n:"☕ Último café no Bellagio",d:"Aproveite! Último com vista para a serra."},
       {t:"9:00–11:00",n:"🧳 Malas + check-out",d:"Chocolates/vinhos na mala despachada!",x:"Checklist: armários, banheiro, embalar chocolates/vinhos (proteção), líquidos >100ml na despachada, carregar celulares, funcional PCDF à mão."},
       {t:"11:00–12:00",n:"🚶 Último passeio",d:"Despedida, últimas fotos."},
-      {t:"12:15",n:"🚌 Citral → POA",d:"Poltronas 5-6 · Linha 0962 · Chega 14:45",c:"transport",tags:["c"],x:"Rodoviária Gramado, 12:15 pontual. R$84,85×2 (pago)."},
+      {p:"Rodoviária Gramado",t:"12:15",n:"🚌 Citral → POA",d:"Poltronas 5-6 · Linha 0962 · Chega 14:45",c:"transport",tags:["c"],x:"Rodoviária Gramado, 12:15 pontual. R$84,85×2 (pago)."},
       {t:"14:45–17:30",n:"✈️ Aeroporto POA",d:"Check-in, mala, sala VIP, embarque.",x:"GOL G3 1795, 17:30. Salas: Ambaar Club (Priority Pass) / W Premium Lounge (Dragon Pass). LATAM Platinum NÃO funciona voando GOL."},
       {t:"17:30",n:"✈️ Decolagem!",d:"POA → BSB. Até a próxima, Serra! 🏔️",c:"transport",tags:["c"]},
     ]
@@ -428,8 +440,10 @@ function renderDays(){
         if(t==='f') return '<span class="tg tg-f">Grátis</span>';
         return '';
       }).join(' ');
-      const detail = it.x ? `<div class="tx">${it.x.replace(/\n/g,'<br>')}${it.h?`<div class="hist">📜 ${it.h}</div>`:''}</div>` : (it.h ? `<div class="tx"><div class="hist">📜 ${it.h}</div></div>` : '');
-      html += `<div class="ti ${cls}" onclick="tog(this)"><div class="tt">${it.t}</div><div class="tn">${it.n}</div><div class="td">${it.d}</div>${tags}${detail}</div>`;
+      const acts = it.p ? '<div class="acts"></div>' : '';
+      const hint = it.p && it.c==='transport' ? ' <span class="tg tg-f">🚗 Toque: Uber e rota</span>' : '';
+      const detail = (it.x||it.h||it.p) ? `<div class="tx">${acts}${it.x?it.x.replace(/\n/g,'<br>'):''}${it.h?`<div class="hist">📜 ${it.h}</div>`:''}</div>` : '';
+      html += `<div class="ti ${cls}" data-i="${i}" onclick="tog(this,event)"><div class="tt">${it.t}</div><div class="tn">${it.n}</div><div class="td">${it.d}</div>${tags}${hint}${detail}</div>`;
     });
     html += '</div></div>';
   }
@@ -463,7 +477,13 @@ function showSec(name){
   if(name==='local'&&!locRequested){locRequested=true;if(geoAllowed||document.getElementById('locSel').value==='')getLoc();}
 }
 
-function tog(el){const d=el.querySelector('.tx');if(d)d.classList.toggle('open');}
+function tog(el,ev){
+  if(ev&&ev.target.closest('a,button,input'))return;
+  const d=el.querySelector('.tx');if(!d)return;
+  const open=d.classList.toggle('open');
+  const acts=el.querySelector('.acts');
+  if(open&&acts)acts.innerHTML=routeActs(+el.closest('.dp').dataset.day,+el.dataset.i);
+}
 
 function startMin(t){const m=String(t).match(/^(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null;}
 function initToday(){
@@ -503,6 +523,47 @@ const geoAllowed=(()=>{
   }catch(e){}
   return !inSandbox;
 })();
+const micAllowed=(()=>{
+  try{
+    const pp=document.permissionsPolicy||document.featurePolicy;
+    if(pp&&pp.allowsFeature)return pp.allowsFeature('microphone');
+  }catch(e){}
+  return !inSandbox;
+})();
+// Full version on GitHub Pages: GPS and microphone work there (no Claude iframe).
+const SITE_URL='https://jlucianocarneiro.github.io/test/';
+const onSite=location.href.startsWith(SITE_URL);
+function siteLink(){
+  const h=new URLSearchParams();
+  try{const l=localStorage.getItem('gramado-loc');if(l!==null)h.set('loc',l);}catch(e){}
+  const done=Object.keys(chk).filter(k=>chk[k]);
+  if(done.length)h.set('chk',done.join('.'));
+  return SITE_URL+(h.toString()?'#'+h:'');
+}
+function handoffHTML(what){
+  return `<div class="handoff"><strong>📲 ${what} funciona no navegador.</strong> Dentro do Claude o celular não libera esse acesso. Continue o guia no Chrome (ou Safari):
+<a class="open" href="${siteLink()}" target="_blank" rel="noopener" onclick="this.href=siteLink()">🌐 Abrir o guia no navegador</a>
+<div class="copy"><input readonly value="${SITE_URL}" aria-label="Endereço do guia"><button onclick="copySite(this)">Copiar</button></div>
+<div class="go-note">O checklist e o local escolhido vão junto. Depois, no Chrome: ⋮ → Instalar app.</div></div>`;
+}
+function copySite(btn){
+  const inp=btn.previousElementSibling;
+  const done=()=>{btn.textContent='Copiado ✓';};
+  if(navigator.clipboard)navigator.clipboard.writeText(SITE_URL).then(done,()=>{inp.select();toast('Toque e segure no endereço para copiar.');});
+  else{inp.select();toast('Toque e segure no endereço para copiar.');}
+}
+const isIdx=(k,arr)=>/^\d+$/.test(String(k))&&+k<arr.length;
+// State sent along by siteLink(): #loc=3&chk=0.2.5
+function importHash(){
+  if(!location.hash||location.hash.length<2)return;
+  const h=new URLSearchParams(location.hash.slice(1));
+  if(!h.has('loc')&&!h.has('chk'))return;
+  try{
+    if(isIdx(h.get('loc'),POINTS)){localStorage.setItem('gramado-loc',h.get('loc'));localStorage.setItem('gramado-loc-t',String(Date.now()));}
+    if(h.get('chk')){h.get('chk').split('.').forEach(k=>{if(isIdx(k,CHECKS))chk[k]=true;});localStorage.setItem('gramado-chk',JSON.stringify(chk));}
+  }catch(e){}
+  history.replaceState(null,'',location.pathname+location.search);
+}
 function showTypicalWeather(){
   document.getElementById('wIcon').textContent='🍂';
   document.getElementById('wText').textContent='Outubro típico: 8°–18°C · noites frias';
@@ -563,8 +624,7 @@ function getLoc(){
   if(!navigator.geolocation)
     return locMsg('Navegador sem GPS','Escolha abaixo onde vocês estão para ver as distâncias.');
   if(!geoAllowed)
-    return locMsg('📲 GPS bloqueado nesta visualização','Escolha abaixo onde vocês estão para ver as distâncias.',
-      '<p style="margin-top:8px">O visualizador do Claude não libera o GPS. Para usar o GPS de verdade, abra o guia pelo <strong>GitHub Pages</strong> no Safari/Chrome e adicione à Tela Inicial.</p>');
+    return locMsg('📲 GPS bloqueado dentro do Claude','Abra o guia no navegador, ou escolha abaixo onde vocês estão.',onSite?'':handoffHTML('O GPS'));
   if(!window.isSecureContext)
     return locMsg('⚠️ GPS requer HTTPS','Escolha abaixo onde vocês estão para ver as distâncias.',
       '<p style="margin-top:8px">O GPS só funciona em páginas <strong>HTTPS</strong>. Abra pelo GitHub Pages em vez do arquivo local.</p>');
@@ -581,12 +641,12 @@ function getLoc(){
     const tail=' Enquanto isso, escolha abaixo onde vocês estão.';
     if(err.code===1){
       const g=/iPad|iPhone|iPod/.test(navigator.userAgent)?GPS_GUIDE.ios:/Android/.test(navigator.userAgent)?GPS_GUIDE.android:GPS_GUIDE.other;
-      locMsg('🚫 Acesso à localização negado','O celular ou o app bloqueou o GPS.'+tail,g+EMBED_HINT);
+      locMsg('🚫 Acesso à localização negado','O celular ou o app bloqueou o GPS.'+tail,(onSite?'':handoffHTML('O GPS'))+g);
     } else if(err.code===2){
-      locMsg('📡 Posição indisponível','O aparelho não informou a posição.'+tail,
+      locMsg('📡 Posição indisponível','O aparelho não informou a posição.'+tail,(onSite?'':handoffHTML('O GPS'))+
         '<p style="margin-top:8px">• Ligue a <strong>Localização</strong> do celular<br>• Ative Wi-Fi ou dados móveis<br>• Toque "Usar meu GPS" de novo</p>'+EMBED_HINT);
     } else {
-      locMsg('⏱️ Tempo esgotado','A localização demorou demais.'+tail,
+      locMsg('⏱️ Tempo esgotado','A localização demorou demais.'+tail,(onSite?'':handoffHTML('O GPS'))+
         '<p style="margin-top:8px">Ative Wi-Fi ou dados móveis e toque "Usar meu GPS" de novo, de preferência perto de uma janela.</p>');
     }
   };
@@ -604,27 +664,50 @@ function hav(a1,n1,a2,n2){const R=6371,dL=(a2-a1)*Math.PI/180,dN=(n2-n1)*Math.PI
 function findN(lat,lng){let b={name:'—',dist:'—'},m=Infinity;POINTS.forEach(p=>{const d=hav(lat,lng,p.lat,p.lng);if(d<m){m=d;b={name:p.name,dist:fD(d)};}});return b;}
 function fD(k){return k<1?`${Math.round(k*1000)}m`:`${k.toFixed(1)}km`;}
 function pickLoc(i){
-  const p=POINTS[i];if(!p)return;
-  locMsg(`Em: ${p.name}`,'Distâncias em linha reta a partir deste ponto.');
-  try{localStorage.setItem('gramado-loc',String(i));}catch(e){}
+  if(!isIdx(i,POINTS))return;
+  const p=POINTS[i];
+  locMsg(`Em: ${p.name}`,'Distâncias em linha reta a partir deste ponto.',!geoAllowed&&!onSite?handoffHTML('O GPS'):'');
+  try{localStorage.setItem('gramado-loc',String(i));localStorage.setItem('gramado-loc-t',String(Date.now()));}catch(e){}
   here={lat:p.lat,lng:p.lng,label:p.name};
   renderDist(p.lat,p.lng);
 }
 function renderLocPick(){
   const sel=document.getElementById('locSel');
   sel.innerHTML='<option value="">Escolha um ponto…</option>'+POINTS.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
-  let saved=null;
-  try{saved=localStorage.getItem('gramado-loc');}catch(e){}
-  if(saved!==null&&POINTS[saved]){sel.value=saved;pickLoc(saved);}
+  let saved=null,age=Infinity;
+  try{saved=localStorage.getItem('gramado-loc');age=Date.now()-(+localStorage.getItem('gramado-loc-t')||0);}catch(e){}
+  if(isIdx(saved,POINTS)&&age<6*3600e3){sel.value=saved;pickLoc(saved);}
+}
+const WALK_KM=1.2;
+function placeByName(n){return POINTS.find(p=>p.name===n);}
+function walkMin(km){return Math.max(1,Math.round(km*1.3/5*60));} // 5 km/h, streets ~30% longer than a straight line
+function goLinks(p,km){
+  const walk=km<WALK_KM,dest=encodeURIComponent(p.addr||p.name);
+  const maps=`https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=${walk?'walking':'driving'}`;
+  const uber=`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${p.lat}&dropoff[longitude]=${p.lng}&dropoff[nickname]=${encodeURIComponent(p.name)}&dropoff[formatted_address]=${dest}`;
+  const ub=`<a class="${walk?'':'pri'}" href="${uber}" target="_blank" rel="noopener">🚗 ${walk?'Uber':'Chamar Uber'}</a>`;
+  const mp=`<a class="${walk?'pri':''}" href="${maps}" target="_blank" rel="noopener">${walk?`🚶 Ir a pé · ~${walkMin(km)} min`:'🗺️ Mapa'}</a>`;
+  return `<div class="go">${walk?mp+ub:ub+mp}</div>`+(walk?'':'<div class="go-note">Uber sugerido pela distância · confira o destino no app antes de confirmar</div>');
+}
+// Origin: where the traveller is, else the previous place in the day's plan, else the hotel.
+function routeActs(day,i){
+  const it=DAYS[day].items[i],dest=placeByName(it.p);
+  if(!dest)return '';
+  let from=null,label='';
+  if(here){from=here;label=here.label==='GPS'?'de onde você está':'de '+here.label;}
+  else{
+    for(let j=i-1;j>=0;j--){const q=DAYS[day].items[j];if(q.p&&q.p!==it.p){from=placeByName(q.p);label='saindo de '+q.p;break;}}
+    if(!from){from=placeByName('Hotel Bellagio');label='saindo do hotel';}
+  }
+  const km=hav(from.lat,from.lng,dest.lat,dest.lng);
+  if(km<0.15)return `<div class="go-head">📍 ${dest.name} · vocês já estão perto</div>`;
+  return `<div class="go-head">📍 ${dest.name} · ${fD(km)} ${label}</div>`+goLinks(dest,km);
 }
 function renderDist(lat,lng){
   const s=POINTS.map(p=>({...p,d:hav(lat,lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d);
-  document.getElementById('distL').innerHTML=s.map(p=>{
-    const walk=p.d<1.5;
-    const maps=`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=${walk?'walking':'driving'}`;
-    const uber=`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${p.lat}&dropoff[longitude]=${p.lng}&dropoff[nickname]=${encodeURIComponent(p.name)}`;
-    return `<div class="di"><span class="dn">${p.name}</span><span class="dv">${fD(p.d)}${walk?' · a pé':''}</span><div class="go"><a href="${maps}" target="_blank" rel="noopener">🗺️ ${walk?'Ir a pé':'Mapa'}</a><a href="${uber}" target="_blank" rel="noopener">🚗 Uber</a></div></div>`;
-  }).join('');
+  document.getElementById('distL').innerHTML=s.map(p=>p.d<0.15
+    ?`<div class="di"><span class="dn">${p.name}</span><span class="dv">aqui</span></div>`
+    :`<div class="di"><span class="dn">${p.name}</span><span class="dv">${fD(p.d)}${p.d<WALK_KM?' · a pé':' · Uber'}</span>${goLinks(p,p.d)}</div>`).join('');
 }
 
 // ===========================
@@ -943,28 +1026,53 @@ async function onPhoto(el){
 // ===========================
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let rec=null;
+const IS_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+function micHandoff(){
+  document.getElementById('toast').hidden=true;
+  const msgs=document.getElementById('chatMsgs');
+  const div=document.createElement('div');
+  div.className='chat-bubble ai';
+  div.innerHTML=handoffHTML('Perguntar por voz')+'<div class="src">Enquanto isso, use o 🎤 do teclado do celular na caixa de texto.</div>';
+  msgs.appendChild(div);
+  window.scrollTo(0,document.body.scrollHeight);
+}
 function toggleMic(){
-  unlockTTS();
+  // iOS needs speech primed inside the tap; on Android it would grab the audio focus from the mic.
+  if(IS_IOS)unlockTTS();
   if(busy)return;
   const input=document.getElementById('chatIn'),btn=document.getElementById('micBtn');
   if(rec){rec.stop();return;}
-  if(!SR){toast('Ditado indisponível aqui. Toque na caixa de texto e use o 🎤 do teclado do celular.');input.focus();return;}
-  ttsStop();
+  if(!micAllowed&&!onSite)return micHandoff();
+  if(!SR&&!onSite)return micHandoff();
+  if(!SR){toast('Ditado indisponível neste navegador. Toque na caixa de texto e use o 🎤 do teclado.');input.focus();return;}
+  if(TTS.chunks.length)ttsStop();
   let heard='',failed=false;
-  rec=new SR();rec.lang='pt-BR';rec.interimResults=true;rec.continuous=false;
-  rec.onresult=e=>{heard=[...e.results].map(r=>r[0].transcript).join('');input.value=heard;};
+  rec=new SR();rec.lang='pt-BR';rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
+  rec.onresult=e=>{
+    let t='';
+    for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;
+    heard=t;input.value=t;
+  };
   rec.onerror=e=>{
     failed=true;
-    if(e.error==='not-allowed'||e.error==='service-not-allowed')toast('Microfone bloqueado aqui. Use o 🎤 do teclado do celular, ou abra o guia no Safari/Chrome.');
-    else if(e.error==='no-speech')toast('Não ouvi nada. Toque no 🎤 e fale de novo.');
-    else if(e.error!=='aborted')toast('Não consegui ouvir. Tente de novo ou digite.');
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+      if(!onSite)micHandoff();
+      else toast('Microfone bloqueado. Toque no cadeado 🔒 ao lado do endereço → Permissões → Microfone → Permitir.',7000);
+    }
+    else if(e.error==='no-speech')toast('Não ouvi nada. Toque no 🎤 e fale logo em seguida.');
+    else if(e.error!=='aborted'&&!onSite)micHandoff();
+    else if(e.error==='audio-capture')toast('Nenhum microfone disponível. Confira se outro app está usando o microfone.');
+    else if(e.error==='network')toast('O ditado precisa de internet. Verifique a conexão.');
+    else if(e.error!=='aborted')toast('Não consegui ouvir ('+e.error+'). Tente de novo ou digite.');
   };
   rec.onend=()=>{
     rec=null;btn.classList.remove('rec');btn.setAttribute('aria-label','Perguntar por voz');
-    if(!failed&&heard.trim())sendChat(true);
+    if(failed)return;
+    if(heard.trim())sendChat(true);
+    else toast('Não entendi. Toque no 🎤 e fale de novo, perto do celular.');
   };
-  try{rec.start();btn.classList.add('rec');btn.setAttribute('aria-label','Parar de ouvir');toast('Ouvindo… fale sua pergunta.',2500);}
-  catch(e){rec=null;toast('Não consegui abrir o microfone. Use o 🎤 do teclado.');}
+  try{rec.start();btn.classList.add('rec');btn.setAttribute('aria-label','Parar de ouvir');toast('🎤 Ouvindo… fale sua pergunta.',2500);}
+  catch(e){rec=null;if(!onSite)micHandoff();else toast('Não consegui abrir o microfone. Use o 🎤 do teclado.');}
 }
 
 // ===========================
@@ -1064,6 +1172,7 @@ function addBubble(text,type,src){
 // ===========================
 // INIT
 // ===========================
+importHash();
 renderDays();
 initToday();
 fetchWeather();
@@ -1071,6 +1180,7 @@ renderChk();
 renderLocPick();
 loadConfig();
 updateAIStatus();
+if(!onSite&&(!geoAllowed||!micAllowed))document.getElementById('fullSite').innerHTML='<div class="st">Versão completa</div>'+handoffHTML('GPS e voz');
 
 // Service Worker
 if('serviceWorker' in navigator){
