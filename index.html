@@ -129,6 +129,14 @@ a{color:var(--accent);text-decoration:none}
 .pk-off .ci{margin-bottom:6px;align-items:center}
 .pk-off .ci .ct{opacity:.45;text-decoration:line-through}
 .pk-back{flex-shrink:0;min-height:32px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:.72rem;font-weight:600;opacity:1}
+.pk-add{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;margin:18px 0 10px}
+.pk-add h4{font-size:.86rem;margin:0 0 10px}
+.pk-add .row{display:flex;gap:8px;flex-wrap:wrap}
+.pk-add input,.pk-add select{min-height:44px;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font:inherit;font-size:.82rem}
+.pk-add input{flex:1 1 100%}
+.pk-add select{flex:1}
+.pk-add button{min-height:44px;padding:0 16px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-weight:700;font-size:.82rem;cursor:pointer}
+.ci .mine{display:inline-block;font-size:.62rem;font-weight:700;color:var(--brand);background:var(--bg);border-radius:6px;padding:0 5px;margin-left:4px;vertical-align:1px}
 .pk-hint{font-size:.72rem;color:var(--muted);margin:6px 0 0}
 .pk-only{display:flex;align-items:center;gap:8px;min-height:40px;font-size:.78rem;color:var(--text);margin-top:4px;cursor:pointer}
 .pk-only input{width:18px;height:18px;accent-color:var(--brand)}
@@ -991,7 +999,10 @@ const OLD_TO_PACK={0:['s','caracol'],1:['s','jolimont'],2:['s','checkin-latam'],
 let pack={s:{},m:{},f:{}},packWho='m',packOnly=false;
 // Items marked "doesn't apply" (swipe + 🗑️): out of the list and the count, restorable at the end.
 let packOff={s:{},m:{},f:{}};
-function savePack(){try{localStorage.setItem('gramado-pack',JSON.stringify(pack));localStorage.setItem('gramado-pack-off',JSON.stringify(packOff));}catch(e){}}
+// Items the travellers add themselves: {id, c: category, t: text, w: profile for per-person categories}.
+let packExtra=[];
+const escH=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function savePack(){try{localStorage.setItem('gramado-pack',JSON.stringify(pack));localStorage.setItem('gramado-pack-off',JSON.stringify(packOff));localStorage.setItem('gramado-pack-extra',JSON.stringify(packExtra));}catch(e){}}
 function migrateOld(old){
   Object.keys(old).forEach(k=>{
     const m=OLD_TO_PACK[k];if(!old[k]||!m)return;
@@ -1009,9 +1020,10 @@ try{
   }
   packWho=localStorage.getItem('gramado-pack-who')==='f'?'f':'m';
   packOff=Object.assign({s:{},m:{},f:{}},JSON.parse(localStorage.getItem('gramado-pack-off')||'{}'));
+  packExtra=JSON.parse(localStorage.getItem('gramado-pack-extra')||'[]');
 }catch(e){}
 const scopeOf=cat=>cat.per?packWho:'s';
-const itemsAll=cat=>cat.items.filter(i=>!i.w||i.w===packWho);
+const itemsAll=cat=>[...cat.items,...packExtra.filter(e=>e.c===cat.c).map(e=>({...e,mine:true}))].filter(i=>!i.w||i.w===packWho);
 const itemsOf=cat=>itemsAll(cat).filter(i=>!packOff[scopeOf(cat)][i.id]);
 function renderChk(){
   let total=0,done=0;
@@ -1020,13 +1032,13 @@ function renderChk(){
     const nd=its.filter(i=>pack[sc][i.id]).length;total+=its.length;done+=nd;
     const rows=its.filter(i=>!(packOnly&&pack[sc][i.id])).map(i=>{
       const on=!!pack[sc][i.id];
-      return `<div class="sw"><button class="sw-del" tabindex="-1" aria-label="Não se aplica: excluir ${i.t}" onclick="offPack(${ci},'${i.id}',true)">🗑️</button><button class="ci${on?' done':''}" role="checkbox" aria-checked="${on}" onclick="tPack(${ci},'${i.id}')"><span class="cb" aria-hidden="true"></span><span class="ct">${i.t}${i.n?`<small>${i.n}</small>`:''}</span>${i.q?`<span class="qty">×${i.q}</span>`:''}</button></div>`;
+      return `<div class="sw"><button class="sw-del" tabindex="-1" aria-label="Não se aplica: excluir ${escH(i.t)}" onclick="offPack(${ci},'${i.id}',true)">🗑️</button><button class="ci${on?' done':''}" role="checkbox" aria-checked="${on}" onclick="tPack(${ci},'${i.id}')"><span class="cb" aria-hidden="true"></span><span class="ct">${escH(i.t)}${i.mine?'<span class="mine">seu item</span>':''}${i.n?`<small>${i.n}</small>`:''}</span>${i.q?`<span class="qty">×${i.q}</span>`:''}</button></div>`;
     }).join('');
     const full=nd===its.length;
     return `<details class="fold pk" data-cat="${cat.c}" ${(packOpen[cat.c]!==undefined?packOpen[cat.c]:!full)?'open':''}><summary class="st" onclick="packOpen['${cat.c}']=!this.parentNode.open">${cat.ic} ${cat.t}${cat.per?` <span class="who">${packWho==='m'?'masculino':'feminino'}</span>`:''} <span class="cnt${full?' full':''}">${full?'✓ completo':nd+'/'+its.length}</span></summary><p class="pk-tip">${cat.tip}</p>${rows||'<p class="pk-tip">Tudo pronto nesta categoria. 🎉</p>'}</details>`;
   }).join('');
   const off=PACK.flatMap((cat,ci)=>itemsAll(cat).filter(i=>packOff[scopeOf(cat)][i.id]).map(i=>
-    `<div class="ci"><span class="ct">${cat.ic} ${i.t}</span><button class="pk-back" onclick="offPack(${ci},'${i.id}',false)" aria-label="Voltar para a lista: ${i.t}">↩︎ Voltar</button></div>`));
+    `<div class="ci"><span class="ct">${cat.ic} ${escH(i.t)}</span><button class="pk-back" onclick="offPack(${ci},'${i.id}',false)" aria-label="Voltar para a lista: ${escH(i.t)}">↩︎ Voltar</button></div>`));
   const offHtml=off.length?`<details class="fold pk pk-off"${packOpen.off?' open':''}><summary class="st" onclick="packOpen.off=!this.parentNode.open">🗑️ Excluídos <span class="cnt">${off.length}</span></summary><p class="pk-tip">Itens que não se aplicam. Toque em ↩︎ Voltar se mudarem de ideia.</p>${off.join('')}</details>`:'';
   const pct=total?Math.round(done*100/total):0;
   document.getElementById('checkL').innerHTML=`
@@ -1039,7 +1051,15 @@ function renderChk(){
   <div class="pk-prog"><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}" aria-label="Itens prontos"><i style="width:${pct}%"></i></div><span>${done} de ${total}</span></div>
   <label class="pk-only"><input type="checkbox" ${packOnly?'checked':''} onchange="packOnly=this.checked;renderChk()"> Mostrar só o que falta</label>
   <p class="pk-hint">Algum item não se aplica? Arraste para a esquerda ← e toque na 🗑️.</p>
-</div>${cats}${offHtml}`;
+</div>${cats}
+<form class="pk-add" onsubmit="addPack(event)">
+  <h4>➕ Adicionar item</h4>
+  <div class="row">
+    <input id="pkNew" maxlength="80" placeholder="Ex.: carregador da câmera" aria-label="Novo item" autocomplete="off">
+    <select id="pkCat" aria-label="Categoria">${PACK.map(c=>`<option value="${c.c}"${c.c==='outros'?' selected':''}>${c.ic} ${c.t}</option>`).join('')}</select>
+    <button type="submit">Adicionar</button>
+  </div>
+</form>${offHtml}`;
 }
 const packOpen={};
 function tPack(ci,id){
@@ -1047,6 +1067,16 @@ function tPack(ci,id){
   pack[sc][id]=!pack[sc][id];
   if(!pack[sc][id])delete pack[sc][id];
   savePack();renderChk();
+}
+function addPack(ev){
+  ev.preventDefault();
+  const t=document.getElementById('pkNew').value.trim(),c=document.getElementById('pkCat').value;
+  if(!t)return document.getElementById('pkNew').focus();
+  const cat=PACK.find(x=>x.c===c);
+  // Clothes and personal items belong to the profile on screen; the rest is shared.
+  packExtra.push({id:'x'+Date.now().toString(36),c,t,...(cat.per?{w:packWho}:{})});
+  packOpen[c]=true;savePack();renderChk();
+  toast(`“${t}” adicionado em ${cat.ic} ${cat.t}${cat.per?` (${packWho==='m'?'masculino':'feminino'})`:''}.`);
 }
 function offPack(ci,id,out){
   const sc=scopeOf(PACK[ci]);
