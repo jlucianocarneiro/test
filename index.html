@@ -38,6 +38,12 @@ header p{font-size:.78rem;opacity:.85;margin-top:2px}
 .swipe-hint{font-size:.7rem;color:var(--muted);text-align:center;margin:-4px 0 10px}
 .dh{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--shadow);border-left:4px solid var(--accent)}
 .dh h2{font-size:1.05rem;font-weight:700}
+details.fold{margin:0}
+details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;min-height:44px;margin:10px 0 4px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:'▾';margin-left:auto;font-size:.9rem;transition:transform .2s}
+details.fold[open]>summary::after{transform:rotate(180deg)}
+details.fold .cnt{font-size:.66rem;padding:1px 7px;border-radius:10px;background:var(--green-l);color:var(--green);letter-spacing:0}
 .free{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:10px;background:var(--card);box-shadow:var(--shadow)}
 .free div{flex:1;min-width:0}.free strong{display:block;font-size:.82rem}.free small{display:block;font-size:.74rem;color:var(--muted)}
 .free em{font-style:normal;font-size:.68rem;font-weight:600;color:var(--green)}
@@ -47,7 +53,8 @@ header p{font-size:.78rem;opacity:.85;margin-top:2px}
 .tips em{font-style:normal;font-weight:600}.tips em.ok{color:var(--green)}.tips em.warn{color:var(--accent)}
 .dmeta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .dmeta span{font-size:.68rem;font-weight:600;padding:3px 8px;border-radius:12px;background:var(--bg);color:var(--muted)}
-.dmeta span.ok{background:var(--green-l);color:var(--green)}.dh .sub{font-size:.78rem;color:var(--muted);margin-top:2px}
+.dmeta span.ok{background:var(--green-l);color:var(--green)}
+.dmeta span.free-c{background:var(--blue-l);color:var(--blue)}.dh .sub{font-size:.78rem;color:var(--muted);margin-top:2px}
 .tl{position:relative;padding-left:20px}
 .tl::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--border);border-radius:1px}
 .ti{position:relative;margin-bottom:10px;background:var(--card);border-radius:var(--r);padding:12px 12px 12px 14px;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s}
@@ -248,9 +255,13 @@ a{color:var(--accent);text-decoration:none}
     <li>Gramado/Canela & Região · Até 15/05/2027</li>
     <li>App → Selecionar → "Utilizar" na chegada</li>
   </ul></div>
-  <div class="st">🆓 Atrações gratuitas</div>
+  <div class="st">🎫 Meus ingressos</div>
+  <div id="tkList"></div>
+  <p class="cfg-hint">Os arquivos ficam guardados só neste celular e funcionam sem internet. Nada é enviado para o site.</p>
+  <details class="fold"><summary class="st">🆓 Atrações gratuitas <span class="cnt">11</span></summary>
   <div id="freeList"></div>
-  <div class="st">Erros comuns — e como está o roteiro de vocês</div>
+  </details>
+  <details class="fold"><summary class="st">💡 Erros comuns — e como está o roteiro de vocês</summary>
   <div class="ic tips">
     <div class="tip"><b>💸 Subestimar o orçamento</b><p>Gramado é cara: fondue ~R$180/pp, Café Colonial ~R$130/pp, parques R$60–190/pp. O Prime 2×1 ajuda. <em class="warn">Definam um teto diário com folga.</em></p></div>
     <div class="tip"><b>🎟️ Deixar ingresso pra hora</b><p>Jolimont + Felsen, Snowland, Nativitaten e Cara de Mau já estão garantidos. <em class="warn">Falta o Parque do Caracol: comprar online antes de 29/10.</em></p></div>
@@ -259,17 +270,15 @@ a{color:var(--accent);text-decoration:none}
     <div class="tip"><b>🆓 Só atrações pagas</b><p><em class="ok">Já equilibrado:</em> Rua Coberta (24), Natal Luz no centro (25), Igreja São Pedro e Lago J.R. Bier (27), Catedral de Pedra (29), Lago Negro e mirantes (30).</p></div>
     <div class="tip"><b>🌲 Ignorar Canela</b><p><em class="ok">Coberto no dia 29:</em> Caracol, Catedral de Pedra e almoço no centro de Canela. Skyglass fica como extra, se sobrar tempo.</p></div>
   </div>
+  </details>
   <div class="st">Contatos</div>
   <div class="ic"><h3>📞 Emergência</h3><ul>
     <li><a href="tel:190">190</a> — PM · <a href="tel:192">192</a> — SAMU · <a href="tel:193">193</a> — Bombeiros</li>
     <li><a href="tel:05436861463">054 3686-1463</a> — Hospital Gramado</li>
     <li><a href="tel:05436862100">054 3686-2100</a> — Turismo Gramado</li>
   </ul></div>
-  <div class="st">Meus ingressos</div>
-  <div id="tkList"></div>
-  <p class="cfg-hint">Os arquivos ficam guardados só neste celular e funcionam sem internet. Nada é enviado para o site.</p>
   <div id="fullSite"></div>
-  <div class="st">Configurações</div>
+  <details class="fold"><summary class="st">⚙️ Configurações da IA e da voz</summary>
   <div class="cfg-row"><label>Provedor IA</label>
     <select id="cfgProvider" onchange="saveConfig()">
       <option value="local">IA Local (grátis)</option>
@@ -285,6 +294,7 @@ a{color:var(--accent);text-decoration:none}
     <select id="cfgRate" onchange="saveConfig()"><option value="0.9">Calma</option><option value="1" selected>Normal</option><option value="1.15">Rápida</option></select>
   </div>
   <div class="cfg-row"><label>Seu nome</label><input id="cfgName" placeholder="Viajante" onchange="saveConfig()"></div>
+  </details>
 </div>
 
 <!-- ============ CHECKLIST ============ -->
@@ -503,7 +513,7 @@ const KB = [
   {k:["chocolate","fábrica","prawer","lugano","florybal"],a:"Gramado produz mais de 7 milhões de kg de chocolate por ano. A Prawer (1975) é a mais antiga do Brasil. Lugano: trufas finas. Florybal: chocolate com pimenta e licores. Todas oferecem degustação gratuita."},
   {k:["café colonial","bela vista","colonial"],a:"O Café Colonial Bela Vista é um dos mais tradicionais da Serra, com 80+ itens: cucas alemãs, strudel de maçã, pão de queijo, galeto, waffles, sopas, queijos coloniais, bolos, tortas. ~R$130/pp. A tradição vem dos colonos alemães (Kaffee und Kuchen). Vocês vão dia 28/10 às 15h."},
   {k:["cara de mau","restaurante","carne"],a:"O Cara de Mau é referência em carnes nobres na Serra Gaúcha. Ambiente Porto: tijolos aparentes, iluminação intimista. Cortes: tomahawk, ancho, costela. Boa carta de vinhos. ~R$130-160/pp. Vocês têm reserva confirmada em 30/10 às 21:30."},
-  {k:["uber","transporte","táxi","como ir","como chegar"],a:"Uber funciona bem em Gramado e Canela. É o principal meio de transporte além de caminhada. Dicas: pedir com 5-10 min de antecedência, especialmente para Snowland e Jolimont. No app do Uber dá para agendar corridas. Corridas no centro ~R$8-15, Snowland ~R$25, Canela ~R$35-45."},
+  {k:["uber","transporte","táxi","como ir","como chegar","até canela","para canela"],a:"Uber funciona bem em Gramado e Canela. É o principal meio de transporte além de caminhada. Dicas: pedir com 5-10 min de antecedência, especialmente para Snowland e Jolimont. No app do Uber dá para agendar corridas. Corridas no centro ~R$8-15, Snowland ~R$25, Canela ~R$35-45."},
   {k:["tempo","clima","temperatura","frio","chuva"],a:"Em outubro, Gramado tem temperatura média de 12-20°C. Noites podem chegar a 5-8°C. Leve agasalho! A altitude (830m) faz o sol ser forte mesmo no frio — protetor solar é essencial. Chuvas são possíveis — tenha um plano B para atividades ao ar livre."},
   {k:["hotel","bellagio","hospedagem"],a:"Vocês ficam no Bellagio Mini Resort, no Centro de Gramado. 7 noites (24→31/10). Café da manhã incluso. A pé para Rua Coberta e principais atrações do centro. Booking 5024.178.207."},
   {k:["prime","gourmet","desconto","2x1"],a:"Vocês têm assinatura Prime Gourmet Club (Gramado/Canela & Região, válida até 15/05/2027). Benefício 'compre 1, leve 2' em restaurantes e ingressos. Como usar: abrir o app → selecionar estabelecimento → 'Utilizar' na chegada. Usarão em: Colosseo, Château D'Geneve, Snowland, Texas Gramado."},
@@ -538,8 +548,9 @@ function renderDays(){
   for(const[day,data] of Object.entries(DAYS)){
     const nConf=data.items.filter(it=>(it.tags||[]).includes('c')).length;
     const nUber=data.items.filter(it=>/Uber/.test(it.n)).length;
+    const nFree=data.items.filter(it=>(it.tags||[]).includes('f')).length;
     const first=data.items[0].t.split('–')[0],last=data.items[data.items.length-1].t.split('–').pop();
-    const meta=`<div class="dmeta"><span>🕗 ${first} – ${last}</span><span>${data.items.length} paradas</span>${nConf?`<span class="ok">✓ ${nConf} confirmado${nConf>1?'s':''}</span>`:''}${nUber?`<span>🚗 ${nUber} Uber</span>`:''}</div>`;
+    const meta=`<div class="dmeta"><span>🕗 ${first} – ${last}</span><span>${data.items.length} paradas</span>${nConf?`<span class="ok">✓ ${nConf} confirmado${nConf>1?'s':''}</span>`:''}${nFree?`<span class="free-c">🆓 ${nFree} grátis</span>`:''}${nUber?`<span>🚗 ${nUber} Uber</span>`:''}</div>`;
     html += `<div class="dp" data-day="${day}" id="day-${day}" role="tabpanel" aria-labelledby="tab-${day}"><div class="dh"><h2>${data.title}</h2><div class="sub">${data.sub}</div>${meta}</div>${swipeHint}<div class="tl">`;
     data.items.forEach((it,i) => {
       const cls = it.c||'';
@@ -586,9 +597,16 @@ function fitTrack(){
   const t=track(),p=document.querySelector(`.dp[data-day="${curDay}"]`);
   if(t&&p&&t.offsetWidth)t.style.height=p.offsetHeight+'px';
 }
+// A new day opens at its top: the sticky date bar's offsetTop moves with it, so use the header height.
+function toDayTop(){
+  const h=document.querySelector('header').offsetHeight;
+  const calm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(window.scrollY>h)window.scrollTo({top:h,behavior:calm?'auto':'smooth'});
+}
 function showDay(d,smooth){
   const t=track(),i=DAY_KEYS.indexOf(+d);
   if(i<0)return;
+  if(smooth&&+d!==curDay)toDayTop();
   markDay(d);
   if(t&&t.offsetWidth){
     navTarget=smooth&&Math.round(t.scrollLeft/t.offsetWidth)!==i?+d:null;
@@ -611,8 +629,7 @@ function initCarousel(){
     if(navTarget!==null){if(d===navTarget)navTarget=null;else{clearTimeout(timer);timer=setTimeout(()=>{navTarget=null;fitTrack();},400);return;}}
     if(d!==undefined&&d!==curDay){
       markDay(d);
-      const top=document.getElementById('tabBar').offsetTop;
-      if(window.scrollY>top)window.scrollTo({top,behavior:'smooth'});
+      toDayTop();
       try{localStorage.setItem('gramado-swiped','1');}catch(e){}
       document.querySelectorAll('.swipe-hint').forEach(h=>h.remove());
     }
@@ -966,7 +983,8 @@ function localAI(q){
     let score=0;
     entry.k.forEach(kw=>{
       const kwn=kw.normalize('NFD').replace(/[̀-ͯ]/g,'');
-      if(ql.includes(kwn))score+=2;
+      // the town name alone says little; longer keywords are more specific
+      if(ql.includes(kwn))score+=kwn==='gramado'?0.5:2+kwn.length*0.05;
       else{
         const words=kwn.split(' ');
         words.forEach(w=>{if(w.length>2&&ql.includes(w))score++;});
@@ -1201,7 +1219,21 @@ async function askAI(q,image,speakIt){
 }
 
 const NEARBY_RE=/onde (eu )?estou|onde estamos|perto (daqui|de mim|de nos)|aqui perto|mais proxim|como (eu )?cheg|quanto (falta|tempo)|distancia/;
-function nearbyAnswer(){
+// "como chego no Snowland?": answer for that place, from the traveller or the hotel.
+function placeInQuestion(q){
+  const n=x=>x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const qn=n(q);
+  return POINTS.find(p=>{const w=n(p.name).replace(/^(hotel|vinicola|parque do|cafe colonial) /,'').split(' ').slice(0,2).join(' ');return qn.includes(w);});
+}
+function routeAnswer(dest){
+  const from=here||placeByName('Hotel Bellagio'),label=here?(here.label==='GPS'?'de onde vocês estão':'de '+here.label):'do hotel';
+  const km=hav(from.lat,from.lng,dest.lat,dest.lng);
+  if(km<0.15)return `Vocês já estão perto de ${dest.name}.`;
+  return `${dest.name} fica a cerca de ${fD(km)} ${label}. `+(km<WALK_KM?`Dá para ir a pé, uns ${walkMin(km)} minutos.`:'Melhor de Uber.')+' Os botões de rota e Uber estão na aba Local e no item do roteiro.';
+}
+function nearbyAnswer(q){
+  const dest=q&&placeInQuestion(q);
+  if(dest)return routeAnswer(dest);
   if(!here)return 'Não consegui sua localização agora. Ligue a localização do celular e permita o acesso, ou escolha onde vocês estão na aba Local.';
   const list=nearestList(4);
   const first=list[0];
@@ -1224,7 +1256,7 @@ async function sendChat(fromVoice){
     const b=addBubble('📍 Verificando sua localização…','ai','');
     setBusy(true);
     try{await freshLocation();}finally{setBusy(false);}
-    const a=nearbyAnswer();
+    const a=nearbyAnswer(q);
     setBubble(b,a,`IA local · ${locLabel()}`,true);
     chatHistory.push({role:'user',content:q},{role:'assistant',content:a});
     if(speakIt)speak(a);
