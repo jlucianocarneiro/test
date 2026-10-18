@@ -38,6 +38,10 @@ header p{font-size:.78rem;opacity:.85;margin-top:2px}
 .swipe-hint{font-size:.7rem;color:var(--muted);text-align:center;margin:-4px 0 10px}
 .dh{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--shadow);border-left:4px solid var(--accent)}
 .dh h2{font-size:1.05rem;font-weight:700}
+.free{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:10px;background:var(--card);box-shadow:var(--shadow)}
+.free div{flex:1;min-width:0}.free strong{display:block;font-size:.82rem}.free small{display:block;font-size:.74rem;color:var(--muted)}
+.free em{font-style:normal;font-size:.68rem;font-weight:600;color:var(--green)}
+.free a{flex-shrink:0;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:12px;background:var(--bg);font-size:1.1rem}
 .tips .tip{padding:8px 0;border-bottom:1px solid var(--border)}.tips .tip:last-child{border-bottom:none}
 .tips b{font-size:.84rem}.tips p{font-size:.78rem;color:var(--muted);margin:2px 0 0;line-height:1.5}
 .tips em{font-style:normal;font-weight:600}.tips em.ok{color:var(--green)}.tips em.warn{color:var(--accent)}
@@ -244,6 +248,8 @@ a{color:var(--accent);text-decoration:none}
     <li>Gramado/Canela & Região · Até 15/05/2027</li>
     <li>App → Selecionar → "Utilizar" na chegada</li>
   </ul></div>
+  <div class="st">🆓 Atrações gratuitas</div>
+  <div id="freeList"></div>
   <div class="st">Erros comuns — e como está o roteiro de vocês</div>
   <div class="ic tips">
     <div class="tip"><b>💸 Subestimar o orçamento</b><p>Gramado é cara: fondue ~R$180/pp, Café Colonial ~R$130/pp, parques R$60–190/pp. O Prime 2×1 ajuda. <em class="warn">Definam um teto diário com folga.</em></p></div>
@@ -360,6 +366,7 @@ const CHECKS=[
   "Definir orçamento diário com folga (parques, fondue, cafés)",
 ];
 
+const FREE=[{"n": "Lago Negro", "d": "Caminhada ao redor do lago e hortênsias (pedalinho pago à parte)", "q": "Lago Negro, Gramado - RS", "w": "30/10"},{"n": "Rua Coberta", "d": "Rua Madre Verônica: teto de vidro, cafés e lojas", "q": "Rua Coberta, Rua Madre Verônica, Gramado - RS", "w": "24 e 30/10"},{"n": "Rua Torta", "d": "Rua Emílio Sorgetz: sinuosa e muito fotogênica", "q": "Rua Torta, Rua Emílio Sorgetz, Gramado - RS", "w": "25/10"},{"n": "Igreja Matriz São Pedro Apóstolo", "d": "Pedra basáltica, na Av. Borges de Medeiros", "q": "Igreja Matriz São Pedro Apóstolo, Av. Borges de Medeiros, Gramado - RS", "w": "27/10"},{"n": "Fonte do Amor Eterno", "d": "Cadeados dos casais, perto da Igreja São Pedro", "q": "Fonte do Amor Eterno, Gramado - RS", "w": "27/10"},{"n": "Praça das Etnias e Casa do Colono", "d": "Cultura dos imigrantes; pães e cucas coloniais", "q": "Praça das Etnias, Gramado - RS", "w": "24/10"},{"n": "Lago Joaquina Rita Bier", "d": "Lago tranquilo para caminhar e descansar", "q": "Lago Joaquina Rita Bier, Gramado - RS", "w": "27/10"},{"n": "Mirante do Vale do Quilombo", "d": "Vista panorâmica na Av. das Hortênsias", "q": "Mirante do Vale do Quilombo, Gramado - RS", "w": "30/10"},{"n": "Pórticos de Gramado", "d": "Portais de entrada (via Nova Petrópolis e via Taquara)", "q": "Pórtico de Gramado, Gramado - RS", "w": "chegada e Snowland"},{"n": "Fábricas de chocolate", "d": "Linhas de produção e degustação (Prawer, Planalto)", "q": "Chocolate Prawer, Gramado - RS", "w": "27/10"},{"n": "Catedral de Pedra", "d": "Cartão-postal de Canela, gótico inglês", "q": "Catedral de Pedra, Praça João Corrêa, Canela - RS", "w": "29/10"}];
 // Ticket slots: files live only on this phone (IndexedDB), never in the published site.
 const TICKETS={
   'voo-ida':{n:'✈️ Voo LATAM BSB → POA',d:'24/10 · cartão de embarque'},
@@ -380,9 +387,9 @@ const DAYS = {
     items:[
       {tk:"voo-ida",t:"05:00",n:"Despertar + aeroporto BSB",d:"Documentos e bagagens.",c:"transport",x:"Check-in online LATAM 48h antes. Priority Pass / Dragon Pass para salas VIP no BSB.",h:"O Aeroporto de Brasília (BSB) é o 3º mais movimentado do Brasil. Inaugurado em 1957 junto com a capital."},
       {tk:"voo-ida",t:"12:05",n:"✈️ Pouso em Porto Alegre",d:"Voo LATAM. Desembarque doméstico.",c:"transport",tags:["c"],x:"Ir à loja Citral Serra no desembarque doméstico até ~13:30. Salas VIP: Ambaar Club (Priority Pass), W Premium Lounge (Dragon Pass) — embarque doméstico.",h:"O Aeroporto Salgado Filho foi inaugurado em 1940. Passou por reforma após enchentes de 2024."},
-      {tk:"citral-ida",t:"14:00–16:30",n:"🚌 Citral → Gramado",d:"Poltronas 3-4 · Linha 0692 · ~2h15",c:"transport",tags:["c"],x:"Embarque ~14:15 no aeroporto. R$84,85×2 (pago). Paisagens lindas na subida da serra — câmera pronta!",h:"A Serra Gaúcha tem altitude média de 800m. Gramado está a 830m. A vegetação muda de planície para Mata Atlântica com araucárias."},
+      {tk:"citral-ida",t:"14:00–16:30",n:"🚌 Citral → Gramado",d:"Poltronas 3-4 · Linha 0692 · ~2h15",c:"transport",tags:["c"],x:"Embarque ~14:15 no aeroporto. R$84,85×2 (pago). Paisagens lindas na subida da serra — câmera pronta! Na chegada a Gramado, reparem no pórtico de entrada da cidade (há dois: via Nova Petrópolis e via Taquara).",h:"A Serra Gaúcha tem altitude média de 800m. Gramado está a 830m. A vegetação muda de planície para Mata Atlântica com araucárias."},
       {tk:"hotel",p:"Hotel Bellagio",t:"16:30–17:30",n:"🏨 Check-in Bellagio",d:"Centro de Gramado · Booking 5024.178.207",tags:["c"],x:"Café incluso. Perguntar sobre mapa turístico e Natal Luz na recepção."},
-      {p:"Rua Coberta",t:"17:30–19:00",n:"🚶 Passeio pelo Centro",d:"Rua Coberta, Praça das Etnias, chocolates.",x:"Rua Coberta: lojas, cafés, chocolaterias. Prawer (a mais antiga!), Lugano, Caracol, Florybal — degustação gratuita.",h:"Gramado foi colonizada por alemães (1875) e italianos (1890). A tradição do chocolate começou nos anos 1970. Hoje são 50+ fábricas artesanais."},
+      {p:"Rua Coberta",t:"17:30–19:00",n:"🚶 Passeio pelo Centro",d:"Rua Coberta, Praça das Etnias, chocolates.",tags:["f"],x:"Rua Coberta (Rua Madre Verônica): corredor com teto de vidro, cafés e lojas. Praça das Etnias e Casa do Colono: cultura dos imigrantes, com pães e cucas coloniais à venda. Chocolaterias com degustação gratuita: Prawer (a mais antiga!), Lugano, Caracol, Florybal.",h:"Gramado foi colonizada por alemães (1875) e italianos (1890). A tradição do chocolate começou nos anos 1970. Hoje são 50+ fábricas artesanais."},
       {p:"Rua Coberta",t:"19:30",n:"🍽️ Colosseo",d:"Italiano · ~R$90/pp · Rua Coberta",c:"meal",tags:["p"],x:"Prime 2×1. Massas e risotos. Peça vinho local (Miolo, Aurora)."},
     ]
   },
@@ -393,10 +400,10 @@ const DAYS = {
       {t:"8:30",n:"☕ Café no hotel",d:"Incluso. Sem pressa!"},
       {t:"10:00–12:00",n:"🚶 Mini Mundo + Dream Cars",d:"A pé pelo Centro. Programas leves.",x:"Mini Mundo: miniaturas 1:24 (~R$60). Dream Cars: carros clássicos do cinema (~R$60). Checar Prime 2×1.",h:"O Mini Mundo existe desde 1983, 160+ miniaturas artesanais feitas por 3 gerações de uma família alemã."},
       {t:"12:30",n:"🍽️ Almoço leve",d:"Lanche rápido — fondue à noite!",c:"meal",x:"Empório Canela, Mamma Tchê ou café com torta na Rua Coberta."},
-      {t:"14:00–16:30",n:"🎄 Decoração + compras",d:"Rua Torta, chocolates, lembranças.",x:"Rua Torta: piso sinuoso, lojas charmosas. Compras: chocolates, malhas, queijos, vinhos."},
+      {t:"14:00–16:30",n:"🎄 Decoração + compras",d:"Rua Torta, chocolates, lembranças.",tags:["f"],x:"Rua Torta (Rua Emílio Sorgetz): rua sinuosa inspirada em São Francisco, uma das mais fotogênicas da cidade. Grátis. Compras: chocolates, malhas, queijos, vinhos."},
       {p:"Château D'Geneve",t:"17:40",n:"🚗 Uber → Château D'Geneve",d:"Av. Hortênsias · ~10 min",c:"transport",x:"NÃO aceita reserva! Ordem de chegada. Sair 17:40, chegar ~17:50, antes das 18:00."},
       {p:"Château D'Geneve",t:"18:00–20:30",n:"🧀🍫🍖 Fondue Château D'Geneve",d:"Sequência: queijo → carne → chocolate",c:"meal",tags:["p"],x:"Prime 2×1! Sequência: gruyère+emmental → filé com molhos → chocolate belga com frutas. ~R$180/pp (com Prime ~R$90/pp).",h:"O fondue originou nos Alpes Suíços — pastores derretiam restos de queijo. Gramado adotou pela herança europeia e clima frio."},
-      {t:"21:00",n:"🌟 Iluminação Natal Luz",d:"Centro iluminado. Fotos noturnas.",x:"Melhores pontos: Praça Major Nicoletti, Lago J.R. Bier, Igreja São Pedro.",h:"O Natal Luz começou em 1986. Hoje é o maior evento natalino das Américas, 2M+ visitantes/temporada."},
+      {t:"21:00",n:"🌟 Iluminação Natal Luz",d:"Centro iluminado. Fotos noturnas.",tags:["f"],x:"Melhores pontos: Praça Major Nicoletti, Lago J.R. Bier, Igreja São Pedro.",h:"O Natal Luz começou em 1986. Hoje é o maior evento natalino das Américas, 2M+ visitantes/temporada."},
     ]
   },
   26: {
@@ -404,7 +411,7 @@ const DAYS = {
     sub:"Dia inteiro no parque de neve",
     items:[
       {t:"8:00",n:"☕ Café reforçado",d:"Dia intenso — coma bem!"},
-      {p:"Snowland",t:"9:30",n:"🚗 Uber → Snowland",d:"RS-235 Km 31 · ~15 min",c:"transport",x:"Abre 10:00. Chegar antes para lockers."},
+      {p:"Snowland",t:"9:30",n:"🚗 Uber → Snowland",d:"RS-235 Km 31 · ~15 min",c:"transport",x:"Abre 10:00. Chegar antes para lockers. O Snowland fica na RS-235, sentido Nova Petrópolis: se o pórtico de Gramado dessa via estiver no caminho, vale pedir uma parada rápida para foto."},
       {tk:"snowland",p:"Snowland",t:"10:00–16:00",n:"❄️ Snowland",d:"Neve real -5°C! Esqui, patinação, tobogã.",c:"nature",tags:["p","c"],x:"2 ingressos Prime 2×1. Roupa de neve inclusa. Leve meias grossas! Restaurante interno (~R$50-70/pp).",h:"Único parque de neve indoor das Américas (2013). Neve real a -5°C, tecnologia austríaca. 16.000m²."},
       {p:"Hotel Bellagio",t:"16:30",n:"🚗 Volta ao hotel",d:"Descanso e banho quente!",c:"transport"},
       {t:"19:30",n:"🍽️ Jantar livre",d:"Mamma Tchê, Cantina 28, ou leve.",c:"meal",x:"Mamma Tchê (~R$80/pp): galeto gaúcho. Cantina 28 (~R$90/pp): massas artesanais."},
@@ -415,9 +422,9 @@ const DAYS = {
     sub:"Fábricas de chocolate, lojas, noite casual",
     items:[
       {t:"8:30",n:"☕ Café no hotel",d:"Dia de caminhar pelo centro."},
-      {t:"10:00–12:30",n:"🍫 Tour Fábricas de Chocolate",d:"Prawer, Lugano, Florybal — degustação!",x:"Prawer (1975, a mais antiga). Lugano (trufas finas). Florybal (chocolate com pimenta!).",h:"A Prawer foi a primeira fábrica (1975), casal Jayme e Telma Prawer. Gramado produz 7M kg de chocolate/ano."},
+      {t:"10:00–12:30",n:"🍫 Tour Fábricas de Chocolate",d:"Prawer, Planalto, Lugano, Florybal — degustação!",tags:["f"],x:"Visitas às linhas de produção com degustação gratuita em marcas tradicionais como Prawer e Planalto (confirmar horários de visita na hora). Prawer (1975, a mais antiga). Lugano (trufas finas). Florybal (chocolate com pimenta!).",h:"A Prawer foi a primeira fábrica (1975), casal Jayme e Telma Prawer. Gramado produz 7M kg de chocolate/ano."},
       {t:"12:30",n:"🍽️ Almoço leve",d:"Josephina Café ou Empório Canela.",c:"meal",x:"Josephina (~R$50/pp): sanduíches, quiches. Empório Canela (~R$60/pp): café colonial light."},
-      {p:"Lago J. R. Bier",t:"14:00–17:00",n:"🛍️ Compras + Lago J.R. Bier",d:"Rua Coberta, Rua Torta, Lago — a pé.",x:"Pedalinhos (~R$40/casal). Igreja São Pedro: pedra basáltica, 1942. Gratuito.",h:"Igreja São Pedro (1942), estilo gótico em pedra basáltica. O lago (1950) leva o nome de uma das primeiras moradoras."},
+      {p:"Lago J. R. Bier",t:"14:00–17:00",n:"🛍️ Igreja São Pedro + Lago J.R. Bier",d:"Igreja, Fonte do Amor Eterno, lago — a pé.",tags:["f"],x:"Igreja Matriz São Pedro Apóstolo (Av. Borges de Medeiros): pedra basáltica, grátis. Ao lado, a Fonte do Amor Eterno, com os cadeados dos casais: levem um cadeado! Lago Joaquina Rita Bier: caminhada tranquila, grátis (pedalinhos ~R$40/casal). Depois, compras na Rua Coberta e na Rua Torta.",h:"Igreja São Pedro (1942), estilo gótico em pedra basáltica. O lago (1950) leva o nome de uma das primeiras moradoras."},
       {t:"19:30",n:"🥩 Texas Gramado",d:"Carnes nobres · ~R$100/pp",c:"meal",tags:["p"],x:"Prime 2×1. Ancho, chorizo, costela na brasa. Harmonize com Tannat ou Malbec."},
     ]
   },
@@ -461,9 +468,9 @@ const DAYS = {
       {t:"9:00",n:"☕ Café tranquilo",d:"Dia mais livre da viagem."},
       {t:"10:30–12:30",n:"🛍️ Compras finais",d:"Chocolates, queijos, vinhos, malhas.",x:"Kits-presente da Prawer e Florybal. Vinhos: despachar na mala, embrulhar bem! Líquidos >100ml → mala despachada."},
       {t:"13:00",n:"🍽️ Almoço livre",d:"Último almoço em Gramado!",c:"meal",x:"Josephina Café (~R$60/pp) ou La Caceria (fondue de almoço ~R$110/pp)."},
-      {p:"Lago Negro",t:"14:30–17:00",n:"🌄 Passeio livre",d:"Lago, mirantes, despedida.",x:"Mirante do Vale do Quilombo: pôr-do-sol espetacular. Le Jardin: lavandas (~R$60/pp, checar Prime). Lago Negro: pedalinhos (~R$30-50/casal).",h:"O Lago Negro (1953) surgiu após incêndio. Mudas de hortênsias vieram da Floresta Negra alemã. Águas escuras pelo reflexo das árvores."},
+      {p:"Lago Negro",t:"14:30–17:00",n:"🌄 Lago Negro + Mirante",d:"Lago, mirante, despedida.",tags:["f"],x:"Lago Negro: parque arborizado com caminhada ao redor do lago e hortênsias, grátis (pedalinhos pagos à parte, ~R$30-50/casal). Mirante do Vale do Quilombo (Av. das Hortênsias): vista panorâmica e pôr do sol, grátis. Opcional pago: Le Jardin, lavandas (~R$60/pp, checar Prime).",h:"O Lago Negro (1953) surgiu após incêndio. Mudas de hortênsias vieram da Floresta Negra alemã. Águas escuras pelo reflexo das árvores."},
       {t:"18:00",n:"🧥 Arrumar-se",d:"Último jantar especial!"},
-      {p:"Rua Coberta",t:"20:30",n:"🚶 Caminhar ao Centro",d:"Última vez pelo Natal Luz."},
+      {p:"Rua Coberta",t:"20:30",n:"🚶 Caminhar ao Centro",d:"Última vez pelo Natal Luz.",tags:["f"]},
       {tk:"caramau",p:"Cara de Mau",t:"21:30",n:"🍷 Cara de Mau",d:"Ambiente Porto · Reserva confirmada",c:"meal",tags:["c"],x:"Reserva 21:30, 2 adultos. Carnes nobres (tomahawk, ancho, costela), risotos. Carta ampla de vinhos. ~R$130-160/pp. Verificar Prime.",h:"Referência em carnes na Serra Gaúcha. 'Gaúcho bravo'. Ambiente Porto: tijolos aparentes, iluminação intimista."},
     ]
   },
@@ -509,7 +516,13 @@ const KB = [
   {k:["mini mundo","miniatura"],a:"O Mini Mundo existe desde 1983 com 160+ miniaturas na escala 1:24. Construções europeias típicas, trenzinhos, moinhos. Feito artesanalmente por 3 gerações de uma família de origem alemã. ~R$60/pp. No Centro de Gramado."},
   {k:["aldeia","papai noel"],a:"A Aldeia do Papai Noel foi o primeiro parque temático de Natal do Brasil (1940). Fábrica de brinquedos, casa do Papai Noel, trenó que 'voa' por trilhos sobre a cidade, neve artificial. ~R$80/pp. Checar Prime 2×1."},
   {k:["texas","churrasco"],a:"O Texas Gramado fica na Av. Borges de Medeiros. Carnes nobres na brasa: ancho, bife de chorizo, costela. Prime 2×1. ~R$100/pp. Harmonize com Tannat ou Malbec. Vocês vão dia 27/10 à noite."},
-  {k:["erro","erros","dica","dicas","orçamento","orcamento","caro","grátis","gratis","de graça"],a:"Erros comuns em Gramado: subestimar o orçamento (fondue ~R$180/pp, Café Colonial ~R$130/pp, parques R$60–190/pp; usem o Prime 2×1), deixar ingresso pra hora (falta comprar o Parque do Caracol), atropelar o roteiro (o dia 29 foi aliviado), não se preparar pro frio (5–10°C à noite em outubro), só fazer atrações pagas (Rua Coberta, Igreja São Pedro, Lago Negro, Catedral de Pedra e mirantes são grátis) e ignorar Canela (Caracol e Catedral de Pedra estão no dia 29)."},
+  {k:["erro","erros","dica","dicas","orçamento","orcamento","caro","evitar"],a:"Erros comuns em Gramado: subestimar o orçamento (fondue ~R$180/pp, Café Colonial ~R$130/pp, parques R$60–190/pp; usem o Prime 2×1), deixar ingresso pra hora (falta comprar o Parque do Caracol), atropelar o roteiro (o dia 29 foi aliviado), não se preparar pro frio (5–10°C à noite em outubro), só fazer atrações pagas (Rua Coberta, Igreja São Pedro, Lago Negro, Catedral de Pedra e mirantes são grátis) e ignorar Canela (Caracol e Catedral de Pedra estão no dia 29)."},
+  {k:["grátis","gratis","gratuito","gratuita","de graça","sem pagar","free"],a:"Atrações gratuitas: Lago Negro (pedalinho é pago), Rua Coberta (Rua Madre Verônica), Rua Torta (Rua Emílio Sorgetz), Igreja Matriz São Pedro Apóstolo, Fonte do Amor Eterno, Praça das Etnias e Casa do Colono, Lago Joaquina Rita Bier, Mirante do Vale do Quilombo, os Pórticos de Gramado, fábricas de chocolate com degustação (Prawer, Planalto) e, em Canela, a Catedral de Pedra. Todas estão no roteiro: veja a lista em Info."},
+  {k:["fonte do amor","amor eterno","cadeado"],a:"A Fonte do Amor Eterno fica perto da Igreja São Pedro, no centro de Gramado. Os casais deixam cadeados com seus nomes. Está no roteiro de 27/10, junto com a Igreja e o Lago Joaquina Rita Bier: levem um cadeado!"},
+  {k:["rua torta","emílio sorgetz","sorgetz"],a:"A Rua Torta (Rua Emílio Sorgetz) é sinuosa, inspirada na Lombard Street de São Francisco, e uma das mais fotogênicas de Gramado. Grátis. Está no roteiro de 25/10 à tarde."},
+  {k:["casa do colono","etnias","cuca","cucas"],a:"A Praça das Etnias celebra os imigrantes que formaram Gramado; na Casa do Colono há pães e cucas coloniais à venda. Fica no centro, no passeio de 24/10."},
+  {k:["mirante","quilombo","vale do quilombo"],a:"O Mirante do Vale do Quilombo fica na Avenida das Hortênsias e tem vista panorâmica do vale, ótima no fim da tarde. Grátis. Está no roteiro de 30/10."},
+  {k:["pórtico","portico","portal"],a:"Gramado tem dois pórticos de entrada: um na via de Nova Petrópolis e outro na via de Taquara. São pontos clássicos de foto, gratuitos. Reparem na chegada com a Citral em 24/10; a via de Nova Petrópolis é a RS-235, a mesma do Snowland."},
   {k:["catedral","catedral de pedra"],a:"A Catedral de Pedra (Nossa Senhora de Lourdes) fica na Praça João Corrêa, no centro de Canela, em estilo gótico inglês. Entrada gratuita. Está no roteiro de 29/10 às 15:00, a pé depois do almoço no Container Bistrot."},
   {k:["mala","bagagem","embalagem","o que levar"],a:"Dicas de mala: meias grossas para Snowland, agasalhos para noites frias (5-10°C), protetor solar (altitude!), power bank. Na volta: chocolates e vinhos na mala despachada (embrulhar bem!), líquidos >100ml na despachada. Carregar celulares 100%."},
 ];
@@ -1447,6 +1460,12 @@ async function tkTx(mode,fn){
 const tkAll=()=>tkTx('readonly',st=>st.getAll());
 const tkBySlot=slot=>tkTx('readonly',st=>st.index('slot').getAll(slot));
 let tkCounts={};
+function renderFree(){
+  document.getElementById('freeList').innerHTML=FREE.map(f=>{
+    const url=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(f.q)}`;
+    return `<div class="free"><div><strong>${f.n}</strong><small>${f.d}</small><em>no roteiro: ${f.w}</em></div><a href="${url}" target="_blank" rel="noopener" data-kind="maps" data-dest="${f.q.replace(/"/g,'&quot;')}" aria-label="Ver ${f.n} no mapa">🗺️</a></div>`;
+  }).join('');
+}
 async function refreshTicketBadges(){
   try{
     const all=await tkAll();
@@ -1602,6 +1621,7 @@ renderLocPick();
 loadConfig();
 updateAIStatus();
 refreshTicketBadges();
+renderFree();
 if(!onSite&&(!geoAllowed||!micAllowed))document.getElementById('fullSite').innerHTML='<div class="st">Versão completa</div>'+handoffHTML('GPS e voz');
 
 // Service Worker
