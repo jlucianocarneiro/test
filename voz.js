@@ -1,14 +1,21 @@
-// Neural voice (Piper, pt-BR) in a worker: espeak-ng phonemes → VITS model in ONNX Runtime → PCM.
+// Neural voices (pt-BR) in a worker: espeak-ng phonemes → ONNX model in ONNX Runtime → PCM.
+// Two kinds of model: Piper (VITS) and Kokoro-82M (StyleTTS2, more natural, heavier).
 // Everything is downloaded once and kept in Cache Storage, so it also works offline afterwards.
 const ORT = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/';
 const PH = 'https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/';
-const HF = ['https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/', 'https://huggingface.co/rhasspy/piper-voices/resolve/main/',
-  'https://huggingface.co/diffusionstudio/piper-voices/resolve/main/'];
-// The pt-BR medium voices of piper-voices; one is kept in memory at a time.
-const VOICES = Object.fromEntries(['faber', 'cadu', 'jeff'].map(v =>
-  [v, HF.map(h => `${h}pt/pt_BR/${v}/medium/pt_BR-${v}-medium.onnx`)]));
+const RH = ['https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/', 'https://huggingface.co/rhasspy/piper-voices/resolve/main/'];
+const rhasspy = v => RH.map(h => `${h}pt/pt_BR/${v}/medium/pt_BR-${v}-medium.onnx`);
+const ovos = v => [`https://huggingface.co/OpenVoiceOS/pipertts_pt-BR_${v}/resolve/main/${v}_pt-BR.onnx`];
+const KOKORO = 'https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/main/';
+const VOICES = {
+  faber: { kind: 'piper', urls: rhasspy('faber') }, cadu: { kind: 'piper', urls: rhasspy('cadu') }, jeff: { kind: 'piper', urls: rhasspy('jeff') },
+  dii: { kind: 'piper', urls: ovos('dii') }, miro: { kind: 'piper', urls: ovos('miro') },
+  dora: { kind: 'kokoro', style: 'pf_dora' }, alex: { kind: 'kokoro', style: 'pm_alex' }, santa: { kind: 'kokoro', style: 'pm_santa' }
+};
 const CACHE = 'gramado-voz';
 let runtime = null, ready = null, current = null, session = null, cfg = null, phUrls = null;
+// Kokoro: one model for every voice; each voice is just a style table.
+let kokoro = null, kokoroVocab = null, kokoroStyle = null;
 
 async function get(url, onBytes) {
   const cache = await caches.open(CACHE);
@@ -17,23 +24,23 @@ async function get(url, onBytes) {
   const resp = await fetch(url);
   if (!resp.ok) throw new Error(resp.status + ' ' + url);
   const reader = resp.body.getReader(), parts = [];
-  let n = 0;
   for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
-    parts.push(value); n += value.length; onBytes && onBytes(value.length, true);
+    parts.push(value); onBytes && onBytes(value.length);
   }
   const buf = await new Blob(parts).arrayBuffer();
   await cache.put(url, new Response(buf, { headers: { 'Content-Type': resp.headers.get('Content-Type') || 'application/octet-stream' } }));
   return buf;
 }
-// The model has mirrors: use the first one that answers.
+// Piper models have mirrors: use the first one that answers.
 async function getAny(urls, onBytes) {
   let err;
   for (const u of urls) { try { return await get(u, onBytes); } catch (e) { err = e; } }
   throw err;
 }
 const blobUrl = (buf, type) => URL.createObjectURL(new Blob([buf], { type }));
+const json = buf => JSON.parse(new TextDecoder().decode(buf));
 
 // ONNX Runtime and the phonemizer are shared by every voice.
 function loadRuntime(tick) {
@@ -55,53 +62,87 @@ function loadRuntime(tick) {
 
 function load(voice) {
   if (ready && current === voice) return ready;
+  const v = VOICES[voice];
+  if (!v) return Promise.reject(new Error('voz desconhecida: ' + voice));
   // Sizes are only for the progress bar; the real totals come from the downloads.
-  const total = 64e6 + (runtime ? 0 : 29.6e6);
+  const total = (v.kind === 'kokoro' ? (kokoro ? 0.6e6 : 93e6) : 64e6) + (runtime ? 0 : 29.6e6);
   let loaded = 0, last = 0;
   const tick = n => {
     loaded += n;
     if (loaded - last > 5e5 || loaded >= total) { last = loaded; postMessage({ type: 'progress', voice, loaded: Math.min(loaded, total), total }); }
   };
   current = voice;
-  const prev = session; session = null;
   ready = (async () => {
-    if (prev) await prev.release().catch(() => {});
-    const [model, json] = await Promise.all([getAny(VOICES[voice], tick), getAny(VOICES[voice].map(u => u + '.json')), loadRuntime(tick)]);
-    cfg = JSON.parse(new TextDecoder().decode(json));
+    if (v.kind === 'kokoro') {
+      const [style] = await Promise.all([get(KOKORO + `voices/${v.style}.bin`, tick), loadRuntime(tick), loadKokoro(tick)]);
+      kokoroStyle = new Float32Array(style);
+      cfg = { espeak: { voice: 'pt-br' }, audio: { sample_rate: 24000 }, kind: 'kokoro' };
+      return;
+    }
+    // Only one Piper model in memory at a time.
+    if (session) { const s = session; session = null; await s.release().catch(() => {}); }
+    const [model, conf] = await Promise.all([getAny(v.urls, tick), getAny(v.urls.map(u => u + '.json')), loadRuntime(tick)]);
+    cfg = json(conf);
     session = await ort.InferenceSession.create(new Uint8Array(model), { executionProviders: ['wasm'] });
   })();
   ready.catch(() => { if (current === voice) ready = null; });
   return ready;
 }
 
-// piper_phonemize is a CLI build: a fresh module per call, ids arrive on stdout.
+function loadKokoro(tick) {
+  if (kokoro) return kokoro;
+  kokoro = (async () => {
+    const [model, tok] = await Promise.all([get(KOKORO + 'onnx/model_quantized.onnx', tick), get(KOKORO + 'tokenizer.json', tick), loadRuntime(tick)]);
+    kokoroVocab = json(tok).model.vocab;
+    return ort.InferenceSession.create(new Uint8Array(model), { executionProviders: ['wasm'] });
+  })();
+  kokoro.catch(() => { kokoro = null; });
+  return kokoro;
+}
+
+// piper_phonemize is a CLI build: a fresh module per call; the IPA arrives on stdout.
 function phonemize(text) {
   return new Promise((resolve, reject) => {
     createPiperPhonemize({
-      print: out => { try { resolve(toIds(JSON.parse(out).phonemes)); } catch (e) { reject(e); } },
+      print: out => { try { resolve(JSON.parse(out).phonemes.flat().join('')); } catch (e) { reject(e); } },
       printErr: m => reject(new Error(m)),
       locateFile: f => f.endsWith('.wasm') ? phUrls.wasm : f.endsWith('.data') ? phUrls.data : f
     }).then(m => m.callMain(['-l', cfg.espeak.voice, '--input', JSON.stringify([{ text }]), '--espeak_data', '/espeak-ng-data']), reject);
   });
 }
 
-// Map with the model's own table (older voices have fewer symbols than piper's default).
-function toIds(phonemes) {
+// Piper: map with the model's own table (older voices have fewer symbols than piper's default).
+function piperIds(ipa) {
   const map = cfg.phoneme_id_map, ids = [...map['^'], ...map['_']];
-  for (const p of [...phonemes.flat().join('')]) if (map[p]) ids.push(...map[p], ...map['_']);
+  for (const p of [...ipa]) if (map[p]) ids.push(...map[p], ...map['_']);
   ids.push(...map['$']);
   return ids;
 }
+// Kokoro spells the affricates as single symbols; the ids are wrapped in the pad token 0.
+function kokoroIds(ipa) {
+  const ids = [...ipa.replace(/dʒ/g, 'ʤ').replace(/tʃ/g, 'ʧ')].map(c => kokoroVocab[c]).filter(i => i !== undefined).slice(0, 510);
+  return [0, ...ids, 0];
+}
 
+const i64 = a => BigInt64Array.from(a.map(BigInt));
 async function say(text, rate) {
-  const ids = await phonemize(text);
-  const inf = cfg.inference;
+  const ipa = await phonemize(text);
+  if (cfg.kind === 'kokoro') {
+    const ids = kokoroIds(ipa), at = 256 * Math.min(Math.max(ids.length - 2, 0), 509);
+    const { waveform } = await (await kokoro).run({
+      input_ids: new ort.Tensor('int64', i64(ids), [1, ids.length]),
+      style: new ort.Tensor('float32', kokoroStyle.slice(at, at + 256), [1, 256]),
+      speed: new ort.Tensor('float32', Float32Array.from([rate || 1]), [1])
+    });
+    return waveform.data;
+  }
+  const ids = piperIds(ipa), inf = cfg.inference;
   const feeds = {
-    input: new ort.Tensor('int64', BigInt64Array.from(ids.map(BigInt)), [1, ids.length]),
-    input_lengths: new ort.Tensor('int64', BigInt64Array.from([BigInt(ids.length)]), [1]),
+    input: new ort.Tensor('int64', i64(ids), [1, ids.length]),
+    input_lengths: new ort.Tensor('int64', i64([ids.length]), [1]),
     scales: new ort.Tensor('float32', Float32Array.from([inf.noise_scale, inf.length_scale / (rate || 1), inf.noise_w]), [3])
   };
-  if (cfg.num_speakers > 1) feeds.sid = new ort.Tensor('int64', BigInt64Array.from([0n]), [1]);
+  if (cfg.num_speakers > 1) feeds.sid = new ort.Tensor('int64', i64([0]), [1]);
   const { output } = await session.run(feeds);
   return output.data;
 }

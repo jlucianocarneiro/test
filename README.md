@@ -40,11 +40,13 @@ No GitHub Pages (HTTPS próprio) clima e GPS funcionam normalmente. Se o GPS fal
 
 Em Info › Configurações, "Voz da guia" (o botão ✨ na barra de leitura leva direto para lá):
 
-- **✨ Faber, Cadu e Jeff · neural**: vozes `pt_BR-*-medium` do projeto aberto [Piper](https://github.com/rhasspy/piper),
-  baixadas uma vez (~90 MB a primeira, ~65 MB as seguintes) e sintetizadas no próprio celular em `voz.js`
-  (espeak-ng em WebAssembly `@diffusionstudio/piper-wasm@1.0.0` + ONNX Runtime Web 1.18.0, via jsDelivr;
-  modelos do Hugging Face `rhasspy/piper-voices`). Ficam no Cache Storage `gramado-voz` e funcionam offline.
-  Só no site: o visualizador do Claude não baixa os modelos.
+- **✨ Vozes neurais abertas**, baixadas uma vez e sintetizadas no próprio celular em `voz.js`
+  (espeak-ng em WebAssembly `@diffusionstudio/piper-wasm@1.0.0` + ONNX Runtime Web 1.18.0, via jsDelivr):
+  - Dora, Alex e Santa: [Kokoro-82M](https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX) (Apache-2.0,
+    `model_quantized.onnx` ~92 MB, um modelo para as três), as mais naturais e as mais lentas para começar;
+  - Dii e Miro: Piper `OpenVoiceOS/pipertts_pt-BR_*` (CC-BY-NC-ND, uso pessoal);
+  - Faber, Cadu e Jeff: Piper `rhasspy/piper-voices` (CC0).
+  Ficam no Cache Storage `gramado-voz` e funcionam offline. Só no site: o visualizador do Claude não baixa os modelos.
 - **🌐 Nova e Onyx · OpenAI**: aparecem com uma chave da OpenAI (`gpt-4o-mini-tts`); precisam de internet.
 - **📱 Do celular**: a melhor voz pt-BR do aparelho (prioriza "Natural/Online", Google e "Premium").
 

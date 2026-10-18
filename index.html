@@ -174,9 +174,6 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 .tk-meta span{flex:1;min-width:120px;word-break:break-all}
 .tk-meta button{min-height:40px;padding:0 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.74rem;font-weight:600;cursor:pointer}
 .tk-lock{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0 0;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--border);font-size:.78rem;color:var(--muted)}
-.tk-lock button{min-height:40px;padding:0 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.74rem;font-weight:600;cursor:pointer;white-space:nowrap}
-.tk-lock button.confirm{background:#b3261e;border-color:#b3261e;color:#fff}
-.tk-meta button.del.confirm{background:#b3261e;border-color:#b3261e;color:#fff}
 .tk-links{display:flex;flex-direction:column;gap:8px;margin:12px auto 4px;max-width:320px}
 .tk-link{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:600;text-decoration:none}
 .tk-links-note{font-size:.76rem;color:var(--muted);text-align:center;margin:12px 0 0;line-height:1.5}
@@ -431,7 +428,8 @@ const TICKETS={
   'nativitaten':{"n": "🎄 Nativitaten", "d": "29/10 20:00 · Setor Ouro · 2 ingressos", "links": [{"l": "Ingressos Nativitaten", "u": "https://drive.google.com/file/d/1Lf1byn9jeFVyHtHQAM8okvOSuUBtG4zJ/view"}]},
   'caramau':{"n": "🏴‍☠️ Pizzaria Cara de Mau", "d": "30/10 21:30 · Ambiente Porto · Mesa 68", "links": [{"l": "Compra Cara de Mau", "u": "https://drive.google.com/file/d/1k8N8FUBg83IJAqrbSZ0zBJFXaAbRCuaE/view"}, {"l": "Sessões e mesa", "u": "https://drive.google.com/file/d/18jCznyC70ouSzgmLHCEP9X5lICcBuHAw/view"}]},
   'citral-volta':{"n": "🚌 Citral Gramado → POA", "d": "31/10 12:15 · plataforma 02 · poltronas 5 e 6", "links": [{"l": "Voucher Citral (ida e volta)", "u": "https://drive.google.com/file/d/1ZJcRXyvy_nngvupUvKxarTzNJGIz9K0H/view"}]},
-  'voo-volta':{"n": "✈️ Voo GOL G3 1795 POA → BSB", "d": "31/10 17:30 · assentos 10E e 10F", "links": [{"l": "Reserva GOL · Luciano (10F)", "u": "https://drive.google.com/file/d/1QLWgsZ_uEDyQFwSjpZCDpa0jPtDRkUX9/view"}, {"l": "Reserva GOL · Greice (10E)", "u": "https://drive.google.com/file/d/1tW40xZxeH1xQt0zmBdkRttrOIj_THLUA/view"}]}
+  'voo-volta':{"n": "✈️ Voo GOL G3 1795 POA → BSB", "d": "31/10 17:30 · assentos 10E e 10F", "links": [{"l": "Reserva GOL · Luciano (10F)", "u": "https://drive.google.com/file/d/1QLWgsZ_uEDyQFwSjpZCDpa0jPtDRkUX9/view"}, {"l": "Reserva GOL · Greice (10E)", "u": "https://drive.google.com/file/d/1tW40xZxeH1xQt0zmBdkRttrOIj_THLUA/view"}]},
+  'outros':{"n": "📁 Outros documentos", "d": "seguro viagem, RG/CNH, comprovantes…", "links": []}
 };
 // Itinerary data
 const DAYS = {
@@ -1540,27 +1538,34 @@ function pickVoice(){
 }
 
 // Fluent voices, played through Web Audio:
-// - Piper (open source, pt-BR) synthesized on the phone in voz.js. Only on the site:
-//   the Claude viewer can't download the models.
+// - Open neural voices (Kokoro and Piper, pt-BR) synthesized on the phone in voz.js.
+//   Only on the site: the Claude viewer can't download the models.
 // - OpenAI TTS, when an OpenAI key is set (needs internet, billed to that key).
-const PIPER={faber:'Faber',cadu:'Cadu',jeff:'Jeff'};
+// k = model family (all Kokoro voices share one model); s = rough first download in MB.
+const VOZES={
+  dora:{n:'Dora',k:'kokoro',d:'feminina · a mais natural',s:95},alex:{n:'Alex',k:'kokoro',d:'masculina · natural',s:95},
+  santa:{n:'Santa',k:'kokoro',d:'masculina · natural',s:95},dii:{n:'Dii',k:'piper',d:'feminina',s:65},
+  miro:{n:'Miro',k:'piper',d:'masculina',s:65},faber:{n:'Faber',k:'piper',d:'masculina',s:65},
+  cadu:{n:'Cadu',k:'piper',d:'masculina',s:65},jeff:{n:'Jeff',k:'piper',d:'masculina',s:65}
+};
 const NEURAL={w:null,id:0,wait:{},ctx:null,have:[],loading:null};
 const canNeural=!inSandbox&&'caches' in window&&typeof Worker!=='undefined'&&typeof WebAssembly==='object';
 try{
   const v=localStorage.getItem('gramado-voz');
-  NEURAL.have=canNeural?(v==='1'?['faber']:JSON.parse(v)||[]):[];
+  NEURAL.have=canNeural?(v==='1'?['faber']:JSON.parse(v)||[]).filter(k=>VOZES[k]):[];
 }catch(e){}
 const openaiKey=()=>{const k=getConfig().key||'';return /^sk-(?!ant)/.test(k)?k:'';};
 function wantVoice(){
   const v=getConfig().voice;
-  if(v==='neural')return 'piper:faber';
-  return v||(openaiKey()?'openai:nova':canNeural?'piper:faber':'auto');
+  if(v==='neural')return 'neural:faber';
+  if(v&&v.startsWith('piper:'))return 'neural:'+v.slice(6);
+  return v||(openaiKey()?'openai:nova':canNeural?'neural:dora':'auto');
 }
 function voiceOptions(){
   const sel=document.getElementById('cfgVoice');if(!sel)return;
   const opts=[];
   if(openaiKey())opts.push(['openai:nova','🌐 Nova · OpenAI (a mais natural)'],['openai:onyx','🌐 Onyx · OpenAI (masculina)']);
-  if(canNeural)Object.entries(PIPER).forEach(([k,n])=>opts.push(['piper:'+k,`✨ ${n} · neural${NEURAL.have.includes(k)?' ✓':''}`]));
+  if(canNeural)Object.entries(VOZES).forEach(([k,v])=>opts.push(['neural:'+k,`✨ ${v.n} · ${v.d}${NEURAL.have.includes(k)?' ✓':''}`]));
   opts.push(['auto','📱 Do celular (automática)']);
   ptVoices().forEach(v=>opts.push([v.name,'📱 '+v.name.replace(/\s*[-–(]?\s*Portugu.*$/i,'').slice(0,28)]));
   sel.textContent='';
@@ -1572,7 +1577,7 @@ function voiceOptions(){
 function ttsEngine(){
   const v=wantVoice();
   if(v.startsWith('openai:')&&openaiKey())return v;
-  if(v.startsWith('piper:')&&canNeural&&NEURAL.have.includes(v.slice(6)))return v;
+  if(v.startsWith('neural:')&&canNeural&&NEURAL.have.includes(v.slice(7)))return v;
   return 'system';
 }
 function vozUI(){
@@ -1580,27 +1585,32 @@ function vozUI(){
   const v=document.getElementById('cfgVoice').value;
   if(v.startsWith('openai:')){box.hidden=true;hint.textContent='Voz da OpenAI: a mais natural, usa a sua chave e precisa de internet (centavos por resposta).';return;}
   if(!canNeural){box.hidden=true;hint.textContent=inSandbox?'Vozes neurais (Faber, Cadu, Jeff) funcionam no site: use "Abrir o guia no navegador" acima. Com uma chave da OpenAI aparecem também as vozes Nova e Onyx.':'Este navegador não suporta as vozes neurais.';return;}
-  const k=v.startsWith('piper:')?v.slice(6):'';
+  const k=v.startsWith('neural:')?v.slice(7):'';
   box.hidden=!k||NEURAL.have.includes(k);
-  if(k&&NEURAL.loading!==k){const b=document.getElementById('vozBtn');b.disabled=!!NEURAL.loading;b.textContent=`⬇️ Baixar a voz ${PIPER[k]} (≈ ${NEURAL.have.length?65:90} MB, uma vez)`;}
-  hint.textContent='Vozes neurais do projeto aberto Piper, que rodam no próprio celular: baixem no Wi-Fi e depois funcionam até sem internet.'+(openaiKey()?'':' Com uma chave da OpenAI aparecem também as vozes Nova e Onyx, ainda mais naturais.');
+  if(k&&NEURAL.loading!==k){
+    const b=document.getElementById('vozBtn');b.disabled=!!NEURAL.loading;
+    // Kokoro voices share one model; everything shares the ~30 MB engine.
+    const mb=(NEURAL.have.some(h=>VOZES[h].k==='kokoro')&&VOZES[k].k==='kokoro'?1:VOZES[k].s)+(NEURAL.have.length?0:30);
+    b.textContent=`⬇️ Baixar a voz ${VOZES[k].n} (≈ ${mb} MB, uma vez)`;
+  }
+  hint.textContent='Vozes neurais abertas (Kokoro e Piper) que rodam no próprio celular: baixem no Wi-Fi e depois funcionam até sem internet. Dora, Alex e Santa (Kokoro) são as mais naturais, mas demoram mais para começar a falar.'+(openaiKey()?'':' Com uma chave da OpenAI aparecem também as vozes Nova e Onyx.');
 }
 function vozWorker(){
   if(!NEURAL.w){
-    NEURAL.w=new Worker('voz.js?v=2');
+    NEURAL.w=new Worker('voz.js?v=3');
     NEURAL.w.onmessage=({data:m})=>{
       if(m.type==='progress'){
         const pc=Math.round(m.loaded*100/m.total);
         document.getElementById('vozFill').style.width=pc+'%';
-        document.getElementById('vozBtn').textContent=`Baixando a voz ${PIPER[m.voice]}… ${pc}%`;
+        document.getElementById('vozBtn').textContent=`Baixando a voz ${VOZES[m.voice].n}… ${pc}%`;
       }
       if(m.type==='ready'&&NEURAL.loading===m.voice){
         NEURAL.loading=null;
         if(!NEURAL.have.includes(m.voice))NEURAL.have.push(m.voice);
         try{localStorage.setItem('gramado-voz',JSON.stringify(NEURAL.have));}catch(e){}
         document.getElementById('vozBar').hidden=true;
-        voiceOptions();vozUI();toast(`✨ Voz ${PIPER[m.voice]} pronta! Ela lê as respostas da guia, mesmo sem internet.`);
-        speak(`Olá! Eu sou a voz ${PIPER[m.voice]}. A partir de agora eu leio as respostas da guia. Boa viagem a Gramado!`);
+        voiceOptions();vozUI();toast(`✨ Voz ${VOZES[m.voice].n} pronta! Ela lê as respostas da guia, mesmo sem internet.`);
+        speak(`Olá! Eu sou a voz ${VOZES[m.voice].n}. A partir de agora eu leio as respostas da guia. Boa viagem a Gramado!`);
       }
       const w=NEURAL.wait[m.id];if(!w)return;delete NEURAL.wait[m.id];
       if(m.type==='audio')w.res(m);
@@ -1619,8 +1629,8 @@ function vozFailed(msg){
 }
 function vozDownload(){
   const v=document.getElementById('cfgVoice').value;
-  if(NEURAL.loading||!v.startsWith('piper:'))return;
-  NEURAL.loading=v.slice(6);unlockTTS();
+  if(NEURAL.loading||!v.startsWith('neural:'))return;
+  NEURAL.loading=v.slice(7);unlockTTS();
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   const b=document.getElementById('vozBtn');b.disabled=true;b.textContent='Baixando a voz…';
   document.getElementById('vozFill').style.width='0';document.getElementById('vozBar').hidden=false;
@@ -1643,7 +1653,7 @@ function synthChunk(text,engine){
     .then(b=>new Promise((res,rej)=>audioCtx().decodeAudioData(b,res,rej)));
   return new Promise((res,rej)=>{
     const id=++NEURAL.id;NEURAL.wait[id]={res,rej};
-    vozWorker().postMessage({type:'say',id,voice:engine.slice(6),text,rate});
+    vozWorker().postMessage({type:'say',id,voice:engine.slice(7),text,rate});
   }).then(a=>{const buf=audioCtx().createBuffer(1,a.pcm.length,a.rate);buf.copyToChannel(a.pcm,0);return buf;});
 }
 // From the reading bar straight to the voice picker.
@@ -1687,7 +1697,9 @@ function speak(text){
   // Short chunks: Chrome drops utterances longer than ~15 s.
   const sentences=speechText(text).match(/[^.!?…]+[.!?…]*/g)||[];
   const chunks=[];let cur='';
-  sentences.forEach(s=>{if((cur+s).length>220&&cur){chunks.push(cur);cur=s;}else cur+=s;});
+  // Kokoro is slower: shorter chunks make it start speaking sooner.
+  const max=engine.startsWith('neural:')&&VOZES[engine.slice(7)].k==='kokoro'?140:220;
+  sentences.forEach(s=>{if((cur+s).length>max&&cur){chunks.push(cur);cur=s;}else cur+=s;});
   if(cur.trim())chunks.push(cur);
   if(!chunks.length)return;
   Object.assign(TTS,{chunks,idx:0,paused:false,run:TTS.run+1,engine,pre:[]});
@@ -1863,12 +1875,12 @@ function trimWhite(c){
   o.getContext('2d').drawImage(c,left,top,o.width,o.height,0,0,o.width,o.height);
   return o;
 }
-// Attached tickets are read-only: no removing or adding until unlocked in the viewer.
-let tkSlot=null,tkUrls=[],tkUnlocked=false;
+// Attached tickets can't be deleted from the app; more files can always be added.
+let tkSlot=null,tkUrls=[];
 function freeTkUrls(){tkUrls.forEach(u=>URL.revokeObjectURL(u));tkUrls=[];}
 function tkUrl(blob){const u=URL.createObjectURL(blob);tkUrls.push(u);return u;}
 async function openTickets(slot){
-  tkSlot=slot;tkUnlocked=false;
+  tkSlot=slot;
   const t=TICKETS[slot];
   document.getElementById('tkTitle').textContent=t.n;
   document.getElementById('tkSub').textContent=t.d;
@@ -1893,10 +1905,10 @@ async function renderTickets(){
   let files;
   try{files=await tkBySlot(tkSlot);}
   catch(e){body.innerHTML='<div class="tk-empty">Este navegador não deixa guardar arquivos aqui. Abra o guia no Chrome (ou Safari) para guardar os ingressos.</div>';return;}
-  const locked=files.length&&!tkUnlocked;
-  document.getElementById('tkFoot').hidden=!!locked;
   if(!files.length){
-    body.innerHTML=`<div class="tk-empty">🎫 Abra direto do seu Google Drive:${tkLinks(tkSlot)}<br>Para ter sem internet: baixe o arquivo e toque no botão abaixo.</div>`;
+    body.innerHTML=TICKETS[tkSlot].links.length
+      ?`<div class="tk-empty">🎫 Abra direto do seu Google Drive:${tkLinks(tkSlot)}<br>Para ter sem internet: baixe o arquivo e toque no botão abaixo.</div>`
+      :'<div class="tk-empty">📁 Guarde aqui outros documentos da viagem (PDF ou foto).<br>Ficam só neste celular, abrem sem internet e não podem ser apagados pelo app.</div>';
     return;
   }
   body.textContent='';
@@ -1908,31 +1920,17 @@ async function renderTickets(){
     const nm=document.createElement('span');nm.textContent=f.name;meta.appendChild(nm);
     const op=document.createElement('button');op.textContent='Abrir original';
     op.onclick=()=>{const u=tkUrl(f.blob);const w=window.open(u,'_blank');if(!w){const a=document.createElement('a');a.href=u;a.download=f.name;a.click();}};
-    const del=document.createElement('button');del.className='del';del.textContent='Remover';
-    del.onclick=async()=>{
-      if(!del.classList.contains('confirm')){del.classList.add('confirm');del.textContent='Toque de novo para remover';setTimeout(()=>{del.classList.remove('confirm');del.textContent='Remover';},4000);return;}
-      await tkTx('readwrite',st=>st.delete(f.id));await renderTickets();refreshTicketBadges();
-    };
     // The Claude viewer blocks downloads; the rendered pages above are what counts there.
     if(!inSandbox)meta.appendChild(op);
-    if(!locked)meta.appendChild(del);
     box.appendChild(meta);
     body.appendChild(box);
   });
   body.insertAdjacentHTML('afterbegin','<p class="go-note" style="margin:0 0 8px">Na entrada: toque no ingresso para abrir em tela cheia e aumente o brilho da tela.</p>');
-  body.insertAdjacentHTML('beforeend',`<p class="tk-links-note">Original no Google Drive:</p>${tkLinks(tkSlot)}`);
+  if(TICKETS[tkSlot].links.length)body.insertAdjacentHTML('beforeend',`<p class="tk-links-note">Original no Google Drive:</p>${tkLinks(tkSlot)}`);
   const lk=document.createElement('div');lk.className='tk-lock';
-  const st=document.createElement('span');
   const persisted=navigator.storage&&navigator.storage.persisted?await navigator.storage.persisted().catch(()=>false):false;
-  st.textContent=(locked?'🔒 Só leitura':'🔓 Edição liberada')+(persisted?' · 🛡️ protegido contra limpeza do celular':'');
-  lk.appendChild(st);
-  const ub=document.createElement('button');
-  ub.textContent=locked?'Destravar':'Travar';
-  ub.onclick=()=>{
-    if(locked&&!ub.classList.contains('confirm')){ub.classList.add('confirm');ub.textContent='Toque de novo para destravar';setTimeout(()=>{ub.classList.remove('confirm');ub.textContent='Destravar';},4000);return;}
-    tkUnlocked=locked;renderTickets();
-  };
-  lk.appendChild(ub);body.appendChild(lk);
+  lk.textContent='🔒 Protegidos: o app não apaga ingressos'+(persisted?' · 🛡️ nem a limpeza do celular':'');
+  body.appendChild(lk);
 }
 // Ask the browser not to clear the tickets when the phone runs low on space.
 function protectTickets(){
@@ -1946,7 +1944,7 @@ function tkLinks(slot){
 async function addTicketFiles(input){
   const files=[...input.files];input.value='';
   if(!files.length||!tkSlot)return;
-  const slot=tkSlot;tkUnlocked=true; // still adding: lock again when the viewer closes
+  const slot=tkSlot;
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   for(const f of files){
     toast(`Guardando ${f.name}…`,8000);
