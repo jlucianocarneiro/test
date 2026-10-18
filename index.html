@@ -195,6 +195,12 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 .cfg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card);border-radius:10px;margin-bottom:8px;box-shadow:var(--shadow)}
 .cfg-row label{font-size:.82rem;font-weight:600}
 .cfg-row input{width:55%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:.78rem;background:var(--bg);color:var(--text)}
+.voz-box{background:var(--card);border-radius:10px;margin:-2px 0 8px;padding:12px 14px;box-shadow:var(--shadow)}
+.voz-box[hidden]{display:none}
+.voz-btn{width:100%;min-height:44px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-weight:600;font-size:.84rem;cursor:pointer}
+.voz-btn:disabled{opacity:.6}
+.voz-bar{height:6px;border-radius:3px;background:var(--border);margin:10px 0 0;overflow:hidden}
+.voz-bar i{display:block;height:100%;width:0;background:var(--brand);transition:width .3s}
 .cfg-row select{padding:8px;border:1px solid var(--border);border-radius:8px;font-size:.78rem;background:var(--bg);color:var(--text)}
 .cfg-hint{font-size:.72rem;color:var(--muted);margin:-4px 0 10px 2px}
 .toggle{position:relative;width:44px;height:24px;background:var(--border);border-radius:12px;cursor:pointer;transition:background .2s}
@@ -312,6 +318,12 @@ details.fold .cnt.full{background:var(--green);color:#fff}
   <p class="cfg-hint">Sua chave fica salva APENAS no seu celular (localStorage). Nunca é compartilhada.</p>
   <div class="cfg-row"><label>Ler respostas em voz alta</label><div class="toggle" id="cfgSpeak" role="switch" tabindex="0" onclick="this.classList.toggle('on');saveConfig()"></div></div>
   <p class="cfg-hint">Respostas de foto e de perguntas por voz são sempre lidas. Ligue para ler também as perguntas digitadas.</p>
+  <div class="cfg-row"><label for="cfgVoice">Voz da guia</label><select id="cfgVoice" onchange="saveConfig();vozUI()"></select></div>
+  <div class="voz-box" id="vozBox" hidden>
+    <button class="voz-btn" id="vozBtn" onclick="vozDownload()">⬇️ Baixar a voz fluida (≈ 90 MB, uma vez)</button>
+    <div class="voz-bar" id="vozBar" hidden><i id="vozFill"></i></div>
+  </div>
+  <p class="cfg-hint" id="vozHint">Voz fluida: voz neural do projeto aberto Piper, que roda no próprio celular. Baixem no Wi-Fi; depois funciona até sem internet.</p>
   <div class="cfg-row"><label>Velocidade da voz</label>
     <select id="cfgRate" onchange="saveConfig()"><option value="0.9">Calma</option><option value="1" selected>Normal</option><option value="1.15">Rápida</option></select>
   </div>
@@ -1027,7 +1039,8 @@ function saveConfig(){
     key:document.getElementById('cfgKey').value,
     name:document.getElementById('cfgName').value,
     speak:document.getElementById('cfgSpeak').classList.contains('on'),
-    rate:document.getElementById('cfgRate').value
+    rate:document.getElementById('cfgRate').value,
+    voice:document.getElementById('cfgVoice').value
   };
   try{localStorage.setItem('gramado-cfg',JSON.stringify(cfg));}catch(e){}
   updateAIStatus();
@@ -1039,6 +1052,7 @@ function loadConfig(){
   if(cfg.name)document.getElementById('cfgName').value=cfg.name;
   if(cfg.speak)document.getElementById('cfgSpeak').classList.add('on');
   if(cfg.rate)document.getElementById('cfgRate').value=cfg.rate;
+  voiceOptions();vozUI();
 }
 
 // Local AI: keyword matching
@@ -1443,15 +1457,114 @@ function toggleMic(){
 // ===========================
 // READ ALOUD (speechSynthesis) with a player that stays on screen
 // ===========================
-const TTS={voice:null,chunks:[],idx:0,run:0,paused:false,lock:null,unlocked:false};
-function pickVoice(){
-  const vs=speechSynthesis.getVoices();
-  TTS.voice=vs.find(v=>/pt[-_]BR/i.test(v.lang)&&/google|luciana|natural|premium|enhanced/i.test(v.name))
-    ||vs.find(v=>/pt[-_]BR/i.test(v.lang))||vs.find(v=>/^pt/i.test(v.lang))||null;
+const TTS={voice:null,chunks:[],idx:0,run:0,paused:false,lock:null,unlocked:false,engine:'system',pre:[],src:null};
+// Phone voices: the "natural"/online ones (Edge, Google, iOS premium) sound far less robotic.
+function voiceScore(v){
+  return (/pt[-_]BR/i.test(v.lang)?10:/^pt/i.test(v.lang)?5:0)
+    +(/natural|neural|online/i.test(v.name)?5:0)+(/google/i.test(v.name)?4:0)
+    +(/premium|enhanced|aprimorad/i.test(v.name)?3:0)+(/francisca|thalita|luciana|felipe/i.test(v.name)?1:0);
 }
+function ptVoices(){
+  return 'speechSynthesis' in window?speechSynthesis.getVoices().filter(v=>/^pt/i.test(v.lang)).sort((a,b)=>voiceScore(b)-voiceScore(a)):[];
+}
+function pickVoice(){
+  const vs=ptVoices(),want=getConfig().voice;
+  TTS.voice=vs.find(v=>v.name===want)||vs[0]||null;
+  voiceOptions();
+}
+
+// Neural voice (Piper pt-BR, open source) synthesized in voz.js. Only on the site:
+// the Claude viewer can't download the model.
+const NEURAL={w:null,id:0,wait:{},ctx:null,ok:false,loading:false};
+const canNeural=!inSandbox&&'caches' in window&&typeof Worker!=='undefined'&&typeof WebAssembly==='object';
+try{NEURAL.ok=canNeural&&localStorage.getItem('gramado-voz')==='1';}catch(e){}
 if('speechSynthesis' in window){pickVoice();speechSynthesis.addEventListener('voiceschanged',pickVoice);}
+function voiceOptions(){
+  const sel=document.getElementById('cfgVoice');if(!sel)return;
+  const want=getConfig().voice||(canNeural?'neural':'auto');
+  const opts=[];
+  if(canNeural)opts.push(['neural','✨ Fluida (neural)']);
+  opts.push(['auto','📱 Do celular (automática)']);
+  ptVoices().forEach(v=>opts.push([v.name,'📱 '+v.name.replace(/\s*[-–(]?\s*Portugu.*$/i,'').slice(0,28)]));
+  sel.textContent='';
+  opts.forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;sel.appendChild(o);});
+  sel.value=opts.some(o=>o[0]===want)?want:'auto';
+}
+function useNeural(){return canNeural&&NEURAL.ok&&(getConfig().voice||'neural')==='neural';}
+function vozUI(){
+  const box=document.getElementById('vozBox'),hint=document.getElementById('vozHint');if(!box)return;
+  if(!canNeural){box.hidden=true;hint.textContent=inSandbox?'A voz fluida (neural) funciona no site: use "Abrir o guia no navegador" acima.':'Este navegador não suporta a voz fluida.';return;}
+  box.hidden=NEURAL.ok||document.getElementById('cfgVoice').value!=='neural';
+}
+function vozWorker(){
+  if(!NEURAL.w){
+    NEURAL.w=new Worker('voz.js?v=1');
+    NEURAL.w.onmessage=({data:m})=>{
+      if(m.type==='progress'){
+        const pc=Math.round(m.loaded*100/m.total);
+        document.getElementById('vozFill').style.width=pc+'%';
+        document.getElementById('vozBtn').textContent=`Baixando a voz… ${pc}%`;
+      }
+      if(m.type==='ready'&&NEURAL.loading){
+        NEURAL.loading=false;NEURAL.ok=true;
+        try{localStorage.setItem('gramado-voz','1');}catch(e){}
+        vozUI();toast('✨ Voz fluida pronta! Ela lê as respostas da guia, mesmo sem internet.');
+        speak('Pronto! A partir de agora eu leio as respostas com esta voz. Boa viagem a Gramado!');
+      }
+      const w=NEURAL.wait[m.id];if(!w)return;delete NEURAL.wait[m.id];
+      if(m.type==='audio')w.res(m);
+      if(m.type==='error')w.rej(new Error(m.msg));
+      if(m.type==='error'&&m.id===0)vozFailed(m.msg);
+    };
+  }
+  return NEURAL.w;
+}
+function vozFailed(msg){
+  NEURAL.loading=false;
+  const b=document.getElementById('vozBtn');b.disabled=false;b.textContent='⬇️ Tentar baixar de novo';
+  document.getElementById('vozBar').hidden=true;
+  toast('Não consegui baixar a voz. Confiram a internet e tentem de novo.');
+  console.warn('voz',msg);
+}
+function vozDownload(){
+  if(NEURAL.loading)return;
+  NEURAL.loading=true;unlockTTS();
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+  const b=document.getElementById('vozBtn');b.disabled=true;b.textContent='Baixando a voz…';
+  document.getElementById('vozBar').hidden=false;
+  NEURAL.wait[0]={res(){},rej(){}};
+  vozWorker().postMessage({type:'load',id:0,voice:'faber'});
+}
+function vozSynth(text){
+  return new Promise((res,rej)=>{
+    const id=++NEURAL.id;NEURAL.wait[id]={res,rej};
+    vozWorker().postMessage({type:'say',id,voice:'faber',text,rate:parseFloat(getConfig().rate)||1});
+  });
+}
+function audioCtx(){
+  if(!NEURAL.ctx){const C=window.AudioContext||window.webkitAudioContext;NEURAL.ctx=new C();}
+  return NEURAL.ctx;
+}
+// Each chunk is synthesized while the previous one plays, so the reading doesn't stall.
+async function neuralChunk(run){
+  if(run!==TTS.run||TTS.paused)return;
+  if(TTS.idx>=TTS.chunks.length)return ttsStop();
+  const i=TTS.idx;
+  let a;
+  try{a=await(TTS.pre[i]||(TTS.pre[i]=vozSynth(TTS.chunks[i])));}
+  catch(e){if(run===TTS.run){TTS.engine='system';speakChunk(run);}return;}
+  if(i+1<TTS.chunks.length&&!TTS.pre[i+1])TTS.pre[i+1]=vozSynth(TTS.chunks[i+1]);
+  if(run!==TTS.run||TTS.paused)return;
+  if(i===0)document.getElementById('ttsLabel').textContent='Lendo resposta… pode guardar o celular no bolso';
+  const ctx=audioCtx();
+  const buf=ctx.createBuffer(1,a.pcm.length,a.rate);buf.copyToChannel(a.pcm,0);
+  const src=ctx.createBufferSource();src.buffer=buf;src.connect(ctx.destination);
+  src.onended=()=>{if(TTS.src===src)TTS.src=null;if(run===TTS.run&&!TTS.paused){TTS.idx++;neuralChunk(run);}};
+  TTS.src=src;src.start();
+}
 // iOS only lets speech start inside a tap: prime it on the first one.
 function unlockTTS(){
+  if(canNeural&&NEURAL.ok)audioCtx().resume().catch(()=>{});
   if(TTS.unlocked||!('speechSynthesis' in window))return;
   TTS.unlocked=true;
   const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);
@@ -1463,7 +1576,8 @@ function speechText(t){
     .replace(/\(resposta cortada[^)]*\)/,'').replace(/\s+/g,' ').trim();
 }
 function speak(text){
-  if(!('speechSynthesis' in window)){toast('Leitura em voz alta indisponível neste navegador.');return;}
+  const neural=useNeural();
+  if(!neural&&!('speechSynthesis' in window)){toast('Leitura em voz alta indisponível neste navegador.');return;}
   ttsStop();
   // Short chunks: Chrome drops utterances longer than ~15 s.
   const sentences=speechText(text).match(/[^.!?…]+[.!?…]*/g)||[];
@@ -1471,12 +1585,14 @@ function speak(text){
   sentences.forEach(s=>{if((cur+s).length>220&&cur){chunks.push(cur);cur=s;}else cur+=s;});
   if(cur.trim())chunks.push(cur);
   if(!chunks.length)return;
-  Object.assign(TTS,{chunks,idx:0,paused:false,run:TTS.run+1});
+  Object.assign(TTS,{chunks,idx:0,paused:false,run:TTS.run+1,engine:neural?'neural':'system',pre:[]});
   document.getElementById('ttsBar').hidden=false;
   document.getElementById('ttsPause').textContent='⏸';
-  document.getElementById('ttsLabel').textContent='Lendo resposta… pode guardar o celular no bolso';
+  document.getElementById('ttsLabel').textContent=neural?'Preparando a voz…':'Lendo resposta… pode guardar o celular no bolso';
   if(navigator.wakeLock)navigator.wakeLock.request('screen').then(l=>{TTS.lock=l;}).catch(()=>{});
-  speakChunk(TTS.run);
+  if(!neural&&canNeural&&!NEURAL.ok&&!TTS.hinted){TTS.hinted=true;setTimeout(()=>toast('Dica: há uma voz mais fluida em Info › ⚙️ Configurações da IA e da voz.',6000),1500);}
+  if(neural){audioCtx().resume().catch(()=>{});neuralChunk(TTS.run);}
+  else speakChunk(TTS.run);
 }
 function speakChunk(run){
   if(run!==TTS.run||TTS.paused)return;
@@ -1493,10 +1609,18 @@ function ttsToggle(){
   TTS.paused=!TTS.paused;
   document.getElementById('ttsPause').textContent=TTS.paused?'▶':'⏸';
   document.getElementById('ttsLabel').textContent=TTS.paused?'Leitura pausada':'Lendo resposta…';
+  if(TTS.engine==='neural'){
+    // Suspending the audio keeps the exact spot; a chunk still being made restarts the loop.
+    if(TTS.paused)audioCtx().suspend();
+    else{audioCtx().resume();if(!TTS.src){TTS.run++;neuralChunk(TTS.run);}}
+    return;
+  }
   if(TTS.paused)speechSynthesis.cancel();else{TTS.run++;speakChunk(TTS.run);}
 }
 function ttsStop(){
-  TTS.run++;TTS.chunks=[];TTS.paused=false;
+  TTS.run++;TTS.chunks=[];TTS.paused=false;TTS.pre=[];
+  if(TTS.src){const s=TTS.src;TTS.src=null;try{s.stop();}catch(e){}}
+  if(NEURAL.ctx&&NEURAL.ctx.state==='suspended')NEURAL.ctx.resume().catch(()=>{});
   if('speechSynthesis' in window)speechSynthesis.cancel();
   document.getElementById('ttsBar').hidden=true;
   if(TTS.lock){TTS.lock.release().catch(()=>{});TTS.lock=null;}
@@ -1517,7 +1641,7 @@ function setBubble(div,text,src,withSpeak){
     if(i)div.appendChild(document.createElement('br'));
     div.appendChild(document.createTextNode(line));
   });
-  if(withSpeak&&'speechSynthesis' in window){
+  if(withSpeak&&('speechSynthesis' in window||canNeural)){
     const b=document.createElement('button');b.className='say';b.textContent='🔊 Ouvir';
     b.onclick=()=>{unlockTTS();speak(text);};
     div.appendChild(document.createElement('br'));div.appendChild(b);
