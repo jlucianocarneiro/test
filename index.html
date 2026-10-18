@@ -172,6 +172,9 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 .tk-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.74rem;color:var(--muted)}
 .tk-meta span{flex:1;min-width:120px;word-break:break-all}
 .tk-meta button{min-height:40px;padding:0 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.74rem;font-weight:600;cursor:pointer}
+.tk-lock{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0 0;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--border);font-size:.78rem;color:var(--muted)}
+.tk-lock button{min-height:40px;padding:0 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.74rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.tk-lock button.confirm{background:#b3261e;border-color:#b3261e;color:#fff}
 .tk-meta button.del.confirm{background:#b3261e;border-color:#b3261e;color:#fff}
 .tk-links{display:flex;flex-direction:column;gap:8px;margin:12px auto 4px;max-width:320px}
 .tk-link{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:600;text-decoration:none}
@@ -347,7 +350,7 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 <div id="tkView" hidden role="dialog" aria-modal="true" aria-labelledby="tkTitle">
   <div class="tk-head"><div><h3 id="tkTitle"></h3><p id="tkSub"></p></div><button onclick="closeTickets()" aria-label="Fechar">✕</button></div>
   <div id="tkBody"></div>
-  <div class="tk-foot">
+  <div class="tk-foot" id="tkFoot">
     <button class="tk-add" onclick="document.getElementById('tkFile').click()">＋ Anexar PDF ou foto do ingresso</button>
     <input type="file" id="tkFile" accept="application/pdf,image/*" multiple hidden onchange="addTicketFiles(this)">
   </div>
@@ -1735,6 +1738,7 @@ async function refreshTicketBadges(){
   try{
     const all=await tkAll();
     tkCounts={};all.forEach(f=>{tkCounts[f.slot]=(tkCounts[f.slot]||0)+1;});
+    if(all.length)protectTickets();
   }catch(e){tkCounts={};}
   document.querySelectorAll('.tkchip').forEach(b=>{
     const n=tkCounts[b.dataset.slot]||0;
@@ -1797,11 +1801,12 @@ function trimWhite(c){
   o.getContext('2d').drawImage(c,left,top,o.width,o.height,0,0,o.width,o.height);
   return o;
 }
-let tkSlot=null,tkUrls=[];
+// Attached tickets are read-only: no removing or adding until unlocked in the viewer.
+let tkSlot=null,tkUrls=[],tkUnlocked=false;
 function freeTkUrls(){tkUrls.forEach(u=>URL.revokeObjectURL(u));tkUrls=[];}
 function tkUrl(blob){const u=URL.createObjectURL(blob);tkUrls.push(u);return u;}
 async function openTickets(slot){
-  tkSlot=slot;
+  tkSlot=slot;tkUnlocked=false;
   const t=TICKETS[slot];
   document.getElementById('tkTitle').textContent=t.n;
   document.getElementById('tkSub').textContent=t.d;
@@ -1826,6 +1831,8 @@ async function renderTickets(){
   let files;
   try{files=await tkBySlot(tkSlot);}
   catch(e){body.innerHTML='<div class="tk-empty">Este navegador não deixa guardar arquivos aqui. Abra o guia no Chrome (ou Safari) para guardar os ingressos.</div>';return;}
+  const locked=files.length&&!tkUnlocked;
+  document.getElementById('tkFoot').hidden=!!locked;
   if(!files.length){
     body.innerHTML=`<div class="tk-empty">🎫 Abra direto do seu Google Drive:${tkLinks(tkSlot)}<br>Para ter sem internet: baixe o arquivo e toque no botão abaixo.</div>`;
     return;
@@ -1846,11 +1853,28 @@ async function renderTickets(){
     };
     // The Claude viewer blocks downloads; the rendered pages above are what counts there.
     if(!inSandbox)meta.appendChild(op);
-    meta.appendChild(del);box.appendChild(meta);
+    if(!locked)meta.appendChild(del);
+    box.appendChild(meta);
     body.appendChild(box);
   });
   body.insertAdjacentHTML('afterbegin','<p class="go-note" style="margin:0 0 8px">Na entrada: toque no ingresso para abrir em tela cheia e aumente o brilho da tela.</p>');
   body.insertAdjacentHTML('beforeend',`<p class="tk-links-note">Original no Google Drive:</p>${tkLinks(tkSlot)}`);
+  const lk=document.createElement('div');lk.className='tk-lock';
+  const st=document.createElement('span');
+  const persisted=navigator.storage&&navigator.storage.persisted?await navigator.storage.persisted().catch(()=>false):false;
+  st.textContent=(locked?'🔒 Só leitura':'🔓 Edição liberada')+(persisted?' · 🛡️ protegido contra limpeza do celular':'');
+  lk.appendChild(st);
+  const ub=document.createElement('button');
+  ub.textContent=locked?'Destravar':'Travar';
+  ub.onclick=()=>{
+    if(locked&&!ub.classList.contains('confirm')){ub.classList.add('confirm');ub.textContent='Toque de novo para destravar';setTimeout(()=>{ub.classList.remove('confirm');ub.textContent='Destravar';},4000);return;}
+    tkUnlocked=locked;renderTickets();
+  };
+  lk.appendChild(ub);body.appendChild(lk);
+}
+// Ask the browser not to clear the tickets when the phone runs low on space.
+function protectTickets(){
+  if(!inSandbox&&navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 }
 // Direct links to each PDF in the Drive; they open for whoever the file is shared with.
 function tkLinks(slot){
@@ -1860,7 +1884,7 @@ function tkLinks(slot){
 async function addTicketFiles(input){
   const files=[...input.files];input.value='';
   if(!files.length||!tkSlot)return;
-  const slot=tkSlot;
+  const slot=tkSlot;tkUnlocked=true; // still adding: lock again when the viewer closes
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   for(const f of files){
     toast(`Guardando ${f.name}…`,8000);
