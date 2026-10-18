@@ -110,7 +110,22 @@ a{color:var(--accent);text-decoration:none}
 .handoff .copy input{flex:1;min-width:0;min-height:44px;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.74rem}
 .handoff .copy button{min-height:44px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-weight:600;cursor:pointer}
 /* Checklist */
-.ci{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--card);border-radius:10px;margin-bottom:6px;box-shadow:var(--shadow);font-size:.82rem;cursor:pointer}
+.ci{display:flex;align-items:flex-start;gap:10px;width:100%;min-height:44px;padding:10px 12px;background:var(--card);border:none;border-radius:10px;margin-bottom:6px;box-shadow:var(--shadow);font:inherit;font-size:.82rem;color:var(--text);text-align:left;cursor:pointer}
+.ci .ct{flex:1}.ci .ct small{display:block;font-size:.7rem;color:var(--muted);margin-top:1px}
+.ci .qty{flex-shrink:0;font-size:.7rem;font-weight:700;color:var(--muted);background:var(--bg);border-radius:10px;padding:2px 8px;margin-top:1px}
+.pk-head{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;margin-bottom:6px}
+.pk-title{font-size:1rem;font-weight:700}.pk-title small{display:block;font-size:.74rem;font-weight:500;color:var(--muted);margin-top:2px}
+.seg{display:flex;gap:4px;background:var(--bg);border-radius:12px;padding:4px;margin:12px 0 10px}
+.seg button{flex:1;min-height:44px;border:none;border-radius:9px;background:none;color:var(--muted);font:inherit;font-size:.84rem;font-weight:700;cursor:pointer}
+.seg button.on{background:var(--brand);color:#fff;box-shadow:var(--shadow)}
+.pk-prog{display:flex;align-items:center;gap:10px;font-size:.74rem;font-weight:700;color:var(--muted)}
+.pk-prog .bar{flex:1;height:8px;border-radius:4px;background:var(--bg);overflow:hidden}
+.pk-prog .bar i{display:block;height:100%;background:var(--green);border-radius:4px;transition:width .3s}
+.pk-only{display:flex;align-items:center;gap:8px;min-height:40px;font-size:.78rem;color:var(--text);margin-top:4px;cursor:pointer}
+.pk-only input{width:18px;height:18px;accent-color:var(--brand)}
+.pk-tip{font-size:.74rem;color:var(--muted);background:var(--card);border-left:3px solid var(--gold);border-radius:8px;padding:8px 10px;margin:0 0 8px;line-height:1.5}
+details.pk .who{font-size:.62rem;padding:1px 7px;border-radius:10px;background:var(--accent-l);color:var(--accent);letter-spacing:0;text-transform:none}
+details.fold .cnt.full{background:var(--green);color:#fff}
 .cb{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:1px}
 .ci.done .cb{background:var(--green);border-color:var(--green);color:#fff}
 .ci.done .cb::after{content:'✓';font-size:.72rem}
@@ -299,7 +314,6 @@ a{color:var(--accent);text-decoration:none}
 
 <!-- ============ CHECKLIST ============ -->
 <div id="sec-check" class="sec">
-  <div class="st">Antes da viagem</div>
   <div id="checkL"></div>
 </div>
 
@@ -356,6 +370,8 @@ const POINTS=[
   {name:"Rodoviária Gramado",lat:-29.3790,lng:-50.8700,addr:"Rodoviária de Gramado, Gramado - RS"},
   {name:"Container Bistrot",lat:-29.3635,lng:-50.8115,addr:"Container Bistrot, Canela - RS"},
 ];
+const PACK=[{"c": "roupa", "ic": "🧥", "t": "Vestuário", "per": true, "tip": "Regra das 3 camadas: segunda pele + suéter ou fleece + casaco corta-vento. Restaurantes e lojas são aquecidos: a camada de fora precisa sair fácil.", "items": [{"id": "casaco", "t": "Casaco quente corta-vento ou impermeável", "q": 1, "n": "noites do Natal Luz e do Nativitaten"}, {"id": "jaqueta-leve", "t": "Jaqueta leve ou fleece", "q": 1, "n": "para os dias de 12°C", "w": "m"}, {"id": "jaqueta-leve", "t": "Jaqueta leve ou cardigan", "q": 1, "n": "para os dias de 12°C", "w": "f"}, {"id": "sueter", "t": "Suéter ou tricô", "q": 2}, {"id": "termica-top", "t": "Blusa térmica (segunda pele)", "q": 2}, {"id": "termica-bottom", "t": "Calça térmica (segunda pele)", "q": 1, "n": "por baixo da calça nas noites", "w": "m"}, {"id": "termica-bottom", "t": "Legging ou meia-calça térmica", "q": 2, "n": "por baixo da calça ou do vestido", "w": "f"}, {"id": "manga-longa", "t": "Camisas ou camisetas de manga longa", "q": 4, "w": "m"}, {"id": "manga-longa", "t": "Blusas de manga longa", "q": 4, "w": "f"}, {"id": "camisetas", "t": "Camisetas", "q": 3, "n": "base das camadas", "w": "m"}, {"id": "camisetas", "t": "Camisetas ou regatas para camadas", "q": 3, "w": "f"}, {"id": "calcas", "t": "Calças jeans ou sarja", "q": 3}, {"id": "jantar", "t": "Look para jantar: camisa e calça mais arrumada", "q": 1, "n": "Cara de Mau e Château D'Geneve", "w": "m"}, {"id": "jantar", "t": "Look para jantar: vestido ou saia de malha + meia-calça térmica", "q": 1, "n": "Cara de Mau e Château D'Geneve", "w": "f"}, {"id": "pijama", "t": "Pijama quente", "q": 1}, {"id": "intimas", "t": "Cuecas", "q": 8, "w": "m"}, {"id": "intimas", "t": "Lingerie", "q": 8, "w": "f"}, {"id": "meias", "t": "Meias comuns", "q": 8}, {"id": "meias-grossas", "t": "Meias grossas de lã", "q": 3, "n": "Snowland e noites frias"}, {"id": "tenis", "t": "Tênis confortável, de preferência impermeável", "q": 1, "n": "Caracol tem 700 degraus"}, {"id": "calcado-noite", "t": "Sapato ou bota para a noite", "q": 1, "w": "m"}, {"id": "calcado-noite", "t": "Bota de cano curto confortável", "q": 1, "n": "evite salto: ruas de pedra", "w": "f"}, {"id": "chinelo", "t": "Chinelo para o hotel", "q": 1}, {"id": "gorro-luvas", "t": "Gorro, cachecol e luvas", "q": 1}, {"id": "chuva", "t": "Guarda-chuva compacto ou capa de chuva", "q": 1}]}, {"c": "pessoal", "ic": "🧴", "t": "Artigos pessoais", "per": true, "tip": "O frio da serra resseca a pele e os lábios, e o sol na altitude queima mesmo com frio.", "items": [{"id": "higiene", "t": "Escova, pasta e fio dental"}, {"id": "desodorante", "t": "Desodorante"}, {"id": "perfume", "t": "Perfume"}, {"id": "barbear", "t": "Barbeador ou lâminas e espuma", "w": "m"}, {"id": "pente", "t": "Pente e gel ou pomada", "w": "m"}, {"id": "maquiagem", "t": "Necessaire de maquiagem e demaquilante", "w": "f"}, {"id": "facial", "t": "Hidratante facial", "w": "f"}, {"id": "cabelo", "t": "Escova de cabelo, secador ou prancha e elásticos", "w": "f"}, {"id": "absorventes", "t": "Absorventes", "w": "f"}, {"id": "acessorios", "t": "Brincos e acessórios para os jantares", "w": "f"}, {"id": "hidratante", "t": "Hidratante corporal"}, {"id": "labial", "t": "Protetor labial"}, {"id": "protetor", "t": "Protetor solar", "n": "sol forte na altitude"}, {"id": "oculos", "t": "Óculos de sol"}, {"id": "remedios", "t": "Remédios de uso contínuo e receita"}, {"id": "farmacinha", "t": "Analgésico, antialérgico e remédio para enjoo", "n": "a estrada da serra tem muitas curvas"}]}, {"c": "tickets", "ic": "🎫", "t": "Tickets e documentos", "per": false, "tip": "Anexem os PDFs no app (botão 🎫 em cada reserva): abrem sem internet e o QR vai em tela cheia.", "items": [{"id": "docs", "t": "RG ou CNH dos dois"}, {"id": "checkin-latam", "t": "Check-in LATAM e cartão de embarque (ida, 24/10)", "n": "abre 48h antes: 22/10"}, {"id": "checkin-gol", "t": "Check-in GOL e cartão de embarque (volta, 31/10)", "n": "abre 48h antes: 29/10"}, {"id": "citral", "t": "Passagens Citral ida e volta", "n": "poltronas 3-4 e 5-6"}, {"id": "hotel", "t": "Voucher do Bellagio", "n": "Booking 5024.178.207"}, {"id": "snowland", "t": "2 ingressos Snowland (26/10)"}, {"id": "jolimont", "t": "Ingressos Jolimont + Felsen (29/10)", "n": "LB32077972 · LB32078275"}, {"id": "caracol", "t": "Comprar ingressos do Parque do Caracol (online)", "n": "ainda falta!"}, {"id": "nativitaten", "t": "2 ingressos Nativitaten, Setor Ouro (29/10)"}, {"id": "caramau", "t": "Reserva Cara de Mau (30/10, 21:30)"}, {"id": "anexar", "t": "Anexar todos os ingressos no app"}, {"id": "prime", "t": "App Prime Gourmet ativo e logado"}, {"id": "salas-vip", "t": "Priority Pass e Dragon Pass"}, {"id": "cartoes", "t": "Cartões de crédito e um pouco de dinheiro"}]}, {"c": "outros", "ic": "📦", "t": "Outros", "per": false, "tip": "Sugestões de quem já foi: espaço sobrando na mala para chocolates e vinhos, e um cadeado para a Fonte do Amor Eterno.", "items": [{"id": "carregadores", "t": "Celulares e carregadores"}, {"id": "powerbank", "t": "Power bank carregado"}, {"id": "mochila", "t": "Mochila pequena para os passeios"}, {"id": "garrafa", "t": "Garrafinha de água"}, {"id": "sacola", "t": "Sacola ou mala extra para chocolates e vinhos"}, {"id": "vinhos", "t": "Plástico-bolha ou meias para proteger os vinhos", "n": "líquidos acima de 100 ml só na mala despachada"}, {"id": "roupa-suja", "t": "Saco para roupa suja"}, {"id": "cadeado", "t": "Cadeado para a Fonte do Amor Eterno 💕"}, {"id": "previsao", "t": "Checar a previsão do tempo na véspera"}, {"id": "uber-pinos", "t": "Conferir os pinos do Uber de cada passeio"}, {"id": "funcionamento", "t": "Conferir funcionamento: Château (dom 25) e Snowland (seg 26)"}, {"id": "orcamento", "t": "Definir um orçamento diário com folga"}, {"id": "casa", "t": "Em casa: lixo, geladeira, tomadas e janelas"}]}];
+// Old flat checklist, kept only to migrate saved ticks (index -> new item ids)
 const CHECKS=[
   "Comprar ingressos Parque do Caracol (online)",
   "Ingressos Jolimont + Felsen comprados (LB32077972 · LB32078275)",
@@ -534,7 +550,7 @@ const KB = [
   {k:["mirante","quilombo","vale do quilombo"],a:"O Mirante do Vale do Quilombo fica na Avenida das Hortênsias e tem vista panorâmica do vale, ótima no fim da tarde. Grátis. Está no roteiro de 30/10."},
   {k:["pórtico","portico","portal"],a:"Gramado tem dois pórticos de entrada: um na via de Nova Petrópolis e outro na via de Taquara. São pontos clássicos de foto, gratuitos. Reparem na chegada com a Citral em 24/10; a via de Nova Petrópolis é a RS-235, a mesma do Snowland."},
   {k:["catedral","catedral de pedra"],a:"A Catedral de Pedra (Nossa Senhora de Lourdes) fica na Praça João Corrêa, no centro de Canela, em estilo gótico inglês. Entrada gratuita. Está no roteiro de 29/10 às 15:00, a pé depois do almoço no Container Bistrot."},
-  {k:["mala","bagagem","embalagem","o que levar"],a:"Dicas de mala: meias grossas para Snowland, agasalhos para noites frias (5-10°C), protetor solar (altitude!), power bank. Na volta: chocolates e vinhos na mala despachada (embrulhar bem!), líquidos >100ml na despachada. Carregar celulares 100%."},
+  {k:["mala","bagagem","embalagem","o que levar","roupa","roupas","vestir"],a:"A aba Check tem a mala completa, com versão masculina e feminina para frio moderado (6 a 12°C), em quatro grupos: vestuário, artigos pessoais, tickets e documentos, e outros. Regra das 3 camadas: segunda pele, suéter ou fleece e casaco corta-vento. Dicas de mala: meias grossas para Snowland, agasalhos para noites frias (5-10°C), protetor solar (altitude!), power bank. Na volta: chocolates e vinhos na mala despachada (embrulhar bem!), líquidos >100ml na despachada. Carregar celulares 100%."},
 ];
 
 // ===========================
@@ -719,8 +735,7 @@ const onSite=location.href.startsWith(SITE_URL);
 function siteLink(){
   const h=new URLSearchParams();
   try{const l=localStorage.getItem('gramado-loc');if(l!==null)h.set('loc',l);}catch(e){}
-  const done=Object.keys(chk).filter(k=>chk[k]);
-  if(done.length)h.set('chk',done.join('.'));
+  ['s','m','f'].forEach(sc=>{const ids=Object.keys(pack[sc]).filter(k=>pack[sc][k]);if(ids.length)h.set('pk'+sc,ids.join('.'));});
   return SITE_URL+(h.toString()?'#'+h:'');
 }
 function handoffHTML(what){
@@ -771,14 +786,17 @@ function sheetCopy(){
   const manual=()=>{inp.focus();inp.select();toast('Toque e segure no texto para copiar.');};
   if(navigator.clipboard)navigator.clipboard.writeText(inp.value).then(ok,manual);else manual();
 }
-// State sent along by siteLink(): #loc=3&chk=0.2.5
+// State sent along by siteLink(): #loc=3&pks=caracol.docs&pkm=casaco (old links: &chk=0.2.5)
 function importHash(){
   if(!location.hash||location.hash.length<2)return;
   const h=new URLSearchParams(location.hash.slice(1));
-  if(!h.has('loc')&&!h.has('chk'))return;
+  if(!h.has('loc')&&!['chk','pks','pkm','pkf'].some(k=>h.has(k)))return;
   try{
     if(isIdx(h.get('loc'),POINTS)){localStorage.setItem('gramado-loc',h.get('loc'));localStorage.setItem('gramado-loc-t',String(Date.now()));}
-    if(h.get('chk')){h.get('chk').split('.').forEach(k=>{if(isIdx(k,CHECKS))chk[k]=true;});localStorage.setItem('gramado-chk',JSON.stringify(chk));}
+    const valid=new Set(PACK.flatMap(c=>c.items.map(i=>i.id)));
+    ['s','m','f'].forEach(sc=>{const v=h.get('pk'+sc);if(v)v.split('.').forEach(id=>{if(valid.has(id))pack[sc][id]=true;});});
+    if(h.get('chk')){const old={};h.get('chk').split('.').forEach(k=>{if(isIdx(k,CHECKS))old[k]=true;});migrateOld(old);}
+    savePack();
   }catch(e){}
   history.replaceState(null,'',location.pathname+location.search);
 }
@@ -930,24 +948,63 @@ function renderDist(lat,lng){
 }
 
 // ===========================
-// CHECKLIST (persistent per user)
+// CHECKLIST: packing list by category, clothes and personal items per profile
 // ===========================
-let chk={};
-try{const s=localStorage.getItem('gramado-chk');if(s)chk=JSON.parse(s);}catch(e){}
-// v2 removed checklist item #5: shift saved ticks after it so they stay on the right items
-try{
-  if(localStorage.getItem('gramado-chk-v')!=='2'){
-    const m={};Object.keys(chk).forEach(k=>{const i=+k;if(i<5)m[i]=chk[k];else if(i>5)m[i-1]=chk[k];});
-    chk=m;localStorage.setItem('gramado-chk',JSON.stringify(chk));localStorage.setItem('gramado-chk-v','2');
-  }
-}catch(e){}
-function renderChk(){
-  document.getElementById('checkL').innerHTML=CHECKS.map((c,i)=>{
-    const d=chk[i]?'done':'';
-    return `<div class="ci ${d}" onclick="tChk(${i})"><div class="cb"></div><span class="ct">${c}</span></div>`;
-  }).join('');
+// Old ticks (flat list) live in 'gramado-chk'; they are migrated once into 'gramado-pack'.
+const OLD_TO_PACK={0:['s','caracol'],1:['s','jolimont'],2:['s','checkin-latam'],3:['s','checkin-gol'],4:['s','prime'],5:['s','salas-vip'],6:['s','previsao'],7:['p','meias-grossas'],8:['s','powerbank'],9:['p','casaco'],10:['p','protetor'],11:['s','caramau'],12:['s','nativitaten'],13:['s','uber-pinos'],14:['s','funcionamento'],15:['p','termica-top','gorro-luvas'],16:['s','orcamento']};
+let pack={s:{},m:{},f:{}},packWho='m',packOnly=false;
+function savePack(){try{localStorage.setItem('gramado-pack',JSON.stringify(pack));}catch(e){}}
+function migrateOld(old){
+  Object.keys(old).forEach(k=>{
+    const m=OLD_TO_PACK[k];if(!old[k]||!m)return;
+    m.slice(1).forEach(id=>{if(m[0]==='s')pack.s[id]=true;else{pack.m[id]=true;pack.f[id]=true;}});
+  });
 }
-function tChk(i){chk[i]=!chk[i];try{localStorage.setItem('gramado-chk',JSON.stringify(chk));}catch(e){}renderChk();}
+try{
+  const p=localStorage.getItem('gramado-pack');
+  if(p){pack=Object.assign({s:{},m:{},f:{}},JSON.parse(p));}
+  else{
+    let old={};const o=localStorage.getItem('gramado-chk');if(o)old=JSON.parse(o);
+    // v2 had removed item #5 from the flat list; shift ticks saved before that
+    if(localStorage.getItem('gramado-chk-v')!=='2'){const m={};Object.keys(old).forEach(k=>{const i=+k;if(i<5)m[i]=old[k];else if(i>5)m[i-1]=old[k];});old=m;}
+    migrateOld(old);savePack();
+  }
+  packWho=localStorage.getItem('gramado-pack-who')==='f'?'f':'m';
+}catch(e){}
+const scopeOf=cat=>cat.per?packWho:'s';
+const itemsOf=cat=>cat.items.filter(i=>!i.w||i.w===packWho);
+function renderChk(){
+  let total=0,done=0;
+  const cats=PACK.map((cat,ci)=>{
+    const sc=scopeOf(cat),its=itemsOf(cat);
+    const nd=its.filter(i=>pack[sc][i.id]).length;total+=its.length;done+=nd;
+    const rows=its.filter(i=>!(packOnly&&pack[sc][i.id])).map(i=>{
+      const on=!!pack[sc][i.id];
+      return `<button class="ci${on?' done':''}" role="checkbox" aria-checked="${on}" onclick="tPack(${ci},'${i.id}')"><span class="cb" aria-hidden="true"></span><span class="ct">${i.t}${i.n?`<small>${i.n}</small>`:''}</span>${i.q?`<span class="qty">×${i.q}</span>`:''}</button>`;
+    }).join('');
+    const full=nd===its.length;
+    return `<details class="fold pk" data-cat="${cat.c}" ${(packOpen[cat.c]!==undefined?packOpen[cat.c]:!full)?'open':''}><summary class="st" onclick="packOpen['${cat.c}']=!this.parentNode.open">${cat.ic} ${cat.t}${cat.per?` <span class="who">${packWho==='m'?'masculino':'feminino'}</span>`:''} <span class="cnt${full?' full':''}">${full?'✓ completo':nd+'/'+its.length}</span></summary><p class="pk-tip">${cat.tip}</p>${rows||'<p class="pk-tip">Tudo pronto nesta categoria. 🎉</p>'}</details>`;
+  }).join('');
+  const pct=total?Math.round(done*100/total):0;
+  document.getElementById('checkL').innerHTML=`
+<div class="pk-head">
+  <div class="pk-title">🧳 Mala para frio moderado<small>6 a 12°C · 8 dias · roupas em camadas</small></div>
+  <div class="seg" role="radiogroup" aria-label="Lista de vestuário e artigos pessoais">
+    <button role="radio" aria-checked="${packWho==='m'}" class="${packWho==='m'?'on':''}" onclick="setWho('m')">👨 Masculino</button>
+    <button role="radio" aria-checked="${packWho==='f'}" class="${packWho==='f'?'on':''}" onclick="setWho('f')">👩 Feminino</button>
+  </div>
+  <div class="pk-prog"><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}" aria-label="Itens prontos"><i style="width:${pct}%"></i></div><span>${done} de ${total}</span></div>
+  <label class="pk-only"><input type="checkbox" ${packOnly?'checked':''} onchange="packOnly=this.checked;renderChk()"> Mostrar só o que falta</label>
+</div>${cats}`;
+}
+const packOpen={};
+function tPack(ci,id){
+  const sc=scopeOf(PACK[ci]);
+  pack[sc][id]=!pack[sc][id];
+  if(!pack[sc][id])delete pack[sc][id];
+  savePack();renderChk();
+}
+function setWho(w){packWho=w;try{localStorage.setItem('gramado-pack-who',w);}catch(e){}renderChk();}
 
 // ===========================
 // CHAT / AI
