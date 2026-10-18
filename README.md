@@ -47,6 +47,7 @@ Em Info › Configurações, "Voz da guia" (o botão ✨ na barra de leitura lev
   - Dii e Miro: Piper `OpenVoiceOS/pipertts_pt-BR_*` (CC-BY-NC-ND, uso pessoal);
   - Faber, Cadu e Jeff: Piper `rhasspy/piper-voices` (CC0).
   Ficam no Cache Storage `gramado-voz` e funcionam offline. Só no site: o visualizador do Claude não baixa os modelos.
+- **Gemini (Google)**: em Configurações › Provedor IA, com uma chave `AIza...` do aistudio.google.com (`gemini-2.5-flash`, com fotos).
 - **🌐 Nova e Onyx · OpenAI**: aparecem com uma chave da OpenAI (`gpt-4o-mini-tts`); precisam de internet.
 - **📱 Do celular**: a melhor voz pt-BR do aparelho (prioriza "Natural/Online", Google e "Premium").
 
