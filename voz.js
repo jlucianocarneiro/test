@@ -124,6 +124,13 @@ function kokoroIds(ipa) {
   return [0, ...ids, 0];
 }
 
+// Some voices come out very quiet (miro peaks at ~0.12): bring every chunk up to the same peak.
+function loud(pcm) {
+  let m = 0;
+  for (const v of pcm) m = Math.max(m, Math.abs(v));
+  if (m > 0 && m < 0.9) for (let i = 0; i < pcm.length; i++) pcm[i] *= 0.9 / m;
+  return pcm;
+}
 const i64 = a => BigInt64Array.from(a.map(BigInt));
 async function say(text, rate) {
   const ipa = await phonemize(text);
@@ -152,7 +159,7 @@ onmessage = async ({ data: m }) => {
     if (m.type === 'load') { await load(m.voice); postMessage({ type: 'ready', id: m.id, voice: m.voice }); }
     if (m.type === 'say') {
       await load(m.voice);
-      const pcm = await say(m.text, m.rate);
+      const pcm = loud(await say(m.text, m.rate));
       postMessage({ type: 'audio', id: m.id, pcm, rate: cfg.audio.sample_rate }, [pcm.buffer]);
     }
   } catch (e) {

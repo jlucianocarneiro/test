@@ -1597,9 +1597,9 @@ function pickVoice(){
 // - OpenAI TTS, when an OpenAI key is set (needs internet, billed to that key).
 // k = model family (all Kokoro voices share one model); s = rough first download in MB.
 const VOZES={
-  dora:{n:'Dora',k:'kokoro',d:'feminina · a mais natural',s:95},alex:{n:'Alex',k:'kokoro',d:'masculina · natural',s:95},
-  santa:{n:'Santa',k:'kokoro',d:'masculina · natural',s:95},dii:{n:'Dii',k:'piper',d:'feminina',s:65},
-  miro:{n:'Miro',k:'piper',d:'masculina',s:65},faber:{n:'Faber',k:'piper',d:'masculina',s:65},
+  dii:{n:'Dii',k:'piper',d:'feminina · rápida',s:65},miro:{n:'Miro',k:'piper',d:'masculina · rápida',s:65},
+  dora:{n:'Dora',k:'kokoro',d:'feminina · mais natural, lenta',s:95},alex:{n:'Alex',k:'kokoro',d:'masculina · mais natural, lenta',s:95},
+  santa:{n:'Santa',k:'kokoro',d:'masculina · mais natural, lenta',s:95},faber:{n:'Faber',k:'piper',d:'masculina',s:65},
   cadu:{n:'Cadu',k:'piper',d:'masculina',s:65},jeff:{n:'Jeff',k:'piper',d:'masculina',s:65}
 };
 const NEURAL={w:null,id:0,wait:{},ctx:null,have:[],loading:null};
@@ -1613,7 +1613,7 @@ function wantVoice(){
   const v=getConfig().voice;
   if(v==='neural')return 'neural:faber';
   if(v&&v.startsWith('piper:'))return 'neural:'+v.slice(6);
-  return v||(openaiKey()?'openai:nova':canNeural?'neural:dora':'auto');
+  return v||(openaiKey()?'openai:nova':canNeural?'neural:dii':'auto');
 }
 function voiceOptions(){
   const sel=document.getElementById('cfgVoice');if(!sel)return;
@@ -1647,11 +1647,11 @@ function vozUI(){
     const mb=(NEURAL.have.some(h=>VOZES[h].k==='kokoro')&&VOZES[k].k==='kokoro'?1:VOZES[k].s)+(NEURAL.have.length?0:30);
     b.textContent=`⬇️ Baixar a voz ${VOZES[k].n} (≈ ${mb} MB, uma vez)`;
   }
-  hint.textContent='Vozes neurais abertas (Kokoro e Piper) que rodam no próprio celular: baixem no Wi-Fi e depois funcionam até sem internet. Dora, Alex e Santa (Kokoro) são as mais naturais, mas demoram mais para começar a falar.'+(openaiKey()?'':' Com uma chave da OpenAI aparecem também as vozes Nova e Onyx.');
+  hint.textContent='Vozes neurais abertas (Kokoro e Piper) que rodam no próprio celular: baixem no Wi-Fi e depois funcionam até sem internet. Dii e Miro respondem na hora. Dora, Alex e Santa (Kokoro) são as mais naturais, mas no celular podem levar 1 minuto ou mais por frase.'+(openaiKey()?'':' Com uma chave da OpenAI aparecem também as vozes Nova e Onyx.');
 }
 function vozWorker(){
   if(!NEURAL.w){
-    NEURAL.w=new Worker('voz.js?v=3');
+    NEURAL.w=new Worker('voz.js?v=4');
     NEURAL.w.onmessage=({data:m})=>{
       if(m.type==='progress'){
         const pc=Math.round(m.loaded*100/m.total);
@@ -1751,9 +1751,9 @@ function speak(text){
   // Short chunks: Chrome drops utterances longer than ~15 s.
   const sentences=speechText(text).match(/[^.!?…]+[.!?…]*/g)||[];
   const chunks=[];let cur='';
-  // Kokoro is slower: shorter chunks make it start speaking sooner.
-  const max=engine.startsWith('neural:')&&VOZES[engine.slice(7)].k==='kokoro'?140:220;
-  sentences.forEach(s=>{if((cur+s).length>max&&cur){chunks.push(cur);cur=s;}else cur+=s;});
+  // Kokoro is slower than real time: short chunks, and the first one alone, so it starts sooner.
+  const slow=engine.startsWith('neural:')&&VOZES[engine.slice(7)].k==='kokoro',max=slow?90:220;
+  sentences.forEach(s=>{if(((cur+s).length>max||(slow&&!chunks.length))&&cur){chunks.push(cur);cur=s;}else cur+=s;});
   if(cur.trim())chunks.push(cur);
   if(!chunks.length)return;
   Object.assign(TTS,{chunks,idx:0,paused:false,run:TTS.run+1,engine,pre:[]});
