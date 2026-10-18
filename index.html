@@ -314,7 +314,7 @@ details.fold .cnt.full{background:var(--green);color:#fff}
       <option value="openai">OpenAI (GPT)</option>
     </select>
   </div>
-  <div class="cfg-row"><label>Chave API</label><input type="password" id="cfgKey" placeholder="sk-... ou sk-ant-..." onchange="saveConfig()"></div>
+  <div class="cfg-row"><label>Chave API</label><input type="password" id="cfgKey" placeholder="sk-... ou sk-ant-..." onchange="saveConfig();voiceOptions();vozUI()"></div>
   <p class="cfg-hint">Sua chave fica salva APENAS no seu celular (localStorage). Nunca é compartilhada.</p>
   <div class="cfg-row"><label>Ler respostas em voz alta</label><div class="toggle" id="cfgSpeak" role="switch" tabindex="0" onclick="this.classList.toggle('on');saveConfig()"></div></div>
   <p class="cfg-hint">Respostas de foto e de perguntas por voz são sempre lidas. Ligue para ler também as perguntas digitadas.</p>
@@ -339,6 +339,7 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 <!-- Reading player: stays visible on every tab -->
 <div id="ttsBar" hidden>
   <span class="tts-ic">🔊</span><span id="ttsLabel" class="tts-lb">Lendo resposta…</span>
+  <button id="ttsBetter" onclick="openVoiceCfg()" aria-label="Trocar por uma voz mais natural" hidden>✨</button>
   <button id="ttsPause" onclick="ttsToggle()" aria-label="Pausar">⏸</button>
   <button onclick="ttsStop()" aria-label="Parar">⏹</button>
 </div>
@@ -1040,7 +1041,7 @@ function saveConfig(){
     name:document.getElementById('cfgName').value,
     speak:document.getElementById('cfgSpeak').classList.contains('on'),
     rate:document.getElementById('cfgRate').value,
-    voice:document.getElementById('cfgVoice').value
+    voice:document.getElementById('cfgVoice').value||undefined
   };
   try{localStorage.setItem('gramado-cfg',JSON.stringify(cfg));}catch(e){}
   updateAIStatus();
@@ -1473,43 +1474,68 @@ function pickVoice(){
   voiceOptions();
 }
 
-// Neural voice (Piper pt-BR, open source) synthesized in voz.js. Only on the site:
-// the Claude viewer can't download the model.
-const NEURAL={w:null,id:0,wait:{},ctx:null,ok:false,loading:false};
+// Fluent voices, played through Web Audio:
+// - Piper (open source, pt-BR) synthesized on the phone in voz.js. Only on the site:
+//   the Claude viewer can't download the models.
+// - OpenAI TTS, when an OpenAI key is set (needs internet, billed to that key).
+const PIPER={faber:'Faber',cadu:'Cadu',jeff:'Jeff'};
+const NEURAL={w:null,id:0,wait:{},ctx:null,have:[],loading:null};
 const canNeural=!inSandbox&&'caches' in window&&typeof Worker!=='undefined'&&typeof WebAssembly==='object';
-try{NEURAL.ok=canNeural&&localStorage.getItem('gramado-voz')==='1';}catch(e){}
-if('speechSynthesis' in window){pickVoice();speechSynthesis.addEventListener('voiceschanged',pickVoice);}
+try{
+  const v=localStorage.getItem('gramado-voz');
+  NEURAL.have=canNeural?(v==='1'?['faber']:JSON.parse(v)||[]):[];
+}catch(e){}
+const openaiKey=()=>{const k=getConfig().key||'';return /^sk-(?!ant)/.test(k)?k:'';};
+function wantVoice(){
+  const v=getConfig().voice;
+  if(v==='neural')return 'piper:faber';
+  return v||(openaiKey()?'openai:nova':canNeural?'piper:faber':'auto');
+}
 function voiceOptions(){
   const sel=document.getElementById('cfgVoice');if(!sel)return;
-  const want=getConfig().voice||(canNeural?'neural':'auto');
   const opts=[];
-  if(canNeural)opts.push(['neural','✨ Fluida (neural)']);
+  if(openaiKey())opts.push(['openai:nova','🌐 Nova · OpenAI (a mais natural)'],['openai:onyx','🌐 Onyx · OpenAI (masculina)']);
+  if(canNeural)Object.entries(PIPER).forEach(([k,n])=>opts.push(['piper:'+k,`✨ ${n} · neural${NEURAL.have.includes(k)?' ✓':''}`]));
   opts.push(['auto','📱 Do celular (automática)']);
   ptVoices().forEach(v=>opts.push([v.name,'📱 '+v.name.replace(/\s*[-–(]?\s*Portugu.*$/i,'').slice(0,28)]));
   sel.textContent='';
   opts.forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;sel.appendChild(o);});
+  const want=wantVoice();
   sel.value=opts.some(o=>o[0]===want)?want:'auto';
 }
-function useNeural(){return canNeural&&NEURAL.ok&&(getConfig().voice||'neural')==='neural';}
+// Which engine reads now: falls back to the phone voice until a Piper voice is downloaded.
+function ttsEngine(){
+  const v=wantVoice();
+  if(v.startsWith('openai:')&&openaiKey())return v;
+  if(v.startsWith('piper:')&&canNeural&&NEURAL.have.includes(v.slice(6)))return v;
+  return 'system';
+}
 function vozUI(){
   const box=document.getElementById('vozBox'),hint=document.getElementById('vozHint');if(!box)return;
-  if(!canNeural){box.hidden=true;hint.textContent=inSandbox?'A voz fluida (neural) funciona no site: use "Abrir o guia no navegador" acima.':'Este navegador não suporta a voz fluida.';return;}
-  box.hidden=NEURAL.ok||document.getElementById('cfgVoice').value!=='neural';
+  const v=document.getElementById('cfgVoice').value;
+  if(v.startsWith('openai:')){box.hidden=true;hint.textContent='Voz da OpenAI: a mais natural, usa a sua chave e precisa de internet (centavos por resposta).';return;}
+  if(!canNeural){box.hidden=true;hint.textContent=inSandbox?'Vozes neurais (Faber, Cadu, Jeff) funcionam no site: use "Abrir o guia no navegador" acima. Com uma chave da OpenAI aparecem também as vozes Nova e Onyx.':'Este navegador não suporta as vozes neurais.';return;}
+  const k=v.startsWith('piper:')?v.slice(6):'';
+  box.hidden=!k||NEURAL.have.includes(k);
+  if(k&&NEURAL.loading!==k){const b=document.getElementById('vozBtn');b.disabled=!!NEURAL.loading;b.textContent=`⬇️ Baixar a voz ${PIPER[k]} (≈ ${NEURAL.have.length?65:90} MB, uma vez)`;}
+  hint.textContent='Vozes neurais do projeto aberto Piper, que rodam no próprio celular: baixem no Wi-Fi e depois funcionam até sem internet.'+(openaiKey()?'':' Com uma chave da OpenAI aparecem também as vozes Nova e Onyx, ainda mais naturais.');
 }
 function vozWorker(){
   if(!NEURAL.w){
-    NEURAL.w=new Worker('voz.js?v=1');
+    NEURAL.w=new Worker('voz.js?v=2');
     NEURAL.w.onmessage=({data:m})=>{
       if(m.type==='progress'){
         const pc=Math.round(m.loaded*100/m.total);
         document.getElementById('vozFill').style.width=pc+'%';
-        document.getElementById('vozBtn').textContent=`Baixando a voz… ${pc}%`;
+        document.getElementById('vozBtn').textContent=`Baixando a voz ${PIPER[m.voice]}… ${pc}%`;
       }
-      if(m.type==='ready'&&NEURAL.loading){
-        NEURAL.loading=false;NEURAL.ok=true;
-        try{localStorage.setItem('gramado-voz','1');}catch(e){}
-        vozUI();toast('✨ Voz fluida pronta! Ela lê as respostas da guia, mesmo sem internet.');
-        speak('Pronto! A partir de agora eu leio as respostas com esta voz. Boa viagem a Gramado!');
+      if(m.type==='ready'&&NEURAL.loading===m.voice){
+        NEURAL.loading=null;
+        if(!NEURAL.have.includes(m.voice))NEURAL.have.push(m.voice);
+        try{localStorage.setItem('gramado-voz',JSON.stringify(NEURAL.have));}catch(e){}
+        document.getElementById('vozBar').hidden=true;
+        voiceOptions();vozUI();toast(`✨ Voz ${PIPER[m.voice]} pronta! Ela lê as respostas da guia, mesmo sem internet.`);
+        speak(`Olá! Eu sou a voz ${PIPER[m.voice]}. A partir de agora eu leio as respostas da guia. Boa viagem a Gramado!`);
       }
       const w=NEURAL.wait[m.id];if(!w)return;delete NEURAL.wait[m.id];
       if(m.type==='audio')w.res(m);
@@ -1520,51 +1546,65 @@ function vozWorker(){
   return NEURAL.w;
 }
 function vozFailed(msg){
-  NEURAL.loading=false;
-  const b=document.getElementById('vozBtn');b.disabled=false;b.textContent='⬇️ Tentar baixar de novo';
-  document.getElementById('vozBar').hidden=true;
+  NEURAL.loading=null;
+  document.getElementById('vozBar').hidden=true;vozUI();
+  document.getElementById('vozBtn').textContent='⬇️ Tentar baixar de novo';
   toast('Não consegui baixar a voz. Confiram a internet e tentem de novo.');
   console.warn('voz',msg);
 }
 function vozDownload(){
-  if(NEURAL.loading)return;
-  NEURAL.loading=true;unlockTTS();
+  const v=document.getElementById('cfgVoice').value;
+  if(NEURAL.loading||!v.startsWith('piper:'))return;
+  NEURAL.loading=v.slice(6);unlockTTS();
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   const b=document.getElementById('vozBtn');b.disabled=true;b.textContent='Baixando a voz…';
-  document.getElementById('vozBar').hidden=false;
+  document.getElementById('vozFill').style.width='0';document.getElementById('vozBar').hidden=false;
   NEURAL.wait[0]={res(){},rej(){}};
-  vozWorker().postMessage({type:'load',id:0,voice:'faber'});
-}
-function vozSynth(text){
-  return new Promise((res,rej)=>{
-    const id=++NEURAL.id;NEURAL.wait[id]={res,rej};
-    vozWorker().postMessage({type:'say',id,voice:'faber',text,rate:parseFloat(getConfig().rate)||1});
-  });
+  vozWorker().postMessage({type:'load',id:0,voice:NEURAL.loading});
 }
 function audioCtx(){
   if(!NEURAL.ctx){const C=window.AudioContext||window.webkitAudioContext;NEURAL.ctx=new C();}
   return NEURAL.ctx;
 }
+if('speechSynthesis' in window){pickVoice();speechSynthesis.addEventListener('voiceschanged',pickVoice);}
+// One chunk of text → AudioBuffer, with the chosen engine.
+function synthChunk(text,engine){
+  const rate=parseFloat(getConfig().rate)||1;
+  if(engine.startsWith('openai:'))return fetch('https://api.openai.com/v1/audio/speech',{
+    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+openaiKey()},
+    body:JSON.stringify({model:'gpt-4o-mini-tts',voice:engine.slice(7),input:text,speed:rate,response_format:'mp3',
+      instructions:'Fale em português do Brasil, com sotaque brasileiro, como uma guia de turismo simpática e calma.'})
+  }).then(r=>{if(!r.ok)throw new Error('OpenAI '+r.status);return r.arrayBuffer();})
+    .then(b=>new Promise((res,rej)=>audioCtx().decodeAudioData(b,res,rej)));
+  return new Promise((res,rej)=>{
+    const id=++NEURAL.id;NEURAL.wait[id]={res,rej};
+    vozWorker().postMessage({type:'say',id,voice:engine.slice(6),text,rate});
+  }).then(a=>{const buf=audioCtx().createBuffer(1,a.pcm.length,a.rate);buf.copyToChannel(a.pcm,0);return buf;});
+}
+// From the reading bar straight to the voice picker.
+function openVoiceCfg(){
+  ttsStop();showSec('info');
+  const sel=document.getElementById('cfgVoice');sel.closest('details').open=true;
+  sel.scrollIntoView({block:'center'});sel.focus();
+}
 // Each chunk is synthesized while the previous one plays, so the reading doesn't stall.
 async function neuralChunk(run){
   if(run!==TTS.run||TTS.paused)return;
   if(TTS.idx>=TTS.chunks.length)return ttsStop();
-  const i=TTS.idx;
-  let a;
-  try{a=await(TTS.pre[i]||(TTS.pre[i]=vozSynth(TTS.chunks[i])));}
-  catch(e){if(run===TTS.run){TTS.engine='system';speakChunk(run);}return;}
-  if(i+1<TTS.chunks.length&&!TTS.pre[i+1])TTS.pre[i+1]=vozSynth(TTS.chunks[i+1]);
+  const i=TTS.idx,eng=TTS.engine;
+  let buf;
+  try{buf=await(TTS.pre[i]||(TTS.pre[i]=synthChunk(TTS.chunks[i],eng)));}
+  catch(e){if(run===TTS.run){TTS.engine='system';toast('A voz escolhida falhou; seguindo com a voz do celular.');speakChunk(run);}return;}
+  if(i+1<TTS.chunks.length&&!TTS.pre[i+1])TTS.pre[i+1]=synthChunk(TTS.chunks[i+1],eng);
   if(run!==TTS.run||TTS.paused)return;
   if(i===0)document.getElementById('ttsLabel').textContent='Lendo resposta… pode guardar o celular no bolso';
-  const ctx=audioCtx();
-  const buf=ctx.createBuffer(1,a.pcm.length,a.rate);buf.copyToChannel(a.pcm,0);
-  const src=ctx.createBufferSource();src.buffer=buf;src.connect(ctx.destination);
+  const src=audioCtx().createBufferSource();src.buffer=buf;src.connect(audioCtx().destination);
   src.onended=()=>{if(TTS.src===src)TTS.src=null;if(run===TTS.run&&!TTS.paused){TTS.idx++;neuralChunk(run);}};
   TTS.src=src;src.start();
 }
 // iOS only lets speech start inside a tap: prime it on the first one.
 function unlockTTS(){
-  if(canNeural&&NEURAL.ok)audioCtx().resume().catch(()=>{});
+  if(ttsEngine()!=='system')audioCtx().resume().catch(()=>{});
   if(TTS.unlocked||!('speechSynthesis' in window))return;
   TTS.unlocked=true;
   const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);
@@ -1576,7 +1616,7 @@ function speechText(t){
     .replace(/\(resposta cortada[^)]*\)/,'').replace(/\s+/g,' ').trim();
 }
 function speak(text){
-  const neural=useNeural();
+  const engine=ttsEngine(),neural=engine!=='system';
   if(!neural&&!('speechSynthesis' in window)){toast('Leitura em voz alta indisponível neste navegador.');return;}
   ttsStop();
   // Short chunks: Chrome drops utterances longer than ~15 s.
@@ -1585,12 +1625,13 @@ function speak(text){
   sentences.forEach(s=>{if((cur+s).length>220&&cur){chunks.push(cur);cur=s;}else cur+=s;});
   if(cur.trim())chunks.push(cur);
   if(!chunks.length)return;
-  Object.assign(TTS,{chunks,idx:0,paused:false,run:TTS.run+1,engine:neural?'neural':'system',pre:[]});
+  Object.assign(TTS,{chunks,idx:0,paused:false,run:TTS.run+1,engine,pre:[]});
   document.getElementById('ttsBar').hidden=false;
   document.getElementById('ttsPause').textContent='⏸';
   document.getElementById('ttsLabel').textContent=neural?'Preparando a voz…':'Lendo resposta… pode guardar o celular no bolso';
   if(navigator.wakeLock)navigator.wakeLock.request('screen').then(l=>{TTS.lock=l;}).catch(()=>{});
-  if(!neural&&canNeural&&!NEURAL.ok&&!TTS.hinted){TTS.hinted=true;setTimeout(()=>toast('Dica: há uma voz mais fluida em Info › ⚙️ Configurações da IA e da voz.',6000),1500);}
+  document.getElementById('ttsBetter').hidden=neural||!(canNeural||openaiKey());
+  if(!neural&&(canNeural||openaiKey())&&!TTS.hinted){TTS.hinted=true;setTimeout(()=>toast('Dica: há uma voz mais fluida em Info › ⚙️ Configurações da IA e da voz.',6000),1500);}
   if(neural){audioCtx().resume().catch(()=>{});neuralChunk(TTS.run);}
   else speakChunk(TTS.run);
 }
@@ -1609,7 +1650,7 @@ function ttsToggle(){
   TTS.paused=!TTS.paused;
   document.getElementById('ttsPause').textContent=TTS.paused?'▶':'⏸';
   document.getElementById('ttsLabel').textContent=TTS.paused?'Leitura pausada':'Lendo resposta…';
-  if(TTS.engine==='neural'){
+  if(TTS.engine!=='system'){
     // Suspending the audio keeps the exact spot; a chunk still being made restarts the loop.
     if(TTS.paused)audioCtx().suspend();
     else{audioCtx().resume();if(!TTS.src){TTS.run++;neuralChunk(TTS.run);}}

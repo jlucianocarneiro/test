@@ -36,15 +36,16 @@ Dentro do Claude (artefato) o celular não libera GPS nem microfone. O guia ent�
 
 No GitHub Pages (HTTPS próprio) clima e GPS funcionam normalmente. Se o GPS falhar ou for bloqueado (por exemplo, dentro do artefato do claude.ai), escolha o ponto atual na lista "Ou estou em" para ver as distâncias; a escolha fica salva. Sem previsão online, o clima mostra a média típica de outubro (8°–18°C).
 
-## Voz fluida (neural)
+## Vozes da guia
 
-Em Info › Configurações, "Voz da guia" → "✨ Fluida (neural)" baixa uma vez (~90 MB) a voz
-`pt_BR-faber-medium` do projeto aberto [Piper](https://github.com/rhasspy/piper) e passa a ler as
-respostas com ela. Tudo roda no próprio celular, em `voz.js` (Web Worker):
+Em Info › Configurações, "Voz da guia" (o botão ✨ na barra de leitura leva direto para lá):
 
-- fonemas: espeak-ng em WebAssembly (`@diffusionstudio/piper-wasm@1.0.0`, jsDelivr);
-- síntese: ONNX Runtime Web 1.18.0 (jsDelivr), modelo do Hugging Face (`rhasspy/piper-voices`);
-- os arquivos ficam no Cache Storage `gramado-voz` (o service worker preserva) e funcionam offline.
+- **✨ Faber, Cadu e Jeff · neural**: vozes `pt_BR-*-medium` do projeto aberto [Piper](https://github.com/rhasspy/piper),
+  baixadas uma vez (~90 MB a primeira, ~65 MB as seguintes) e sintetizadas no próprio celular em `voz.js`
+  (espeak-ng em WebAssembly `@diffusionstudio/piper-wasm@1.0.0` + ONNX Runtime Web 1.18.0, via jsDelivr;
+  modelos do Hugging Face `rhasspy/piper-voices`). Ficam no Cache Storage `gramado-voz` e funcionam offline.
+  Só no site: o visualizador do Claude não baixa os modelos.
+- **🌐 Nova e Onyx · OpenAI**: aparecem com uma chave da OpenAI (`gpt-4o-mini-tts`); precisam de internet.
+- **📱 Do celular**: a melhor voz pt-BR do aparelho (prioriza "Natural/Online", Google e "Premium").
 
-Sem a voz baixada, ou dentro do visualizador do Claude, a leitura usa a melhor voz pt-BR do aparelho
-(prioriza as "Natural"/"Online", Google e "Premium"). Uso pessoal, sem fins comerciais.
+Se a voz escolhida falhar, a leitura continua com a voz do celular. Uso pessoal, sem fins comerciais.
