@@ -121,6 +121,15 @@ a{color:var(--accent);text-decoration:none}
 .pk-prog{display:flex;align-items:center;gap:10px;font-size:.74rem;font-weight:700;color:var(--muted)}
 .pk-prog .bar{flex:1;height:8px;border-radius:4px;background:var(--bg);overflow:hidden}
 .pk-prog .bar i{display:block;height:100%;background:var(--green);border-radius:4px;transition:width .3s}
+.sw{position:relative;margin-bottom:6px;border-radius:10px;overflow:hidden}
+.sw:not(.drag):not(.open) .sw-del{visibility:hidden}
+.sw .ci{margin-bottom:0;position:relative;z-index:1;touch-action:pan-y;transition:transform .2s ease}
+.sw.drag .ci{transition:none}
+.sw-del{position:absolute;right:0;top:0;bottom:0;width:72px;border:none;background:#b3261e;color:#fff;font-size:1.2rem;cursor:pointer}
+.pk-off .ci{margin-bottom:6px;align-items:center}
+.pk-off .ci .ct{opacity:.45;text-decoration:line-through}
+.pk-back{flex-shrink:0;min-height:32px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:.72rem;font-weight:600;opacity:1}
+.pk-hint{font-size:.72rem;color:var(--muted);margin:6px 0 0}
 .pk-only{display:flex;align-items:center;gap:8px;min-height:40px;font-size:.78rem;color:var(--text);margin-top:4px;cursor:pointer}
 .pk-only input{width:18px;height:18px;accent-color:var(--brand)}
 .pk-tip{font-size:.74rem;color:var(--muted);background:var(--card);border-left:3px solid var(--gold);border-radius:8px;padding:8px 10px;margin:0 0 8px;line-height:1.5}
@@ -980,7 +989,9 @@ function renderDist(lat,lng){
 // Old ticks (flat list) live in 'gramado-chk'; they are migrated once into 'gramado-pack'.
 const OLD_TO_PACK={0:['s','caracol'],1:['s','jolimont'],2:['s','checkin-latam'],3:['s','checkin-gol'],4:['s','prime'],5:['s','salas-vip'],6:['s','previsao'],7:['p','meias-grossas'],8:['s','powerbank'],9:['p','casaco'],10:['p','protetor'],11:['s','caramau'],12:['s','nativitaten'],13:['s','uber-pinos'],14:['s','funcionamento'],15:['p','termica-top','gorro-luvas'],16:['s','orcamento']};
 let pack={s:{},m:{},f:{}},packWho='m',packOnly=false;
-function savePack(){try{localStorage.setItem('gramado-pack',JSON.stringify(pack));}catch(e){}}
+// Items marked "doesn't apply" (swipe + 🗑️): out of the list and the count, restorable at the end.
+let packOff={s:{},m:{},f:{}};
+function savePack(){try{localStorage.setItem('gramado-pack',JSON.stringify(pack));localStorage.setItem('gramado-pack-off',JSON.stringify(packOff));}catch(e){}}
 function migrateOld(old){
   Object.keys(old).forEach(k=>{
     const m=OLD_TO_PACK[k];if(!old[k]||!m)return;
@@ -997,9 +1008,11 @@ try{
     migrateOld(old);savePack();
   }
   packWho=localStorage.getItem('gramado-pack-who')==='f'?'f':'m';
+  packOff=Object.assign({s:{},m:{},f:{}},JSON.parse(localStorage.getItem('gramado-pack-off')||'{}'));
 }catch(e){}
 const scopeOf=cat=>cat.per?packWho:'s';
-const itemsOf=cat=>cat.items.filter(i=>!i.w||i.w===packWho);
+const itemsAll=cat=>cat.items.filter(i=>!i.w||i.w===packWho);
+const itemsOf=cat=>itemsAll(cat).filter(i=>!packOff[scopeOf(cat)][i.id]);
 function renderChk(){
   let total=0,done=0;
   const cats=PACK.map((cat,ci)=>{
@@ -1007,11 +1020,14 @@ function renderChk(){
     const nd=its.filter(i=>pack[sc][i.id]).length;total+=its.length;done+=nd;
     const rows=its.filter(i=>!(packOnly&&pack[sc][i.id])).map(i=>{
       const on=!!pack[sc][i.id];
-      return `<button class="ci${on?' done':''}" role="checkbox" aria-checked="${on}" onclick="tPack(${ci},'${i.id}')"><span class="cb" aria-hidden="true"></span><span class="ct">${i.t}${i.n?`<small>${i.n}</small>`:''}</span>${i.q?`<span class="qty">×${i.q}</span>`:''}</button>`;
+      return `<div class="sw"><button class="sw-del" tabindex="-1" aria-label="Não se aplica: excluir ${i.t}" onclick="offPack(${ci},'${i.id}',true)">🗑️</button><button class="ci${on?' done':''}" role="checkbox" aria-checked="${on}" onclick="tPack(${ci},'${i.id}')"><span class="cb" aria-hidden="true"></span><span class="ct">${i.t}${i.n?`<small>${i.n}</small>`:''}</span>${i.q?`<span class="qty">×${i.q}</span>`:''}</button></div>`;
     }).join('');
     const full=nd===its.length;
     return `<details class="fold pk" data-cat="${cat.c}" ${(packOpen[cat.c]!==undefined?packOpen[cat.c]:!full)?'open':''}><summary class="st" onclick="packOpen['${cat.c}']=!this.parentNode.open">${cat.ic} ${cat.t}${cat.per?` <span class="who">${packWho==='m'?'masculino':'feminino'}</span>`:''} <span class="cnt${full?' full':''}">${full?'✓ completo':nd+'/'+its.length}</span></summary><p class="pk-tip">${cat.tip}</p>${rows||'<p class="pk-tip">Tudo pronto nesta categoria. 🎉</p>'}</details>`;
   }).join('');
+  const off=PACK.flatMap((cat,ci)=>itemsAll(cat).filter(i=>packOff[scopeOf(cat)][i.id]).map(i=>
+    `<div class="ci"><span class="ct">${cat.ic} ${i.t}</span><button class="pk-back" onclick="offPack(${ci},'${i.id}',false)" aria-label="Voltar para a lista: ${i.t}">↩︎ Voltar</button></div>`));
+  const offHtml=off.length?`<details class="fold pk pk-off"${packOpen.off?' open':''}><summary class="st" onclick="packOpen.off=!this.parentNode.open">🗑️ Excluídos <span class="cnt">${off.length}</span></summary><p class="pk-tip">Itens que não se aplicam. Toque em ↩︎ Voltar se mudarem de ideia.</p>${off.join('')}</details>`:'';
   const pct=total?Math.round(done*100/total):0;
   document.getElementById('checkL').innerHTML=`
 <div class="pk-head">
@@ -1022,7 +1038,8 @@ function renderChk(){
   </div>
   <div class="pk-prog"><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}" aria-label="Itens prontos"><i style="width:${pct}%"></i></div><span>${done} de ${total}</span></div>
   <label class="pk-only"><input type="checkbox" ${packOnly?'checked':''} onchange="packOnly=this.checked;renderChk()"> Mostrar só o que falta</label>
-</div>${cats}`;
+  <p class="pk-hint">Algum item não se aplica? Arraste para a esquerda ← e toque na 🗑️.</p>
+</div>${cats}${offHtml}`;
 }
 const packOpen={};
 function tPack(ci,id){
@@ -1031,6 +1048,43 @@ function tPack(ci,id){
   if(!pack[sc][id])delete pack[sc][id];
   savePack();renderChk();
 }
+function offPack(ci,id,out){
+  const sc=scopeOf(PACK[ci]);
+  if(out)packOff[sc][id]=true;else delete packOff[sc][id];
+  savePack();renderChk();
+  if(out)toast('Item movido para 🗑️ Excluídos, no fim da lista.');
+}
+// Swipe a row left to reveal its trash button; a drag never counts as a tap on the checkbox.
+(function(){
+  let row=null,x0=0,y0=0,dx=0,moved=false,open=null;
+  const W=72,close=r=>{if(r){r.querySelector('.ci').style.transform='';r.classList.remove('open');}};
+  document.addEventListener('pointerdown',e=>{
+    const r=e.target.closest('#checkL .sw');
+    if(open&&open!==r&&!e.target.closest('.sw-del')){close(open);open=null;}
+    if(!r||e.target.closest('.sw-del'))return;
+    row=r;x0=e.clientX;y0=e.clientY;dx=0;moved=false;
+  });
+  document.addEventListener('pointermove',e=>{
+    if(!row)return;
+    const mx=e.clientX-x0,my=e.clientY-y0;
+    if(!moved){if(Math.abs(mx)<8||Math.abs(mx)<Math.abs(my)){if(Math.abs(my)>10)row=null;return;}moved=true;row.classList.add('drag');}
+    dx=Math.max(-W*1.4,Math.min(0,mx+(row.classList.contains('open')?-W:0)));
+    row.querySelector('.ci').style.transform=`translateX(${dx}px)`;
+  });
+  const end=()=>{
+    if(!row)return;
+    const r=row;row=null;r.classList.remove('drag');
+    if(!moved)return;
+    if(dx<-W/2){r.querySelector('.ci').style.transform=`translateX(${-W}px)`;r.classList.add('open');r.querySelector('.sw-del').tabIndex=0;open=r;}
+    else{close(r);if(open===r)open=null;}
+    suppress=Date.now()+400;
+  };
+  // Swallow the click that follows a drag.
+  let suppress=0;
+  document.addEventListener('click',e=>{if(Date.now()<suppress&&e.target.closest('#checkL .sw .ci')){e.stopPropagation();e.preventDefault();}},true);
+  document.addEventListener('pointerup',end);
+  document.addEventListener('pointercancel',()=>{if(row){close(row);row.classList.remove('drag');row=null;}});
+})();
 function setWho(w){packWho=w;try{localStorage.setItem('gramado-pack-who',w);}catch(e){}renderChk();}
 
 // ===========================
