@@ -38,6 +38,9 @@ header p{font-size:.78rem;opacity:.85;margin-top:2px}
 .swipe-hint{font-size:.7rem;color:var(--muted);text-align:center;margin:-4px 0 10px}
 .dh{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--shadow);border-left:4px solid var(--accent)}
 .dh h2{font-size:1.05rem;font-weight:700}
+.tips .tip{padding:8px 0;border-bottom:1px solid var(--border)}.tips .tip:last-child{border-bottom:none}
+.tips b{font-size:.84rem}.tips p{font-size:.78rem;color:var(--muted);margin:2px 0 0;line-height:1.5}
+.tips em{font-style:normal;font-weight:600}.tips em.ok{color:var(--green)}.tips em.warn{color:var(--accent)}
 .dmeta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .dmeta span{font-size:.68rem;font-weight:600;padding:3px 8px;border-radius:12px;background:var(--bg);color:var(--muted)}
 .dmeta span.ok{background:var(--green-l);color:var(--green)}.dh .sub{font-size:.78rem;color:var(--muted);margin-top:2px}
@@ -241,6 +244,15 @@ a{color:var(--accent);text-decoration:none}
     <li>Gramado/Canela & Região · Até 15/05/2027</li>
     <li>App → Selecionar → "Utilizar" na chegada</li>
   </ul></div>
+  <div class="st">Erros comuns — e como está o roteiro de vocês</div>
+  <div class="ic tips">
+    <div class="tip"><b>💸 Subestimar o orçamento</b><p>Gramado é cara: fondue ~R$180/pp, Café Colonial ~R$130/pp, parques R$60–190/pp. O Prime 2×1 ajuda. <em class="warn">Definam um teto diário com folga.</em></p></div>
+    <div class="tip"><b>🎟️ Deixar ingresso pra hora</b><p>Jolimont + Felsen, Snowland, Nativitaten e Cara de Mau já estão garantidos. <em class="warn">Falta o Parque do Caracol: comprar online antes de 29/10.</em></p></div>
+    <div class="tip"><b>🏃 Atropelar o roteiro</b><p>O dia 29 era o mais pesado. <em class="ok">Ajustado: o Skyglass saiu e a Catedral de Pedra (grátis, a pé) entrou, com volta às 15:45 para descansar antes do Nativitaten.</em></p></div>
+    <div class="tip"><b>🧣 Não preparar pro frio</b><p>Em outubro: 8–18°C de dia e 5–10°C à noite. Segunda pele, luvas e gorro para as noites do Natal Luz e do Nativitaten; o Snowland empresta a roupa de neve, mas levem meias grossas.</p></div>
+    <div class="tip"><b>🆓 Só atrações pagas</b><p><em class="ok">Já equilibrado:</em> Rua Coberta (24), Natal Luz no centro (25), Igreja São Pedro e Lago J.R. Bier (27), Catedral de Pedra (29), Lago Negro e mirantes (30).</p></div>
+    <div class="tip"><b>🌲 Ignorar Canela</b><p><em class="ok">Coberto no dia 29:</em> Caracol, Catedral de Pedra e almoço no centro de Canela. Skyglass fica como extra, se sobrar tempo.</p></div>
+  </div>
   <div class="st">Contatos</div>
   <div class="ic"><h3>📞 Emergência</h3><ul>
     <li><a href="tel:190">190</a> — PM · <a href="tel:192">192</a> — SAMU · <a href="tel:193">193</a> — Bombeiros</li>
@@ -344,6 +356,8 @@ const CHECKS=[
   "Conferir horários Nativitaten",
   "Abrir cada link de Uber do roteiro e conferir o pino do destino",
   "Conferir funcionamento: Château (dom 25), Snowland (seg 26)",
+  "Segunda pele, luvas e gorro (noites de 5–10°C; Snowland a −5°C)",
+  "Definir orçamento diário com folga (parques, fondue, cafés)",
 ];
 
 // Ticket slots: files live only on this phone (IndexedDB), never in the published site.
@@ -422,7 +436,7 @@ const DAYS = {
   },
   29: {
     title:"🌲 Quinta 29/10 — Jolimont, Felsen, Caracol + Nativitaten",
-    sub:"Jolimont + Felsen · Caracol · Nativitaten à noite",
+    sub:"Jolimont + Felsen · Caracol · Catedral de Pedra · Nativitaten",
     items:[
       {t:"7:30",n:"⏰ Acordar cedo!",d:"Café reforçado às 8:00. Dia cheio."},
       {p:"Vinícola Jolimont",t:"8:45",n:"🚗 Uber → Jolimont",d:"~20 min de Gramado",c:"transport"},
@@ -432,8 +446,8 @@ const DAYS = {
       {p:"Parque do Caracol",t:"11:45–13:30",n:"🌊 Parque do Caracol",d:"Cascata 130m, teleférico, trilhas",c:"nature",tags:["w"],x:"Elevador panorâmico (80m), teleférico, Trilha da Cascata (700 degraus). ~R$60-190/pp. FECHA TER/QUA — por isso quinta!",h:"Cascata descoberta por colonos alemães em 1912. Nome vem do formato espiralado do rio. Mata Atlântica com araucárias centenárias. 800 mil visitantes/ano."},
       {p:"Container Bistrot",t:"13:45",n:"🚗 Uber → Centro Canela",d:"~10 min",c:"transport"},
       {p:"Container Bistrot",t:"14:00",n:"🍽️ Container Bistrot",d:"Gastronomia criativa · ~R$80/pp",c:"meal",x:"Restaurante em containers. Pratos criativos com ingredientes locais. Boa carta de vinhos da Serra.",h:"Canela (fundada 1944): nome de uma caneleira na atual Praça João Corrêa. 837m altitude."},
-      {p:"Skyglass Canela",t:"15:15",n:"🔭 (Opcional) Skyglass",d:"Plataforma vidro 360m · R$99-159/pp",x:"Passarela de vidro sobre o Vale da Ferradura. Sky bike, mirante 360°. Avaliar cansaço: o dia já tem vinícola, cervejaria e Caracol, e à noite tem Nativitaten."},
-      {p:"Hotel Bellagio",t:"16:30",n:"🚗 Volta a Gramado",d:"~30 min. Hotel, descanso (sem Skyglass, dá para voltar às 15:15).",c:"transport"},
+      {t:"15:00–15:45",n:"⛪ Catedral de Pedra",d:"Centro de Canela · grátis · a pé",c:"nature",tags:["f"],x:"Na Praça João Corrêa, no centro de Canela: a pé do almoço, sem Uber. Entrada gratuita. Skyglass (R$99–159/pp, ~14 km) ficou fora para não atropelar o dia: vinícola, cervejaria, Caracol e Nativitaten já bastam. Se sobrar energia, dá para ir em outro dia.",h:"A Catedral de Nossa Senhora de Lourdes, conhecida como Catedral de Pedra, tem estilo gótico inglês e torre de 65 m. É o cartão-postal de Canela."},
+      {p:"Hotel Bellagio",t:"15:45",n:"🚗 Volta a Gramado",d:"~30 min. Descanso no hotel antes do Nativitaten.",c:"transport"},
       {t:"18:30",n:"🥪 Lanche leve",d:"Algo rápido antes do show.",c:"meal"},
       {p:"Serra Park",t:"19:15",n:"🚗 Uber → Serra Park",d:"~10 min. Chegar 19:30.",c:"transport"},
       {tk:"nativitaten",p:"Serra Park",t:"20:00–21:30",n:"🎄 Nativitaten",d:"Espetáculo principal · Setor Ouro",tags:["c"],x:"Música ao vivo, projeções a laser, pirotecnia, neve artificial. ~1h30. Leve agasalho (8-10°C à noite!).",h:"Herdeiro do 'Grande Desfile de Natal'. Desde 2017 no Serra Park, investimento milionário em efeitos especiais."},
@@ -495,6 +509,8 @@ const KB = [
   {k:["mini mundo","miniatura"],a:"O Mini Mundo existe desde 1983 com 160+ miniaturas na escala 1:24. Construções europeias típicas, trenzinhos, moinhos. Feito artesanalmente por 3 gerações de uma família de origem alemã. ~R$60/pp. No Centro de Gramado."},
   {k:["aldeia","papai noel"],a:"A Aldeia do Papai Noel foi o primeiro parque temático de Natal do Brasil (1940). Fábrica de brinquedos, casa do Papai Noel, trenó que 'voa' por trilhos sobre a cidade, neve artificial. ~R$80/pp. Checar Prime 2×1."},
   {k:["texas","churrasco"],a:"O Texas Gramado fica na Av. Borges de Medeiros. Carnes nobres na brasa: ancho, bife de chorizo, costela. Prime 2×1. ~R$100/pp. Harmonize com Tannat ou Malbec. Vocês vão dia 27/10 à noite."},
+  {k:["erro","erros","dica","dicas","orçamento","orcamento","caro","grátis","gratis","de graça"],a:"Erros comuns em Gramado: subestimar o orçamento (fondue ~R$180/pp, Café Colonial ~R$130/pp, parques R$60–190/pp; usem o Prime 2×1), deixar ingresso pra hora (falta comprar o Parque do Caracol), atropelar o roteiro (o dia 29 foi aliviado), não se preparar pro frio (5–10°C à noite em outubro), só fazer atrações pagas (Rua Coberta, Igreja São Pedro, Lago Negro, Catedral de Pedra e mirantes são grátis) e ignorar Canela (Caracol e Catedral de Pedra estão no dia 29)."},
+  {k:["catedral","catedral de pedra"],a:"A Catedral de Pedra (Nossa Senhora de Lourdes) fica na Praça João Corrêa, no centro de Canela, em estilo gótico inglês. Entrada gratuita. Está no roteiro de 29/10 às 15:00, a pé depois do almoço no Container Bistrot."},
   {k:["mala","bagagem","embalagem","o que levar"],a:"Dicas de mala: meias grossas para Snowland, agasalhos para noites frias (5-10°C), protetor solar (altitude!), power bank. Na volta: chocolates e vinhos na mala despachada (embrulhar bem!), líquidos >100ml na despachada. Carregar celulares 100%."},
 ];
 
@@ -977,6 +993,8 @@ RESERVAS CONFIRMADAS:
 - Nativitaten 29/10 20:00 (Setor Ouro)
 - Cara de Mau 30/10 21:30 (Porto, 2 adultos)
 - Jolimont + Felsen Beer 29/10: combo Beer Tour Felsen + Tour Jolimont com taça, 2 ingressos (LB32077972, LB32078275). Tour Jolimont 9h–16h45, Felsen 10h–17h, mesmo complexo em Canela
+
+Ao sugerir programas, evite os erros comuns de turista em Gramado: orçamento apertado, ingresso comprado na hora, roteiro corrido demais, pouca roupa de frio, só atrações pagas e esquecer Canela.
 
 Responda de forma concisa, prática e amigável, em texto simples (sem markdown, listas com asteriscos ou emojis), porque a resposta pode ser lida em voz alta. Dê informações históricas e culturais quando relevante. Sugira alternativas se o clima estiver ruim. Lembre do Prime 2×1 quando for relevante. Não mencione descontos para policiais ou servidores.`;
 }
