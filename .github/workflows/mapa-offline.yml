@@ -1,0 +1,36 @@
+# Builds the offline map of Gramado–Canela (Protomaps / OpenStreetMap) used by the Local tab.
+# Runs only when this file changes on the claude/mapa-offline branch, and commits lib/gramado.pmtiles there.
+name: Mapa offline Gramado-Canela
+on:
+  push:
+    branches: [claude/mapa-offline]
+    paths: ['.github/workflows/mapa-offline.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: pmtiles CLI
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download -R protomaps/go-pmtiles -p '*Linux_x86_64.tar.gz' -O p.tgz
+          tar xzf p.tgz pmtiles
+          ./pmtiles version || true
+      - name: Recorte da região
+        run: |
+          B=$(curl -sf https://build-metadata.protomaps.dev/builds.json | grep -oE '[0-9]{8}\.pmtiles' | sort -u | tail -1)
+          echo "build: $B"
+          ./pmtiles extract "https://build.protomaps.com/$B" lib/gramado.pmtiles --bbox=-50.93,-29.43,-50.78,-29.27 --maxzoom=15
+          ls -la lib/gramado.pmtiles
+          echo "Protomaps $B · bbox -50.93,-29.43,-50.78,-29.27 · z0-15 · © OpenStreetMap (ODbL)" > lib/gramado.pmtiles.txt
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/gramado.pmtiles lib/gramado.pmtiles.txt
+          git commit -m "Mapa offline Gramado-Canela (Protomaps)"
+          git push
