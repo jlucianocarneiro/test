@@ -1067,8 +1067,7 @@ async function baseLayer(m){
   const attrib='© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
   try{
     await Promise.all([loadScript('./lib/protomaps-leaflet.js'),loadScript('./lib/pmtiles.js')]);
-    const r=await fetch('./lib/gramado.pmtiles');if(!r.ok)throw new Error(r.status);
-    const buf=new Uint8Array(await r.arrayBuffer());
+    const buf=await mapData();
     // Whole file in memory: no HTTP range requests needed (the Claude viewer may not serve them).
     const source={getKey:()=>'gramado',getBytes:async(o,n)=>({data:buf.slice(o,o+n).buffer})};
     const dark=matchMedia('(prefers-color-scheme: dark)').matches;
@@ -1077,6 +1076,15 @@ async function baseLayer(m){
     console.warn('mapa offline indisponível',e);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:attrib}).addTo(m);
   }
+}
+// The Claude viewer only serves known file types, so there the map comes as base64 text.
+async function mapData(){
+  const r=await fetch('./lib/gramado.pmtiles');
+  if(r.ok)return new Uint8Array(await r.arrayBuffer());
+  const t=await fetch('./lib/gramado-pmtiles.b64.txt');if(!t.ok)throw new Error(t.status);
+  const bin=atob((await t.text()).trim()),out=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);
+  return out;
 }
 // The chosen or nearest place gets the big pin.
 function mapFocus(name){
