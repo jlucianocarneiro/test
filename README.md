@@ -52,3 +52,12 @@ Em Info › Configurações, "Voz da guia" (o botão ✨ na barra de leitura lev
 - **📱 Do celular**: a melhor voz pt-BR do aparelho (prioriza "Natural/Online", Google e "Premium").
 
 Se a voz escolhida falhar, a leitura continua com a voz do celular. Uso pessoal, sem fins comerciais.
+
+## Mapa (aba Local)
+
+Mapa offline de Gramado e Canela com [Leaflet](https://leafletjs.com) 1.9.4 (BSD-2) e
+[protomaps-leaflet](https://github.com/protomaps/protomaps-leaflet) 5.1 + [pmtiles](https://github.com/protomaps/PMTiles) 4.5 (BSD-3),
+em `lib/`. Os dados ficam em `lib/gramado.pmtiles` (2,7 MB, recorte Protomaps de 18/10/2026, zoom 0–15,
+© OpenStreetMap, ODbL), carregado inteiro na memória (sem requisições por faixa). Se o arquivo faltar, usa os
+blocos online do OpenStreetMap. O recorte foi gerado pelo workflow `.github/workflows/mapa-offline.yml`
+(branch `claude/mapa-offline`). O botão 📍 do mapa segue o GPS só enquanto a aba está aberta.

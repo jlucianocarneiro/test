@@ -93,6 +93,27 @@ a{color:var(--accent);text-decoration:none}
 /* Location */
 #locS{background:var(--card);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);margin-bottom:12px;text-align:center}
 #locS .em{font-size:1.8rem;margin-bottom:6px}
+#locS.has-map{padding:0 0 12px;overflow:hidden}
+#locS.has-map .em{display:none}
+#locS.has-map p{padding:0 14px}
+#locMap{height:42vh;min-height:260px;max-height:460px;margin-bottom:12px;background:#ece7df;z-index:0}
+#locMap[hidden]{display:none}
+.mp-dot{width:14px;height:14px;border-radius:50%;background:var(--brand);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.mp-pin{font-size:30px;line-height:30px;text-align:center;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.mp-me{width:16px;height:16px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 2px rgba(26,115,232,.35),0 1px 4px rgba(0,0,0,.4)}
+.mp-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:none;border-radius:12px;background:var(--card);color:var(--text);font-size:1.2rem;box-shadow:0 1px 6px rgba(0,0,0,.3);cursor:pointer}
+.mp-btn.on{background:#1a73e8;color:#fff}
+.mp-btn.on.half{background:var(--card);color:#1a73e8;box-shadow:0 0 0 2px #1a73e8,0 1px 6px rgba(0,0,0,.3)}
+.leaflet-container{font:inherit}
+#locMap .leaflet-control-zoom a{width:44px;height:44px;line-height:44px;font-size:22px}
+.leaflet-tooltip.mp-lb{background:rgba(255,255,255,.92);border:none;box-shadow:0 1px 3px rgba(0,0,0,.25);font-size:.68rem;font-weight:600;padding:1px 6px;color:#222}
+.leaflet-tooltip.mp-lb::before{display:none}
+.mp-hide-lb .mp-lb{display:none}
+.leaflet-popup-content .go{flex-wrap:wrap}
+.leaflet-popup-content .go a{flex:1 1 100%}
+.leaflet-popup-content{margin:10px 12px;font-size:.8rem}
+.leaflet-popup-content b{display:block;margin-bottom:6px;font-size:.86rem}
+.leaflet-popup-content .go a{font-size:.74rem;min-height:40px}
 #locS p{font-size:.8rem;color:var(--muted)}
 #locS .pl{font-size:.95rem;font-weight:700;color:var(--text)}
 .locBtn{width:100%;min-height:48px;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:var(--r);font-size:.88rem;font-weight:600;cursor:pointer;margin-bottom:14px}
@@ -270,7 +291,7 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 
 <!-- ============ LOCATION ============ -->
 <div id="sec-local" class="sec">
-  <div id="locS"><div class="em">📍</div><p class="pl" id="locPl">Ative a localização</p><p id="locDt">Toque abaixo para ver distâncias até cada ponto.</p></div>
+  <div id="locS"><div id="locMap" hidden role="region" aria-label="Mapa de Gramado e Canela: arraste e use dois dedos para aproximar"></div><div class="em">📍</div><p class="pl" id="locPl">Ative a localização</p><p id="locDt">Toque abaixo para ver distâncias até cada ponto.</p></div>
   <button class="locBtn" onclick="getLoc()">📍 Usar meu GPS</button>
   <div id="locPick" class="cfg-row"><label for="locSel">Ou estou em</label><select id="locSel" onchange="pickLoc(this.value)"></select></div>
   <div id="locHelp" style="display:none;background:var(--gold-l);border:1px solid var(--gold);border-radius:var(--r);padding:14px;margin-bottom:14px;font-size:.8rem;line-height:1.6">
@@ -718,6 +739,7 @@ function showSec(name){
   if(name==='roteiro')showDay(curDay);
   if(name==='chat')toLatestChat();else window.scrollTo(0,0);
   // Auto-request location on first visit to Local tab
+  if(name==='local')initMap();else mapLeave();
   if(name==='local'&&!locRequested){locRequested=true;if(geoAllowed||document.getElementById('locSel').value==='')getLoc();}
 }
 
@@ -912,8 +934,11 @@ function getLoc(){
 
   locMsg('Localizando…','Permita o acesso se o celular perguntar.');
   const ok=p=>{
-    const lat=p.coords.latitude,lng=p.coords.longitude,near=findN(lat,lng);
-    locMsg(`Perto de: ${near.name}`,`${near.dist} de distância · precisão ~${fD(p.coords.accuracy/1000)}`);
+    const lat=p.coords.latitude,lng=p.coords.longitude,near=findN(lat,lng),acc=`precisão ~${fD(p.coords.accuracy/1000)}`;
+    // Far from the trip (still at home): "near Skyglass, 1534 km" makes no sense.
+    if(near.d>FAR_KM)locMsg(`Vocês estão a ${fD(hav(lat,lng,GRAMADO.lat,GRAMADO.lng))} de Gramado`,`O mapa mostra a região da viagem · ${acc}`);
+    else locMsg(`Perto de: ${near.name}`,`${near.dist} de distância · ${acc}`);
+    mapShowMe(lat,lng,p.coords.accuracy,near);
     document.getElementById('locSel').value='';
     here={lat,lng,label:'GPS',acc:p.coords.accuracy,ts:Date.now()};
     renderDist(lat,lng);
@@ -942,8 +967,9 @@ function getLoc(){
 // Auto-request location when visiting the tab
 let locRequested=false;
 function hav(a1,n1,a2,n2){const R=6371,dL=(a2-a1)*Math.PI/180,dN=(n2-n1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(a1*Math.PI/180)*Math.cos(a2*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
-function findN(lat,lng){let b={name:'—',dist:'—'},m=Infinity;POINTS.forEach(p=>{const d=hav(lat,lng,p.lat,p.lng);if(d<m){m=d;b={name:p.name,dist:fD(d)};}});return b;}
-function fD(k){return k<1?`${Math.round(k*1000)}m`:`${k.toFixed(1)}km`;}
+function findN(lat,lng){let b={name:'—',dist:'—',d:Infinity},m=Infinity;POINTS.forEach(p=>{const d=hav(lat,lng,p.lat,p.lng);if(d<m){m=d;b={name:p.name,dist:fD(d),d};}});return b;}
+const FAR_KM=5,GRAMADO={lat:-29.3790,lng:-50.8740};
+function fD(k){return k<1?`${Math.round(k*1000)} m`:k<100?`${k.toFixed(1).replace('.',',')} km`:`${Math.round(k).toLocaleString('pt-BR')} km`;}
 function pickLoc(i){
   if(!isIdx(i,POINTS))return;
   const p=POINTS[i];
@@ -951,6 +977,7 @@ function pickLoc(i){
   try{localStorage.setItem('gramado-loc',String(i));localStorage.setItem('gramado-loc-t',String(Date.now()));}catch(e){}
   here={lat:p.lat,lng:p.lng,label:p.name};
   renderDist(p.lat,p.lng);
+  mapFocus(p.name);
 }
 function renderLocPick(){
   const sel=document.getElementById('locSel');
@@ -991,6 +1018,119 @@ function renderDist(lat,lng){
     ?`<div class="di"><span class="dn">${p.name}</span><span class="dv">aqui</span></div>`
     :`<div class="di"><span class="dn">${p.name}</span><span class="dv">${fD(p.d)}${p.d<WALK_KM?' · a pé':' · Uber'}</span>${goLinks(p,p.d)}</div>`).join('');
 }
+
+// ===========================
+// MAP (Local tab): Leaflet + an offline Protomaps extract of Gramado–Canela (lib/gramado.pmtiles,
+// © OpenStreetMap). Loaded on the first visit to the tab; falls back to online OSM tiles.
+// ===========================
+const MAP_BOUNDS=[[-29.43,-50.93],[-29.27,-50.78]];
+const MAP={m:null,p:null,pins:{},me:null,acc:null,watch:null,follow:false,btn:null,focus:null};
+function loadScript(src){
+  return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=()=>rej(new Error(src));document.head.appendChild(sc);});
+}
+function initMap(){
+  if(!MAP.p)MAP.p=(async()=>{
+    const css=document.createElement('link');css.rel='stylesheet';css.href='./lib/leaflet.css';document.head.appendChild(css);
+    await loadScript('./lib/leaflet.js');
+    const el=document.getElementById('locMap');el.hidden=false;document.getElementById('locS').classList.add('has-map');
+    const m=L.map(el,{zoomControl:false,maxBounds:L.latLngBounds(MAP_BOUNDS).pad(0.15),maxBoundsViscosity:0.8,minZoom:12,maxZoom:18,attributionControl:true});
+    m.attributionControl.setPrefix(false);
+    // Panning by hand stops the auto-centering (the blue dot keeps moving); 📍 brings it back.
+    m.on('dragstart',()=>{if(MAP.follow){MAP.follow=false;MAP.btn&&MAP.btn.classList.add('half');}});
+    m.fitBounds([[-29.395,-50.88],[-29.36,-50.83]]);
+    await baseLayer(m);
+    L.control.zoom({position:'bottomright'}).addTo(m);
+    // "Minha posição": follow the GPS while the tab is open.
+    const Me=L.Control.extend({onAdd(){
+      const b=L.DomUtil.create('button','mp-btn');b.type='button';b.textContent='📍';b.title='Minha posição (toque de novo para parar)';b.setAttribute('aria-label','Mostrar minha posição no mapa');
+      L.DomEvent.disableClickPropagation(b);b.onclick=toggleFollow;MAP.btn=b;return b;}});
+    new Me({position:'topright'}).addTo(m);
+    POINTS.forEach(pt=>{
+      const mk=L.marker([pt.lat,pt.lng],{icon:L.divIcon({className:'',html:'<div class="mp-dot"></div>',iconSize:[14,14]}),title:pt.name,alt:pt.name,keyboard:true});
+      mk.bindPopup(()=>{const from=here||placeByName('Hotel Bellagio'),km=hav(from.lat,from.lng,pt.lat,pt.lng);
+        return `<b>${pt.name}</b>`+(km<0.03?'Vocês estão aqui.':`<small>${fD(km)} ${here?(here.label==='GPS'?'de onde vocês estão':'de '+here.label):'do hotel'}</small>`+goLinks(pt,km));},{maxWidth:240,minWidth:220,autoPanPaddingTopLeft:[10,60],autoPanPaddingBottomRight:[64,30]});
+      mk.bindTooltip(pt.name,{permanent:true,direction:'right',offset:[8,0],className:'mp-lb'});
+      mk.addTo(m);MAP.pins[pt.name]=mk;
+    });
+    // Labels only from street level up: at city scale they pile on top of each other.
+    const lb=()=>el.classList.toggle('mp-hide-lb',m.getZoom()<15);m.on('zoomend',lb);lb();
+    MAP.m=m;
+    if(MAP.focus)mapFocus(MAP.focus);
+    if(MAP.me)mapShowMe(MAP.me.lat,MAP.me.lng,MAP.me.acc);
+    return m;
+  })().catch(e=>{console.warn('mapa',e);MAP.p=null;});
+  else if(MAP.m)setTimeout(()=>MAP.m.invalidateSize(),50);
+  return MAP.p;
+}
+// Offline vector map first (works in the mountains without signal), online OSM tiles otherwise.
+async function baseLayer(m){
+  const attrib='© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+  try{
+    await Promise.all([loadScript('./lib/protomaps-leaflet.js'),loadScript('./lib/pmtiles.js')]);
+    const r=await fetch('./lib/gramado.pmtiles');if(!r.ok)throw new Error(r.status);
+    const buf=new Uint8Array(await r.arrayBuffer());
+    // Whole file in memory: no HTTP range requests needed (the Claude viewer may not serve them).
+    const source={getKey:()=>'gramado',getBytes:async(o,n)=>({data:buf.slice(o,o+n).buffer})};
+    const dark=matchMedia('(prefers-color-scheme: dark)').matches;
+    protomapsL.leafletLayer({url:new pmtiles.PMTiles(source),flavor:dark?'dark':'light',lang:'pt',maxDataZoom:15,attribution:attrib+' · Protomaps'}).addTo(m);
+  }catch(e){
+    console.warn('mapa offline indisponível',e);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:attrib}).addTo(m);
+  }
+}
+// The chosen or nearest place gets the big pin.
+function mapFocus(name){
+  MAP.focus=name;
+  if(!MAP.m)return;
+  const pt=placeByName(name);if(!pt)return;
+  if(MAP.big)MAP.m.removeLayer(MAP.big);
+  Object.entries(MAP.pins).forEach(([n,mk])=>mk.setOpacity(n===name?0:1));
+  MAP.big=L.marker([pt.lat,pt.lng],{icon:L.divIcon({className:'',html:'<div class="mp-pin">📍</div>',iconSize:[30,30],iconAnchor:[15,28]}),zIndexOffset:500,title:pt.name}).addTo(MAP.m);
+  MAP.big.on('click',()=>MAP.pins[name].openPopup());
+  if(!MAP.follow)MAP.m.setView([pt.lat,pt.lng],Math.max(MAP.m.getZoom(),15));
+}
+function mapShowMe(lat,lng,acc,near){
+  MAP.me={lat,lng,acc};
+  if(near&&near.d<=FAR_KM)MAP.focus=near.name;
+  if(!MAP.m)return;
+  const inArea=L.latLngBounds(MAP_BOUNDS).pad(0.5).contains([lat,lng]);
+  if(!MAP.dot){
+    MAP.acc=L.circle([lat,lng],{radius:acc||30,color:'#1a73e8',weight:1,fillOpacity:.12,interactive:false}).addTo(MAP.m);
+    MAP.dot=L.marker([lat,lng],{icon:L.divIcon({className:'',html:'<div class="mp-me"></div>',iconSize:[16,16]}),zIndexOffset:1000,title:'Você está aqui',interactive:false}).addTo(MAP.m);
+  }else{MAP.dot.setLatLng([lat,lng]);MAP.acc.setLatLng([lat,lng]).setRadius(acc||30);}
+  if(MAP.focus&&near)mapFocus(MAP.focus);
+  if(MAP.follow&&inArea)MAP.m.setView([lat,lng],Math.max(MAP.m.getZoom(),16));
+  else if(MAP.follow&&!inArea)toast(`Vocês estão a ${fD(hav(lat,lng,GRAMADO.lat,GRAMADO.lng))} de Gramado: a posição aparece no mapa quando chegarem.`);
+}
+function toggleFollow(){
+  if(MAP.watch!==null&&!MAP.follow){
+    MAP.follow=true;MAP.btn.classList.remove('half');
+    if(MAP.me)MAP.m.setView([MAP.me.lat,MAP.me.lng],Math.max(MAP.m.getZoom(),16));
+    return;
+  }
+  if(MAP.watch!==null){stopFollow();return;}
+  if(!navigator.geolocation||!geoAllowed){toast('O GPS não funciona dentro do Claude: abram o guia no navegador para ver a posição no mapa.',6000);return;}
+  MAP.follow=true;MAP.btn&&MAP.btn.classList.add('on');
+  MAP.watch=navigator.geolocation.watchPosition(p=>{
+    const {latitude:lat,longitude:lng,accuracy}=p.coords;
+    // The list and the card only change when they moved ~20 m: GPS ticks every second.
+    const moved=!MAP.me||hav(MAP.me.lat,MAP.me.lng,lat,lng)>0.02;
+    here={lat,lng,label:'GPS',acc:accuracy,ts:Date.now()};
+    mapShowMe(lat,lng,accuracy);
+    if(moved){
+      const near=findN(lat,lng);renderDist(lat,lng);
+      if(near.d>FAR_KM)locMsg(`Vocês estão a ${fD(hav(lat,lng,GRAMADO.lat,GRAMADO.lng))} de Gramado`,'O mapa mostra a região da viagem');
+      else locMsg(`Perto de: ${near.name}`,`${near.dist} de distância · seguindo o GPS`);
+    }
+  },err=>{stopFollow();toast(err.code===1?'Localização negada: libere o GPS para este site.':'Não consegui a posição agora. Tente de novo perto de uma janela.');},
+  {enableHighAccuracy:true,maximumAge:5000,timeout:20000});
+}
+function stopFollow(){
+  if(MAP.watch!==null)navigator.geolocation.clearWatch(MAP.watch);
+  MAP.watch=null;MAP.follow=false;MAP.btn&&MAP.btn.classList.remove('on','half');
+}
+// Leaving the tab stops the GPS to save battery.
+function mapLeave(){if(MAP.watch!==null)stopFollow();}
 
 // ===========================
 // CHECKLIST: packing list by category, clothes and personal items per profile
