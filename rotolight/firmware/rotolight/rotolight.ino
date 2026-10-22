@@ -1,7 +1,9 @@
 // =====================================================================
 // Rotolight LED v0.7 — controladora (Arduino Nano / ATmega328P)
 //
-// Barra única com fita RGB endereçável WS2815 (12 V), uma só fileira.
+// Barra única com a fita RGB endereçável SEZO WS2812B (5 V, 144 LED/m,
+// 1 m = 144 LEDs, IP65), uma só fileira. A fita é de 5 V: um conversor
+// 12 V → 5 V de 10 A, dentro da controladora, alimenta a fita e o Nano.
 // Três botões pré-programados (metálicos, 12 mm, na tampa da caixa):
 //   D2  VM     → pisca VERMELHO (barra inteira, flash triplo)
 //   D3  AZ|VM  → pisca metade AZUL / metade VERMELHO (as metades alternam)
@@ -10,20 +12,21 @@
 // Ao ligar, a barra começa APAGADA (não acende sozinha ao dar a partida).
 //
 // Biblioteca: FastLED (Arduino IDE → Gerenciar bibliotecas → "FastLED").
-// Ligações: D6 ──[330 Ω]── DI da fita; BI do primeiro LED ao GND (conferir
-// no anúncio da fita). Botões entre o pino e o GND (pull-up interno).
-// Se o vermelho aparecer verde, troque ORDEM_CORES para GRB.
+// Ligações: D6 ──[330 Ω]── DIN da fita (fio de dados do conector JST de 3
+// pinos); 5 V e GND da fita direto no conversor, com 1000 µF na entrada da
+// fita. Botões entre o pino e o GND (pull-up interno).
+// Se o vermelho aparecer verde, troque ORDEM_CORES para RGB.
 // =====================================================================
 #include <FastLED.h>
 
 // ---- Configuração ----------------------------------------------------
 #define PINO_DADOS   6
-#define ORDEM_CORES  RGB          // WS2815: a maioria é RGB; se não, GRB
-const uint16_t N_LEDS = 151;      // 144 LED/m × 1,052 m de fita (AJUSTAR à fita cortada)
+#define ORDEM_CORES  GRB          // WS2812B: GRB
+const uint16_t N_LEDS = 144;      // 1 m de fita de 144 LED/m
 const uint8_t  PINO_BOTAO[3] = {2, 3, 4};   // VM, AZ|VM, BR
-const uint16_t LIMITE_mA = 3000;  // teto de corrente da fita (12 V); fusível de 5 A no plugue
+const uint16_t LIMITE_mA = 4000;  // teto de corrente da fita a 5 V (~20 W); o cabo de 0,5 mm² e o calor no alumínio pedem esse limite
 const uint8_t  BRILHO_FLASH = 255;
-const uint8_t  BRILHO_BRANCO = 140;   // branco fixo é contínuo: brilho menor para não esquentar
+const uint8_t  BRILHO_BRANCO = 255;   // o limite de corrente já reduz o branco cheio (~43 W) para ~20 W
 const bool     AZUL_NA_ESQUERDA = true; // metade azul do lado do motorista? (lado de quem olha de dentro)
 
 CRGB leds[N_LEDS];
@@ -104,8 +107,8 @@ void trataBotoes(uint32_t agora) {
 // ---- Principal -------------------------------------------------------
 void setup() {
   for (uint8_t i = 0; i < 3; i++) pinMode(PINO_BOTAO[i], INPUT_PULLUP);
-  FastLED.addLeds<WS2815, PINO_DADOS, ORDEM_CORES>(leds, N_LEDS);
-  FastLED.setMaxPowerInVoltsAndMilliamps(12, LIMITE_mA);
+  FastLED.addLeds<WS2812B, PINO_DADOS, ORDEM_CORES>(leds, N_LEDS);
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, LIMITE_mA);
   pintaTudo(CRGB::Black);
   FastLED.show();
 }

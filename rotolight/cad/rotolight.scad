@@ -4,7 +4,7 @@
 //
 // v0.7: BARRA ÚNICA ao longo do topo do para-brisa, passando acima do
 // retrovisor, só com o básico: dois trilhos impressos que seguram a fita RGB endereçável
-// WS2815 (12 V, 144 LED/m, IP67 em tubo de silicone), a ligação e o cabo
+// escolhida (SEZO WS2812B, 5 V, 144 LED/m, 1 m, IP65 com revestimento de silicone), a ligação e o cabo
 // que sai para a controladora. A fita já é impermeável: não há janela nem
 // policarbonato na frente. Braços, docas, ventosas e pontos de fixação
 // saíram nesta versão (a fixação será definida depois). O limite da mesa
@@ -45,16 +45,17 @@ lab = 1.6;            // espessura do lábio de trás
 sob_lab = 2.0;        // quanto o lábio e o ombro cobrem o alumínio em cada borda
 p_tb = 2.0;           // parede de cima e de baixo, sobre a ranhura
 
-/* [Fita WS2815 IP67] */
-w_fita = 16;          // largura do tubo de silicone (MEDIR a fita comprada)
-e_fita = 5.5;         // espessura do tubo de silicone (MEDIR)
-x_fita = [12, L_barra - 36];  // trecho de fita (a ponta x = L tem o PG7; as línguas das tampas ocupam 8 mm em cada ponta)
+/* [Fita SEZO WS2812B IP65, 1 m] */
+w_fita = 12;          // largura com o silicone (MEDIR a fita comprada)
+e_fita = 3;           // espessura com o silicone (MEDIR)
+L_fita = 1000;        // 1 rolo = 1 m = 144 LEDs
+x_fita = [L_barra - 36 - L_fita, L_barra - 36];  // a ponta x = L tem o PG7; as línguas das tampas ocupam 8 mm em cada ponta
 x_pg7 = L_barra - 22;         // PG7 pelo alumínio (cabo para a caixa); contraporca até SW17
 d_M3_piloto = 2.5;
 d_M3_passante = 3.4;
 
 H = w_al + 2 * (g_al + p_tb);        // altura total (29,8)
-D = lab + t_al + 2 * g_al + e_fita + 1.5;   // profundidade: a parede passa 1,5 mm da fita
+D = lab + t_al + 2 * g_al + e_fita + 2.5;   // profundidade: o trilho passa 2,5 mm da fita (cabe a contraporca do PG7 de 5 mm)
 // derivados do corte
 z_g = [(H - w_al) / 2 - g_al, (H + w_al) / 2 + g_al];     // ranhura do alumínio (z)
 y_g = [D - lab - t_al - 2 * g_al, D - lab];               // ranhura do alumínio (y)
@@ -159,28 +160,29 @@ module gabarito_furacao() {
 // ---------------------------------------------------------------------
 // CONTROLADORA: caixa mínima em forma de seixo (todas as arestas boleadas),
 // onde chega o cabo da barra. Dentro: Arduino Nano (fios soldados direto,
-// sem adaptador), buck 5 V e uma plaquinha com o TVS, o capacitor e o
-// resistor da linha de dados. Na tampa, 3 botões metálicos de 12 mm com
+// sem adaptador), conversor 12 V → 5 V de 10 A (alimenta a fita de 5 V e o
+// Nano) e uma plaquinha com o TVS, o capacitor e o resistor da linha de dados. Na tampa, 3 botões metálicos de 12 mm com
 // os modos pré-programados, com o nome gravado ao lado:
 //   VM = pisca vermelho · AZ|VM = pisca metade azul / metade vermelho ·
 //   BR = acende branco. Tocar de novo no botão do modo ativo apaga.
 // Local: interior a partir de (0, 0, 0); parede dos prensa-cabos em x = 0.
-cx_int = [90, 50, 28];   // interior (x, y, altura) — medir as placas antes
+cx_int = [136, 60, 30];  // interior (x, y, altura) — medir as placas antes
 p_cx = 2.4;              // parede
 r_cx = 7;                // raio dos cantos e arestas (por fora)
 z_corte = cx_int[2] - 4; // altura do corte base/tampa (a tampa leva os botões)
 d_botao = 12.2;
-xs_botao = [47, 64, 81]; // botões ao longo de x, no meio da largura (sobre as placas baixas)
+xs_botao = [22, 38, 54]; // botões ao longo de x, sobre o Nano (placa baixa)
+y_botao = 40;
 nomes_botao = ["VM", "AZ|VM", "BR"];
 pg = [[12.7, 12], [12.7, 38]];   // [furo, y]: PG7 da alimentação e PG7 do cabo da barra (contraporca até SW17)
 z_pg = 13;               // centro dos prensa-cabos acima do fundo interno
 // [nome, [x, y] do canto, [comprimento, largura], altura]
 modulos = [
     ["plaquinha TVS/capacitor/resistor", [15, 3],  [22, 20], 12],
-    ["buck 5 V",                         [40, 3],  [22, 17],  6],
-    ["Arduino Nano",                     [15, 27], [44, 19],  5]];
-// 3 postes: um entre os prensa-cabos e dois na ponta oposta
-xy_postes = [[10, 25], [cx_int[0] - 5, 5], [cx_int[0] - 5, cx_int[1] - 5]];
+    ["Arduino Nano",                     [15, 30], [44, 19],  5],
+    ["conversor 12→5 V 10 A",            [62, 4],  [64, 52], 24]];   // MEDIR o conversor comprado
+// 3 postes: um entre os prensa-cabos e dois na ponta oposta, além do conversor
+xy_postes = [[10, 25], [cx_int[0] - 4.5, 5], [cx_int[0] - 4.5, cx_int[1] - 5]];
 // sólido arredondado: casca convexa de 8 esferas
 module seixo(c, r, z0, z1) {
     hull() for (x = [r, c[0] - r], y = [r, c[1] - r], z = [z0 + r, z1 - r]) translate([x, y, z]) sphere(r = r);
@@ -195,9 +197,9 @@ module caixa_completa() {
         corpo_cx(0);
         corpo_cx(p_cx);
         for (q = pg) translate([-p_cx - 1, q[1], z_pg]) rotate([0, 90, 0]) cylinder(d = q[0], h = p_cx + 2);
-        for (i = [0 : 2]) translate([xs_botao[i], cx_int[1] / 2, cx_int[2] - 1]) cylinder(d = d_botao, h = p_cx + 3);
+        for (i = [0 : 2]) translate([xs_botao[i], y_botao, cx_int[2] - 1]) cylinder(d = d_botao, h = p_cx + 3);
         // nomes gravados (0,6 mm) ao lado de cada botão
-        for (i = [0 : 2]) translate([xs_botao[i], cx_int[1] / 2 + 12, cx_int[2] + p_cx - 0.6])
+        for (i = [0 : 2]) translate([xs_botao[i], y_botao - 12, cx_int[2] + p_cx - 0.6])
             linear_extrude(1) text(nomes_botao[i], size = 4, halign = "center", valign = "center", font = "Liberation Sans:style=Bold");
     }
 }
