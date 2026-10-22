@@ -4,9 +4,9 @@ Projeto modular de barra de luz de emergência com **144 LEDs em fita** (vermelh
 
 Desenho **orgânico**: a frente de cada meia-barra acompanha a curvatura do para-brisa (raio medido no carro, parâmetro `R_vidro`), as arestas e pontas são arredondadas e as peças de fixação têm transições suaves.
 
-Status: **v0.6, projeto.** Nada foi fabricado nem testado em bancada. Na v0.6 a barra passou a usar **fita de LED**, e a caixa de controle virou uma caixa **separada** (sob o painel) com **módulos prontos** da Shopee/AliExpress. Não há mais placa a desenhar. Falta comprar, montar e fazer os testes de brilho ao sol e térmico (ver "Pendências").
+Status: **v0.7 em andamento.** A barra virou **uma só, ao longo do topo do para-brisa** (passa acima do retrovisor), com **fita RGB endereçável WS2815 IP67** colada numa barra chata de alumínio 1" × 1/8" e presa por **dois trilhos impressos** e **duas tampas de ponta**. A **controladora** é uma caixa mínima (≈ 95 × 55 × 31 mm) com 3 botões: pisca vermelho, pisca metade azul / metade vermelho e branco fixo. Os braços e as docas saíram; o **suporte** é a próxima etapa. Nesta etapa o limite da mesa da impressora foi deixado de lado (trilho de 1100 mm). **Os docs 01–05 abaixo ainda descrevem a v0.6** e serão atualizados ao fechar a v0.7.
 
-![Meia-barra montada](cad/meia_barra_frente.png)
+![Controladora](cad/controladora.png)
 
 ## Visão geral
 
