@@ -10,7 +10,8 @@ Com o paquímetro e uma trena, anote:
 | Distância do parafuso do quebra-sol até o retrovisor, ao longo do vidro | comprimento do braço | `L_fixo`, `L_corr` |
 | Inclinação do parabrisa (app de nível do celular apoiado no vidro) | aba da ventosa | `angulo_vidro` |
 | Curvatura do para-brisa em planta: estique uma linha entre as colunas A rente ao topo do vidro (corda *c*) e meça a flecha *f* no centro; **R = c² / (8·f)** | frente curva das meias-barras | `R_vidro` (padrão 3000 mm) |
-| Até onde o suporte do quebra-sol cobre a doca, medido a partir do parafuso | trecho fino da doca | `L_lingueta` (padrão 16 mm) |
+| Posição dos **dois** parafusos do suporte do quebra-sol (distância entre eles e direção em relação ao braço) | furos oblongos da doca | `parafusos_doca` (padrão: 26 mm, alinhados com o braço) |
+| Até onde o suporte do quebra-sol cobre a doca, medido a partir do parafuso mais próximo do braço | trecho fino da doca | `L_lingueta` (padrão 16 mm) |
 | Folga entre o forro do teto e o vidro, à frente da haste do quebra-sol | caber o braço (14 mm de altura) | — |
 | Onde fica o airbag de cortina (manual do veículo) | **a doca e o braço não podem ficar no caminho** | — |
 
@@ -71,8 +72,8 @@ Faixa de ajuste com os valores-padrão: do pino da doca até a ponta externa da 
 
 ## 4.7 Instalação no carro (uma vez, com ferramenta)
 
-1. Solte **um** parafuso do suporte do quebra-sol (o mais próximo do centro do carro).
-2. Passe a lingueta da doca sob o suporte, recoloque o parafuso e aperte com o torque original. Se o parafuso ficar curto, troque por um de mesma rosca, 3 mm mais longo.
+1. Solte os **dois** parafusos do suporte do quebra-sol (segure o quebra-sol).
+2. Passe a placa da doca sob o suporte, recoloque os dois parafusos pelos furos oblongos e aperte com o torque original. Se os parafusos ficarem curtos, troque por outros de mesma rosca, 3 mm mais longos.
 3. Confira se o quebra-sol continua abrindo e fechando normalmente.
 4. Repita do outro lado. **As docas ficam no carro.**
 

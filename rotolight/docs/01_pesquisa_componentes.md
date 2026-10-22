@@ -1,7 +1,7 @@
 # 1 — Pesquisa de componentes e decisões de projeto
 
 Projeto: Rotolight LED para parabrisa de viatura descaracterizada (PCDF, 8ª DP)
-Versão: v0.3 (projeto, ainda não fabricado), 22/10/2026 — forma orgânica e correções das auditorias independentes (rodadas 1 e 2)
+Versão: v0.4 (projeto, ainda não fabricado), 22/10/2026 — forma orgânica, correções das auditorias independentes e doca ancorada em dois parafusos
 
 > Valores marcados com **(confirmar)** vêm de datasheet de distribuidor ou de estimativa de engenharia e têm de ser conferidos no datasheet oficial ou em bancada antes da compra/fabricação.
 
@@ -27,7 +27,7 @@ Fontes: [Res. CONTRAN 970/2022 (LegisWeb)](https://www.legisweb.com.br/legislaca
 | Acionamento | Strings de **3 LEDs** + **regulador de corrente linear 350 mA** por string; MOSFET low-side por canal | Corrente constante na faixa 12,0–14,4 V sem indutores, sem ruído de rádio, montagem simples |
 | Controlador | **Arduino Nano** (ATmega328P, 5 V) | Lógica de 5 V aciona bem os MOSFETs, programa pelo USB no Zorin (Arduino IDE), barato e fácil de trocar |
 | Dissipação | **Tampa traseira de alumínio** (barra chata 1-1/2" × 1/8") com a placa de LEDs colada nela | A tampa é o próprio dissipador, voltado para o ar da cabine |
-| Fixação | **Doca** sob o parafuso do quebra-sol + **braço telescópico** + articulações sem ferramenta + **1 ventosa por meia-barra** (2 no total) | Atende ao requisito "sem ventosa como fixação principal; no máximo duas auxiliares" |
+| Fixação | **Doca** presa pelos dois parafusos do suporte do quebra-sol + **braço telescópico** + articulações sem ferramenta + **1 ventosa por meia-barra** (2 no total) | Atende ao requisito "sem ventosa como fixação principal; no máximo duas auxiliares" |
 
 ---
 
@@ -166,7 +166,7 @@ Configuração sugerida para PETG funcional: 4–6 paredes, 5 camadas sólidas e
 
 ## 1.10 Fixação no quebra-sol (avaliação)
 
-- **Escolhido:** "doca" presa **sob o suporte do quebra-sol**, aproveitando **um dos parafusos originais** (furo oblongo de 12 mm de curso para ajuste). Só o trecho que fica preso sob o suporte (`L_lingueta`, 16 mm por padrão) tem 2,5 mm; dali em diante a doca tem a altura toda do soquete (14,4 mm), porque é essa seção que recebe o momento do braço. Instala uma vez com chave; depois, **a barra entra e sai sem ferramentas** (encaixe + pino magnético).
+- **Escolhido (v0.4, decisão do usuário):** "doca" presa **sob o suporte do quebra-sol** pelos **dois parafusos originais** (`parafusos_doca`, furos oblongos de ±5 mm para ajuste). Com dois parafusos o suporte prende a placa fina de verdade e o momento do braço vira um binário nos parafusos (≈ 70 N por parafuso a 1 g com 26 mm entre eles), em vez de dobrar a placa. Só o trecho que fica preso sob o suporte (`L_lingueta`, 16 mm por padrão) tem 2,5 mm; dali em diante a doca tem a altura toda do soquete (14,4 mm), porque é essa seção que recebe o momento do braço. Instala uma vez com chave; depois, **a barra entra e sai sem ferramentas** (encaixe + pino magnético).
 - **Por que mudou (v0.2):** na v0.1 a lingueta de 26 × 2,5 mm ia do parafuso ao soquete e levava todo o momento do braço em balanço (≈ 1,7 N·m): ≈ 62 MPa a 1 g, acima da resistência do PETG (~45–50 MPa). **Atenção (auditoria v0.2):** encurtar o trecho fino não basta. O momento do braço continua passando pela seção de 2,5 mm na borda do suporte (≈ 65 MPa a 1 g), a não ser que o suporte do quebra-sol aperte a lingueta com rigidez até essa borda, o que só o carro real responde. Para aguentar com folga, a doca precisa ser de **alumínio** (lingueta de 5 mm, parafuso do quebra-sol 5 mm mais longo) ou ancorada nos **dois** parafusos do suporte. **Medir no carro** até onde o suporte do quebra-sol cobre a lingueta e ajustar `L_lingueta`: o degrau tem de ficar logo na borda do suporte.
 - O parafuso original pode ficar curto com a doca embaixo: medir e, se preciso, usar um parafuso de mesma rosca 3 mm mais longo.
 - A doca sob pressão do parafuso, em PETG, pode **fluir (creep)** no calor. Se a barra começar a folgar, refazer a doca em **chapa de alumínio de 2 mm** (o desenho serve de gabarito).

@@ -77,6 +77,11 @@ fenda = t_aba + 0.4;   // vão do garfo
 b_inf = 5;             // bochecha com a cabeça M5 cativa
 b_sup = 4.5;           // bochecha da porca/manopla
 L_lingueta = 16;       // trecho fino da doca que fica sob o suporte do quebra-sol (medir)
+// Os DOIS parafusos do suporte do quebra-sol, em coordenadas da doca
+// (x ao longo do braço, a partir do primeiro parafuso; medir no carro).
+// Furos oblongos de ±folga_oblongo em x para ajuste.
+parafusos_doca = [[-22, 0], [4, 0]];
+folga_oblongo = 5;
 
 /* [Caixa de controle] */
 x_caixa = 108;         // posição na meia-barra esquerda (cobre 3 colunas de parafusos,
@@ -439,11 +444,12 @@ module engate() {
     translate([28 + 18, 0, z_eng]) garfo(20, dy_eng);
 }
 
-// DOCA: lingueta fina (2,5 mm) só no trecho preso sob o suporte do
-// quebra-sol (L_lingueta, com furo oblongo para o parafuso original); a
-// partir daí o corpo tem a altura toda do soquete, que recebe o momento do
-// braço. Canal para o engate, furo do pino e alojamento do ímã.
-// Base da lingueta em z=0.
+// DOCA: placa fina (2,5 mm) presa sob o suporte do quebra-sol pelos DOIS
+// parafusos originais (parafusos_doca). Com dois parafusos o suporte prende
+// a placa de verdade e o momento do braço vira um binário nos parafusos, em
+// vez de dobrar a placa fina. A partir de x = L_lingueta, fora do suporte,
+// o corpo tem a altura toda do soquete: canal para o engate (com frisos de
+// aperto), furo do pino e alojamento do ímã. Base da placa em z=0.
 module doca() {
     x_sq = L_lingueta; L_sq = 35; z_canal = e_doca; h_canal = h_canal_doca;
     h_sq = z_canal + h_canal + 3.1;
@@ -451,7 +457,8 @@ module doca() {
     difference() {
         union() {
             hull() {
-                translate([4, 0, 0]) cylinder(d = 26, h = e_doca);
+                for (q = parafusos_doca) translate([q[0], q[1], 0])
+                    hull() for (dx = [-folga_oblongo, folga_oblongo]) translate([dx, 0, 0]) cylinder(d = 22, h = e_doca);
                 translate([x_sq, -13, 0]) placa_arr(L_sq, 26, e_doca, 4);
             }
             hull() {
@@ -459,7 +466,8 @@ module doca() {
                 translate([x_sq + 2, -10, 0]) placa_arr(L_sq - 4, 20, h_sq, 4);
             }
         }
-        hull() for (x = [2, 12]) translate([x, 0, -1]) cylinder(d = d_parafuso_quebra_sol, h = 5);
+        for (q = parafusos_doca) translate([q[0], q[1], -1])
+            hull() for (dx = [-folga_oblongo, folga_oblongo]) translate([dx, 0, 0]) cylinder(d = d_parafuso_quebra_sol, h = e_doca + 2);
         translate([x_canal, -7 - 0.2, z_canal]) cube([L_sq, 14.4, h_canal]);
         translate([x_canal + 12, 0, 1]) cylinder(d = d_pino_doca, h = 20);
         translate([x_canal - 3, 0, h_sq - h_ima]) cylinder(d = d_ima, h = 5);

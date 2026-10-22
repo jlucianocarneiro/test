@@ -4,7 +4,7 @@ Projeto modular de barra de luz de emergência com **72 LEDs** (vermelho, azul, 
 
 Desenho **orgânico**: a frente de cada meia-barra acompanha a curvatura do para-brisa (raio medido no carro, parâmetro `R_vidro`), as arestas e pontas são arredondadas e as peças de fixação têm transições suaves.
 
-Status: **v0.3, projeto.** Nada foi fabricado nem testado em bancada. Falta desenhar as PCBs (KiCad) e fazer o teste térmico (ver "Pendências").
+Status: **v0.4, projeto.** Nada foi fabricado nem testado em bancada. Falta desenhar as PCBs (KiCad) e fazer o teste térmico (ver "Pendências").
 
 ![Meia-barra montada](cad/meia_barra_frente.png)
 
@@ -21,7 +21,7 @@ Status: **v0.3, projeto.** Nada foi fabricado nem testado em bancada. Falta dese
 | **Meia-barra** (×2, espelhadas) | carcaça + junta TPU | 36 LEDs atrás de janela de policarbonato; a tampa traseira de alumínio é também o dissipador |
 | **Braço** (×2, iguais) | adaptador, braço corrediça, braço fixo, engate, 3 manoplas | Telescópico (passos de 10 mm) + 2 articulações verticais + junta rosácea tipo Hirth (inclinação em passos de 15°, LEDs na horizontal em 0°) |
 | **Extensor** (opcional, empilhável) | extensor | Entra entre o braço fixo e a corrediça e alonga o braço em até 80 mm |
-| **Doca** (×2, iguais) | doca + pino magnético | Fica no carro, sob o parafuso do quebra-sol; a barra encaixa e trava com um pino |
+| **Doca** (×2, iguais) | doca + pino magnético | Fica no carro, presa pelos **dois** parafusos do suporte do quebra-sol; a barra encaixa e trava com um pino |
 | **Controle** (×1) | caixa + tampa | Arduino Nano, 12 canais MOSFET, proteção de entrada, pulsador |
 
 Os módulos se ligam entre si só por parafusos, pinos e encaixes: qualquer um pode ser trocado ou reimpresso sozinho, e a maior peça (a carcaça, 251 mm) cabe na mesa da A1.
@@ -51,7 +51,7 @@ cd rotolight/cad
 ./exportar.sh            # requer openscad; a conferência usa python3 + trimesh
 ```
 
-Parâmetros que dependem do carro (topo do `.scad`): `R_vidro`, `d_parafuso_quebra_sol`, `L_lingueta`, `L_fixo`, `L_corr`, `angulo_vidro`. Ver doc 04, seção 4.0.
+Parâmetros que dependem do carro (topo do `.scad`): `R_vidro`, `d_parafuso_quebra_sol`, `parafusos_doca`, `L_lingueta`, `L_fixo`, `L_corr`, `angulo_vidro`. Ver doc 04, seção 4.0.
 
 ## Números principais
 
@@ -73,4 +73,4 @@ Parâmetros que dependem do carro (topo do `.scad`): `R_vidro`, `d_parafuso_queb
 5. **Medidas do veículo** (parafuso do quebra-sol, airbag de cortina, folga do forro) ainda não conferidas num carro real.
 6. Firmware testado **só em simulação no PC** (lógica dos padrões e limite de corrente); falta gravar e testar no Nano.
 7. **Peso acima da meta:** a auditoria estimou ~570 g no mínimo e ~700 g realista (barra + braços, sem cabo), contra a meta de 500 g. O alumínio sozinho pesa ~150 g. Baixar o peso pede uma decisão de projeto (ver relatório da avaliação).
-8. **Rigidez e resistência da fixação (bloqueia a aprovação):** a doca de PETG, com 2,5 mm sob o suporte do quebra-sol, leva o momento do braço em balanço e passa da resistência do PETG já a 1 g (~65 MPa, auditoria v0.2). Língua e corrediça passam de 45 MPa a 5 g. Com a ventosa carregando parte do peso os números caem, mas o requisito diz que a ventosa é só auxiliar. Saídas: doca de alumínio de 5 mm, ancoragem nos dois parafusos do suporte, ou aceitar a ventosa como apoio estrutural. **Decisão do usuário.**
+8. **Resistência da fixação (decisão do usuário, v0.4):** a doca agora é **ancorada nos dois parafusos** do suporte do quebra-sol, que prendem a placa fina; o momento do braço vira um binário nos parafusos e a seção crítica passa a ser o corpo cheio da doca (~11 MPa a 5 g, estimado). Língua do engate e corrediça ficam acima de 45 MPa num pico de 5 g sem a ventosa. **Decisão:** imprimir tudo em PETG e testar (vibração, buraco, queda); a peça que falhar troca de material (alumínio ou PETG-CF). Peso: aceito acima de 500 g por enquanto. Material: PETG no protótipo, ASA na versão final.

@@ -85,7 +85,7 @@ Os **preços são faixas estimadas** (out/2026, R$, varejo nacional ou AliExpres
 | braco_corredica | 2 | PETG 100 % | 196 × 18 × 20 | de lado |
 | extensor (opcional) | 0–2 | PETG 100 % | 150 × 14 × 18 | de lado; alonga o braço em até 80 mm |
 | engate | 2 | PETG 100 % | 56 × 18 × 20 | de lado |
-| doca | 2 | PETG 100 % (ou alumínio usinado) | 63 × 26 × 14 | lingueta na mesa |
+| doca | 2 | PETG 100 % (alumínio ou PETG-CF se falhar no teste) | 89 × 26 × 14 | placa na mesa |
 | pino | 2 | PETG 100 % | 31 × 14 × 16 | cabeça na mesa |
 | manopla_parafuso | 2 | PETG | 25 × 25 × 10 | plana |
 | manopla_porca | 4 | PETG | 25 × 25 × 10 | plana |
