@@ -89,7 +89,7 @@ Os cortes dos trilhos de cima e de baixo ficam nas mesmas posições (220, 440, 
 | Silicone neutro preto (nas ranhuras: prende e veda a luz) | pouco |
 | Fita de EVA 2 mm × 5 mm, adesiva | 2 × 1,1 m |
 | Tinta spray preta fosca (costas do alumínio, opcional) | pouco |
-| Peças impressas em **PETG preto**: trilho_inf ×1, trilho_sup ×1, tampa_ponta ×2, gabarito ×1 | — |
+| Peças impressas em **PETG preto**: trilho de baixo ×5 trechos, trilho de cima ×5 trechos, tampa_ponta ×2, gabarito ×1 | — |
 
 **Material:** PETG preto, não PLA. Atrás do para-brisa, ao sol, a temperatura passa de 60 °C e o PLA amolece.
 
