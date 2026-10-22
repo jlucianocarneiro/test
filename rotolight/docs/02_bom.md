@@ -14,7 +14,7 @@ Os **preços são faixas estimadas** (out/2026, R$, varejo nacional ou AliExpres
 | 5 | Regulador de corrente onsemi NSI50350ADT4G (DPAK, 350 mA) | 24 (+2) | ou NSV50350 (automotivo) | 80–180 |
 | 6 | Resistor 8,2 Ω 2 W, SMD 2512 | 8 | strings vermelhas | 5–15 |
 | 7 | NTC 10 kΩ B3950, SMD 0805 ou de gota | 1 (+1) | só na placa esquerda | 2–10 |
-| 8 | PCB de alumínio 1 camada 1,6 mm, 211 × 26 mm (JLCPCB) | 2 (lote mín. 5) | **desenhar no KiCad** | 60–150 + frete |
+| 8 | PCB de alumínio 1 camada 1,6 mm, 207 × 24 mm (JLCPCB) | 2 (lote mín. 5) | **desenhar no KiCad** | 60–150 + frete |
 | 9 | Adesivo térmico epóxi (tipo Arctic Silver Thermal Adhesive) | 1 | cola a PCB no alumínio | 40–80 |
 
 ## 2.2 Eletrônica — controle
@@ -46,7 +46,8 @@ Os **preços são faixas estimadas** (out/2026, R$, varejo nacional ou AliExpres
 | 27 | Fio de silicone 22 AWG (vermelho, preto e mais 3 cores), 2 m de cada | 1 kit | 20–40 |
 | 28 | Conector aviação GX16-2 (macho + fêmea de cabo) | 1 par | 15–25 |
 | 29 | Conector aviação GX16-8 (macho + fêmea de cabo) | 1 par | 15–30 |
-| 30 | Prensa-cabo PG7 (nylon, IP68) | 4 | 8–15 |
+| 30 | Prensa-cabo PG7 (nylon, IP68) | 3 | 8–15 |
+| 30a | Passa-fio/anel de vedação de silicone para furo Ø8 (passagem alumínio → caixa) | 1 | 3 |
 | 31 | Espaguete termorretrátil sortido | 1 kit | 15 |
 
 ## 2.4 Mecânica (compradas)
@@ -54,13 +55,15 @@ Os **preços são faixas estimadas** (out/2026, R$, varejo nacional ou AliExpres
 | # | Item | Qtd | Obs. | Faixa R$ |
 |---|---|---|---|---|
 | 32 | Barra chata de alumínio 1-1/2" × 1/8" (38,1 × 3,18 mm) | 2 × 238 mm | tampa traseira/dissipador; vende-se em barra de 1 m | 25–50 |
-| 33 | Chapa de policarbonato 2 mm transparente (preferir com UV) | 2 × (207 × 26 mm) | cortar com estilete e régua | 15–40 |
+| 33 | Chapa de policarbonato 2 mm transparente (preferir com UV) | 2 × (207 × 25 mm) | cortar com estilete e régua | 15–40 |
 | 34 | Parafuso M3 × 16 inox, cabeça panela/Phillips | 18 (+6) | tampa de alumínio (12 por meia-barra; na esquerda, 6 deles são os M3 × 20 da linha 35) | 10–20 |
 | 35 | Parafuso M3 × 20 inox | 6 | atravessam a base da caixa de controle | 5 |
 | 36 | Parafuso M3 × 10 autoatarraxante para plástico | 4 | tampa da caixa | 3 |
-| 37 | Parafuso sextavado M5 × 20 (DIN 933) inox | 6 | 2 rosáceas + 4 articulações | 6–12 |
-| 38 | Porca sextavada M5 inox | 6 | 2 cativas nas carcaças + 4 nas manoplas | 3 |
-| 39 | Pino de aço Ø4 × 40 mm (para os braços telescópicos) ou parafuso M4 × 30 + borboleta | 2 | | 5–10 |
+| 37 | Parafuso sextavado M5 × 25 (DIN 933) inox | 2 | rosáceas (atravessa manopla + adaptador até a porca cativa) | 3–6 |
+| 37a | Parafuso sextavado M5 × 20 (DIN 933) inox | 4 | articulações (cabeça cativa no garfo) | 4–8 |
+| 38 | Porca sextavada M5 **DIN 934** (m = 4,0) inox | 2 | cativas nas carcaças | 2 |
+| 38a | Porca autotravante M5 **DIN 985** (nylon) inox | 4 | dentro das manoplas das articulações | 3 |
+| 39 | Parafuso M4 × 25 cabeça panela + porca borboleta M4 inox | 2 + 2 | trava da corrediça no tubo (cabeça em cima, borboleta embaixo) | 5–10 |
 | 40 | Mini ventosa Ø30 mm com cabeça cogumelo | 2 (+2) | anti-vibração | 10–20 |
 | 41 | Ímã de neodímio Ø10 × 1,5 mm | 4 | **em estoque** | — |
 | 42 | Silicone neutro (cura neutra, não acética) | 1 tubo | janela de PC | 20–35 |
@@ -73,19 +76,20 @@ Os **preços são faixas estimadas** (out/2026, R$, varejo nacional ou AliExpres
 
 | Peça | Qtd | Material | Medidas (mm) | Orientação na mesa |
 |---|---|---|---|---|
-| carcaca_E | 1 | PETG (ASA na versão final) | 251 × 56 × 23 | face frontal (janela) na mesa; suporte só sob a aba da ventosa |
-| carcaca_D | 1 | idem | 251 × 56 × 23 | idem |
+| carcaca_E | 1 | PETG (ASA na versão final) | 252 × 51 × 25 | **face traseira (plana) na mesa**; suporte só sob a aba da ventosa; **sem brim** (ou girar na diagonal) |
+| carcaca_D | 1 | idem | 252 × 51 × 25 | idem |
 | junta_vedacao | 2 | TPU 95A | 238 × 38 × 1 | plana |
-| gabarito_furacao | 1 | PLA ou PETG | 243 × 43 × 5 | plana (ferramenta, não vai no carro) |
-| adaptador | 2 | PETG 100 % | 35 × 16 × 35 | como exportado |
-| braco_fixo | 2 | PETG | 168 × 14 × 28 | de lado (já orientado) |
-| braco_corredica | 2 | PETG 100 % | 192 × 15 × 16 | de lado |
-| engate | 2 | PETG 100 % | 52 × 15 × 16 | de lado |
-| doca | 2 | PETG 100 % (ou alumínio 2 mm usinado) | 63 × 26 × 14 | lingueta na mesa |
-| pino | 2 | PETG 100 % | 25 × 14 × 16 | cabeça na mesa |
+| gabarito_furacao | 1 | PLA ou PETG | 243 × 44 × 5 | plana (ferramenta, não vai no carro) |
+| adaptador | 2 | PETG 100 % | 52 × 20 × 37 | face de cima da aba na mesa (já orientado) |
+| braco_fixo | 2 | PETG | 176 × 14 × 26 | de lado (já orientado) |
+| braco_corredica | 2 | PETG 100 % | 196 × 18 × 20 | de lado |
+| extensor (opcional) | 0–2 | PETG 100 % | 150 × 14 × 18 | de lado; alonga o braço em até 80 mm |
+| engate | 2 | PETG 100 % | 56 × 18 × 20 | de lado |
+| doca | 2 | PETG 100 % (ou alumínio usinado) | 63 × 26 × 14 | lingueta na mesa |
+| pino | 2 | PETG 100 % | 31 × 14 × 16 | cabeça na mesa |
 | manopla_parafuso | 2 | PETG | 25 × 25 × 10 | plana |
 | manopla_porca | 4 | PETG | 25 × 25 × 10 | plana |
 | caixa | 1 | PETG | 124 × 38 × 30 | base na mesa |
-| tampa_caixa | 1 | PETG | 124 × 26 × 5 | plana |
+| tampa_caixa | 1 | PETG | 123 × 26 × 5 | plana |
 
 A **meia-barra direita usa as mesmas peças** de fixação que a esquerda; só a carcaça é espelhada. A caixa de controle vai apenas na esquerda.

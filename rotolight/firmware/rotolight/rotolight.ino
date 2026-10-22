@@ -12,12 +12,12 @@
 // Botão (D2 → GND, pulsador 12 mm IP67 na tampa da caixa de controle):
 //   toque curto (< 0,6 s)   → próximo padrão
 //   toque longo (0,6–2,5 s) → próxima combinação de cores
-//   muito longo (> 2,5 s)   → alterna modo DIA (100 %) / NOITE (30 %)
+//   muito longo (> 2,5 s)   → alterna modo DIA (100 %) / NOITE (31 %)
 // A escolha fica gravada na EEPROM.
 //
 // Proteção térmica: NTC 10k (B3950) na placa de LEDs esquerda, em A6
-// com pull-up de 10k. Acima de 70 °C limita a 30 %; acima de 85 °C
-// limita a 10 %; volta ao normal abaixo de 65 °C.
+// com pull-up de 10k. Acima de 70 °C limita a 31 %; acima de 85 °C
+// limita a 12,5 %; volta ao normal abaixo de 65 °C.
 // =====================================================================
 #include <EEPROM.h>
 #include <avr/pgmspace.h>

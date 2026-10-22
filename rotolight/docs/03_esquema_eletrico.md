@@ -74,11 +74,11 @@ NTC:     +5V ──[10k 1%]──●── A6
 
 **GX16-8 (enlace com a meia-barra direita):** 1 = +12V, 2 = +12V (em paralelo, para dividir a corrente nos fios 24 AWG), 3–8 = retornos da tabela acima.
 
-**Meia-barra esquerda (fios de silicone 22 AWG):** +12V, 6 retornos e 2 fios do NTC (9 fios no PG7).
+**Meia-barra esquerda (fios de silicone 22 AWG):** +12V, 6 retornos e 2 fios do NTC (9 fios), que passam do alumínio direto para a caixa por um furo Ø8 com anel de vedação de silicone.
 
 ## 3.5 Placa de LEDs (cada meia-barra, idênticas)
 
-Grade de 2 fileiras × 18 colunas, passo de 11 mm. Colunas 0–8 = zona externa; 9–17 = zona interna. Na meia-barra direita a placa é girada 180°, então a "coluna 0" também fica na ponta externa.
+Placa de 207 × 24 mm. Grade de 2 fileiras × 18 colunas, passo de 11 mm. Colunas 0–8 = zona externa; 9–17 = zona interna. Na meia-barra direita a placa é girada 180°, então a "coluna 0" também fica na ponta externa.
 
 ```
 coluna:      0  1  2  3  4  5  6  7  8 | 9 10 11 12 13 14 15 16 17

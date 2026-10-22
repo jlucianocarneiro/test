@@ -1,7 +1,7 @@
 # 1 — Pesquisa de componentes e decisões de projeto
 
 Projeto: Rotolight LED para parabrisa de viatura descaracterizada (PCDF, 8ª DP)
-Versão: v0.1 (projeto, ainda não fabricado), 22/10/2026
+Versão: v0.2 (projeto, ainda não fabricado), 22/10/2026 — forma orgânica e correções da auditoria independente
 
 > Valores marcados com **(confirmar)** vêm de datasheet de distribuidor ou de estimativa de engenharia e têm de ser conferidos no datasheet oficial ou em bancada antes da compra/fabricação.
 
@@ -21,7 +21,7 @@ Fontes: [Res. CONTRAN 970/2022 (LegisWeb)](https://www.legisweb.com.br/legislaca
 
 | Item | Decisão | Motivo |
 |---|---|---|
-| Formato | **Duas meias-barras idênticas** (espelhadas), uma de cada lado do retrovisor interno | O retrovisor e o sensor de chuva ocupam o centro do parabrisa; cada meia-barra (238 mm) cabe inteira na A1 sem emenda |
+| Formato | **Duas meias-barras idênticas** (espelhadas), uma de cada lado do retrovisor interno, com **frente curva** que acompanha o arco do para-brisa e cantos arredondados | O retrovisor e o sensor de chuva ocupam o centro do parabrisa; cada meia-barra (238 mm) cabe inteira na A1 sem emenda; a curvatura (raio `R_vidro`) deixa a barra rente ao vidro em toda a extensão |
 | LEDs | **72 LEDs** = 2 × 36; cada meia-barra tem 2 fileiras × 18 colunas, passo 11 mm | 24 vermelhos + 24 azuis + 24 brancos, intercalados (VM-BR-AZ na fileira de cima, AZ-VM-BR na de baixo) para qualquer combinação ficar uniforme |
 | Zonas | **4 zonas** (esq. externa, esq. interna, dir. interna, dir. externa) × 3 cores = **12 canais** | Permite padrões alternados, cruzados, centro/pontas e perseguição |
 | Acionamento | Strings de **3 LEDs** + **regulador de corrente linear 350 mA** por string; MOSFET low-side por canal | Corrente constante na faixa 12,0–14,4 V sem indutores, sem ruído de rádio, montagem simples |
@@ -98,10 +98,10 @@ O resistor do vermelho tira parte do calor de cima do CCR. Com o motor desligado
 | Opção | Veredito |
 |---|---|
 | FR4 | Descartado para os LEDs: não tira calor de 36 LEDs + 12 CCRs |
-| **PCB de alumínio (MCPCB) 1 camada, 1,6 mm, 211 × 26 mm, uma por meia-barra (idênticas)** | **Escolhido.** A JLCPCB fabrica alumínio de 1 camada; uma placa longa elimina fios entre módulos |
+| **PCB de alumínio (MCPCB) 1 camada, 1,6 mm, 207 × 24 mm, uma por meia-barra (idênticas)** | **Escolhido.** A JLCPCB fabrica alumínio de 1 camada; uma placa longa elimina fios entre módulos |
 | Módulos segmentados (6 cabeças por lado) | Mais conectores e mais pontos de falha; só vale se a placa longa ficar cara |
 
-Na placa de LEDs ficam 36 LEDs, 12 CCRs (DPAK), 4 resistores de 8,2 Ω 2512, 1 NTC 10 k (só a placa esquerda precisa) e os pads de saída (12V, 6 retornos, NTC).
+Placa de LEDs: **207 × 24 mm** (x de 6 a 213 mm a partir da ponta externa). Nela ficam 36 LEDs, 12 CCRs (DPAK), 4 resistores de 8,2 Ω 2512, 1 NTC 10 k (só a placa esquerda precisa) e os pads de saída (12V, 6 retornos, NTC).
 A placa portadora do Nano (FR4) leva os 12 MOSFETs, o LM2936, o TVS e os capacitores. Para o protótipo serve placa perfurada com os AO3400A em adaptadores SOT-23→DIP.
 
 **Pendente:** desenhar as duas placas no KiCad (o esquema elétrico está no doc 03).
@@ -111,7 +111,7 @@ A placa portadora do Nano (FR4) leva os 12 MOSFETs, o LM2936, o TVS e os capacit
 ## 1.5 Óptica
 
 - **Lente TIR Ø10 mm para 3535** (família Carclo 10 mm para XP-E/XP-E2, ou genéricas "lente 10 mm 3535"), feixe de 25–30°. Concentra a luz para a frente, que é o que garante visibilidade sob sol direto. Altura útil prevista no CAD: 7 mm (**confirmar** no modelo comprado).
-- **Janela frontal: policarbonato 2 mm, transparente**, 207 × 26 mm, colada por dentro da carcaça com silicone neutro. PC suporta impacto e calor; prefira o PC com proteção UV.
+- **Janela frontal: policarbonato 2 mm, transparente**, 207 × 25 mm, colada por dentro da carcaça com silicone neutro. Ela verga sem esforço para acompanhar a frente curva (flecha de ~2,4 mm). PC suporta impacto e calor; prefira o PC com proteção UV.
 - **Anti-reflexo:** o vidro do parabrisa reflete parte da luz de volta para a cabine. Coloque uma tira de EVA preto fosco (5 mm) entre a borda inferior da carcaça e o vidro, de ponta a ponta, para o motorista não ser ofuscado. Esse item é obrigatório.
 
 ---
@@ -135,7 +135,7 @@ A placa portadora do Nano (FR4) leva os 12 MOSFETs, o LM2936, o TVS e os capacit
 | Material | Tg aprox. | Veredito |
 |---|---|---|
 | PLA | ~60 °C | **Proibido.** Deforma no carro ao sol |
-| **PETG** | ~80 °C | **Usar no protótipo e nas peças de fixação.** No limite para 80 °C: imprimir em cor clara nas peças expostas e conferir a deformação após o teste ao sol |
+| **PETG** | ~80 °C | **Usar no protótipo e nas peças de fixação.** No limite para 80 °C: imprimir em cor clara nas peças expostas e conferir a deformação após o teste ao sol. A carcaça e a caixa encostam no alumínio, que pode passar de 85 °C: nelas, PETG só no protótipo |
 | ASA | ~100 °C, resistente a UV | **Ideal para a carcaça definitiva.** Na A1 aberta (sem câmara) entorta em peças de 238 mm; tentar com brim, mesa a 100 °C e abrigo contra correntes de ar |
 | TPU 95A | — | Junta de vedação e pé anti-vibração |
 
@@ -148,7 +148,7 @@ Configuração sugerida para PETG funcional: 4–6 paredes, 5 camadas sólidas e
 | Trecho | Cabo | Conector |
 |---|---|---|
 | Acendedor → caixa de controle (1,8 m) | PP 2 × 0,75 mm² (OD ~6 mm) | Plugue de acendedor **com fusível 5 A e chave liga/desliga** + **GX16-2** em linha perto da barra (desconexão rápida) |
-| Caixa → meia-barra esquerda | Fios de silicone 22 AWG, direto pelo prensa-cabo da tampa de alumínio | — (as duas peças ficam montadas juntas) |
+| Caixa → meia-barra esquerda | Fios de silicone 22 AWG, do alumínio direto para a caixa (furo Ø8 + anel de silicone) | — (as duas peças ficam montadas juntas) |
 | Caixa → meia-barra direita (~0,6 m) | Cabo manga 8 vias 24 AWG (OD ~5,5 mm); o 12 V usa 2 vias | **GX16-8** em linha |
 | Vedação | Prensa-cabo **PG7** (cabos de 3–6,5 mm) | — |
 
@@ -166,7 +166,8 @@ Configuração sugerida para PETG funcional: 4–6 paredes, 5 camadas sólidas e
 
 ## 1.10 Fixação no quebra-sol (avaliação)
 
-- **Escolhido:** "doca" de 2,5 mm de espessura, presa **sob o suporte do quebra-sol**, aproveitando **um dos parafusos originais** (furo oblongo de 12 mm de curso para ajuste). Instala uma vez com chave; depois, **a barra entra e sai sem ferramentas** (encaixe + pino magnético).
+- **Escolhido:** "doca" presa **sob o suporte do quebra-sol**, aproveitando **um dos parafusos originais** (furo oblongo de 12 mm de curso para ajuste). Só o trecho que fica preso sob o suporte (`L_lingueta`, 16 mm por padrão) tem 2,5 mm; dali em diante a doca tem a altura toda do soquete (14,4 mm), porque é essa seção que recebe o momento do braço. Instala uma vez com chave; depois, **a barra entra e sai sem ferramentas** (encaixe + pino magnético).
+- **Por que mudou (v0.2):** na v0.1 a lingueta de 26 × 2,5 mm ia do parafuso ao soquete e levava todo o momento do braço em balanço (≈ 1,7 N·m): ≈ 62 MPa a 1 g, acima da resistência do PETG (~45–50 MPa). Agora a seção crítica é a do soquete, ≈ 11 MPa a 5 g. **Medir no carro** até onde o suporte do quebra-sol cobre a lingueta e ajustar `L_lingueta`: o degrau tem de ficar logo na borda do suporte.
 - O parafuso original pode ficar curto com a doca embaixo: medir e, se preciso, usar um parafuso de mesma rosca 3 mm mais longo.
 - A doca sob pressão do parafuso, em PETG, pode **fluir (creep)** no calor. Se a barra começar a folgar, refazer a doca em **chapa de alumínio de 2 mm** (o desenho serve de gabarito).
 - **Plano B** (carros onde o suporte não permite a doca): abraçadeira na haste do quebra-sol. Fica para uma v0.2, se necessário.
