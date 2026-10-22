@@ -1,6 +1,6 @@
 # 2 — Lista de materiais (BOM)
 
-Quantidades para **uma barra completa** (2 meias-barras + controle).
+Quantidades para **uma barra completa** (2 meias-barras + controle). Para a eletrônica com links de compra (Mercado Livre / Shopee), veja o **doc 05**.
 Os **preços são faixas estimadas** (out/2026, R$, varejo nacional ou AliExpress) só para orçamento. **Conferir na hora da compra.** Os custos de impressão (gramas, tempo, filamento) **não estão aqui de propósito**: saem do fatiador (Bambu Studio) depois de fatiar os `.3mf`.
 
 ## 2.1 Eletrônica — placas de LEDs (×2, idênticas)
@@ -11,7 +11,7 @@ Os **preços são faixas estimadas** (out/2026, R$, varejo nacional ou AliExpres
 | 2 | LED 3535 azul 1–3 W (XP-E2 blue ou genérico 460–470 nm) | 24 (+3) | | 40–200 |
 | 3 | LED 3535 branco 1–3 W (XP-E2 white ou genérico 6000 K) | 24 (+3) | | 40–200 |
 | 4 | Lente TIR Ø10 mm para 3535, 25–30° | 72 (+6) | conferir altura ≤ 7 mm | 60–200 |
-| 5 | Regulador de corrente onsemi NSI50350ADT4G (DPAK, 350 mA) | 24 (+2) | ou NSV50350 (automotivo) | 80–180 |
+| 5 | Regulador de corrente onsemi NSI50350 (350 mA) | 24 (+2) | DPAK (ADT4G) na LCSC/Digi-Key; no Mercado Livre só achei o **AST3G (SMC)**: a placa de LEDs deve usar o footprint do que for comprado (ver doc 05) | 80–180 |
 | 6 | Resistor 8,2 Ω 2 W, SMD 2512 | 8 | strings vermelhas | 5–15 |
 | 7 | NTC 10 kΩ B3950, SMD 0805 ou de gota | 1 (+1) | só na placa esquerda | 2–10 |
 | 8 | PCB de alumínio 1 camada 1,6 mm, 207 × 24 mm (JLCPCB) | 2 (lote mín. 5) | **desenhar no KiCad** | 60–150 + frete |

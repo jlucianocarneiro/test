@@ -35,7 +35,8 @@ rotolight/
 │   ├── 01_pesquisa_componentes.md ← pesquisa, decisões, legislação, térmica, links
 │   ├── 02_bom.md                  ← lista de materiais com faixas de custo
 │   ├── 03_esquema_eletrico.md     ← esquema, mapa de canais, layout dos LEDs
-│   └── 04_instrucoes_montagem.md  ← impressão, montagem, instalação, testes
+│   ├── 04_instrucoes_montagem.md  ← impressão, montagem, instalação, testes
+│   └── 05_lista_compras_eletronica.md ← eletrônicos com links do Mercado Livre/Shopee
 ├── cad/
 │   ├── rotolight.scad             ← modelo paramétrico (todas as peças)
 │   ├── exportar.sh                ← gera STL + 3MF e confere se cabe na A1
