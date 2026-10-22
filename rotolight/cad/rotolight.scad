@@ -153,7 +153,7 @@ module gabarito_furacao() {
             translate([-2.4, -2.4, 0]) cube([2.4, w_al + 4.8, 2 + t_al]);
         }
         // centro do PG7 medido a partir da ponta do alumínio que fica em x = L_barra
-        translate([L_barra - 3 - x_pg7, w_al / 2, -1]) cylinder(d = 3, h = 5);
+        translate([(L_barra - 0.3) - x_pg7, w_al / 2, -1]) cylinder(d = 3, h = 5);   // o alumínio termina 0,3 mm antes da ponta
     }
 }
 
