@@ -9,7 +9,7 @@
 // Uso:  openscad -D 'peca="carcaca_E"' -o carcaca_E.stl rotolight.scad
 // Peças: montagem, meia_barra, carcaca_E, carcaca_D, junta_vedacao, adaptador,
 //        braco_fixo, braco_corredica, extensor, engate, doca, pino, manopla_parafuso,
-//        manopla_porca, caixa, tampa_caixa, gabarito_furacao
+//        manopla_porca, caixa_controle, tampa_controle, gabarito_furacao
 // =====================================================================
 
 peca = "montagem";
@@ -26,14 +26,20 @@ p_frente = 2.4;       // parede frontal (6 perímetros de 0.4)
 p_tb = 6;             // paredes superior/inferior (recebem parafusos M3; junta ≥ 1,2 mm ao lado do furo)
 p_ext = 6;            // paredes das pontas (junta ≥ 1,3 mm ao lado do furo)
 
-/* [LEDs e óptica] */
-passo_led = 11;       // passo entre LEDs (lente TIR Ø10)
-colunas = 18;         // 18 colunas × 2 fileiras = 36 LEDs por meia-barra
-dz_fileira = 5.5;     // meia distância entre as duas fileiras
+/* [LEDs: fita de LED] */
+// v0.6: três fileiras de fita 12 V de 5 mm (2835, 120 LED/m, corte a cada
+// 3 LEDs = 25 mm), coladas direto na tampa de alumínio, que é o dissipador.
+// Fileira de cima vermelha, do meio branca, de baixo azul. Cada fileira tem
+// dois trechos de 100 mm (zona externa e interna) = 12 LEDs por trecho;
+// 72 LEDs por meia-barra. Faixas livres de 3 mm acima e abaixo para os fios.
+w_fita = 5;           // largura da fita (comprar 5 mm)
+e_fita = 2.5;         // espessura com a resina IP65
+dz_fita = 7.5;        // distância entre os centros das fileiras
+L_trecho = 100;       // 4 grupos de 25 mm
+x_fita0 = 10;         // início da zona externa (x = 0 é a ponta externa)
 x_c = 110;            // centro do campo de LEDs ao longo da barra
 janela = [203, 22];   // abertura frontal
 lente_pc = [207, 25, 2]; // placa de policarbonato colada por dentro
-pcb = [207, 24];      // placa de LEDs (alumínio), x de 6,5 a 213,5
 
 /* [Forma orgânica] */
 R_vidro = 3000;       // raio do para-brisa em planta (medir no carro, ver flecha())
@@ -57,10 +63,12 @@ d_pescoco_ventosa = 6.2;
 /* [Braço e doca] */
 L_fixo = 150;
 L_corr = 170;
-tubo_ext = [18, 14];
-tubo_int = [12.6, 8.6];
-corredica = [12, 8];
-d_pino = 4.6;          // furo da trava do braço (parafuso M4 + borboleta); horizontal na impressão
+// v0.5: seção de pé (alta em z, que é o sentido da carga do peso da barra);
+// a trava atravessa na horizontal (em y), perto da linha neutra
+tubo_ext = [14, 18];
+tubo_int = [8.6, 12.6];
+corredica = [8, 12];
+d_pino = 4.6;          // furo da trava do braço (parafuso M4 + borboleta); vertical na impressão
 d_M5 = 5.4;
 d_M3_piloto = 2.5;     // parafuso M3 autoatarraxante em PETG
 d_M3_passante = 3.4;
@@ -71,7 +79,7 @@ porca_M5_af = 8.3; h_porca_M5 = 4.3; h_cabeca_M5 = 3.7;  // porca cativa da carc
 h_porca_trava = 5.3;   // porca autotravante DIN 985 nas manoplas (m = 5,0)
 
 /* [Articulações] */
-t_aba = 8;             // espessura das abas de articulação
+t_aba = 10;            // espessura das abas de articulação (v0.5: era 8)
 w_aba = 20;            // largura das abas e garfos
 fenda = t_aba + 0.4;   // vão do garfo
 b_inf = 5;             // bochecha com a cabeça M5 cativa
@@ -83,13 +91,25 @@ L_lingueta = 16;       // trecho fino da doca que fica sob o suporte do quebra-s
 parafusos_doca = [[-22, 0], [4, 0]];
 folga_oblongo = 5;
 
-/* [Caixa de controle] */
-x_caixa = 108;         // posição na meia-barra esquerda (cobre 3 colunas de parafusos,
-                       // deixa livre o parafuso da ponta interna)
-L_caixa = 124;
-P_caixa = 30;
-z_caixa = [6, 32.1];
-d_botao = 12.2;        // furo do pulsador metálico 12 mm à prova d'água
+/* [Caixa de controle — separada, sob o painel] */
+// v0.6: caixa solta, presa sob o painel perto do acendedor, ligada a cada
+// meia-barra por um cabo de 10 vias com conector GX16-10 em linha.
+// Módulos prontos assentam em bolsos rasos e são presos com fita dupla-face
+// e abraçadeira (não dependem da posição dos furos de fixação, que os
+// anúncios não informam). Medir cada placa e corrigir 'modulos'.
+cx_int = [180, 110, 32]; // interior da caixa (x, y, altura); faixa livre em y > 90 para o botão
+p_cx = 2.4;              // paredes e fundo
+d_botao = 12.2;          // furo do pulsador metálico 12 mm à prova d'água
+xy_botao = [90, 100];    // posição do botão (interior), sobre a faixa livre
+d_pg9 = 15.4;            // furo dos prensa-cabos PG9 (cabos de 4 a 8 mm)
+z_pg = 15;               // centro dos prensa-cabos acima do fundo interno (contraporca SW24 livre do fundo)
+xs_pg = [32, 82, 140];   // barra E, barra D, alimentação (parede y = 0)
+// [nome, [x, y] do canto, [comprimento, largura], altura até o topo]
+modulos = [
+    ["OPMSC12 12 canais",    [5, 15],   [107, 72], 14],
+    ["diodo ideal LTC4359",  [116, 15],  [33, 27], 10],
+    ["buck 5 V",             [154, 15],  [16, 33],  6],
+    ["Nano + adaptador",     [116, 50],  [53, 36], 25]];
 
 // ---------------------------------------------------------------------
 // Pontos de parafuso da tampa de alumínio (x, z) — compartilhados por
@@ -99,7 +119,7 @@ function furos_tampa() = concat(
     [for (x = xs_borda) [x, p_tb/2]],
     [for (x = xs_borda) [x, H - p_tb/2]],
     [[p_ext/2, H/2 + 10], [L - p_ext/2, H/2 + 10]]); // acima do furo M5 da junta
-x_prensa = 222.5;        // passagem dos fios pela tampa de alumínio (PG7 na meia-barra D; Ø8 + anel de vedação na E)
+x_prensa = 222.5;        // passagem do cabo pela tampa de alumínio (PG7, rosca 8 mm, contraporca até SW17)
 
 // ---------------------------------------------------------------------
 module hexagono(af, h) { cylinder(d = af / cos(30), h = h, $fn = 6); }
@@ -221,7 +241,7 @@ module carcaca() {
             cube([janela[0], p_frente + flecha(0) + 2, janela[1]]);
         // furos-piloto M3 para a tampa de alumínio
         // furos-piloto M3 rasos, para não atravessar a frente arredondada:
-        // 9,5 mm nas bordas (M3×12 entra 7,8 mm; M3×16 da caixa, 9,3 mm) e 8 mm nas pontas
+        // 9,5 mm nas bordas (M3×12 entra 7,8 mm) e 8 mm nas pontas
         for (p = furos_tampa()) translate([p[0], D + 0.01, p[1]])
             rotate([90, 0, 0]) cylinder(d = d_M3_piloto, h = (p[0] < p_ext || p[0] > L - p_ext) ? 8 : 9.5);
         // furo M5 da junta (cego: não atravessa para a cavidade)
@@ -240,17 +260,20 @@ module carcaca_lado(lado = "E") {
     else mirror([1, 0, 0]) carcaca();
 }
 
-// Placa de policarbonato e PCB, apenas para visualização
+// Placa de policarbonato, fitas de LED e tampa de alumínio (visualização)
+module fita(cor) {
+    color(cor) cube([L_trecho - 0.5, e_fita, w_fita]);
+}
+module fitas() {
+    for (z = [1, 0, -1], k = [0, 1])
+        translate([x_fita0 + k * L_trecho, D + 1 - e_fita, H/2 + z * dz_fita - w_fita/2])
+            fita(z > 0 ? "red" : (z == 0 ? "white" : "blue"));
+}
 module fantasma_interno() {
     color("lightblue", 0.4)
         translate([x_c - lente_pc[0]/2, p_frente, H/2 - lente_pc[1]/2])
         cube([lente_pc[0], lente_pc[2], lente_pc[1]]);
-    color("white") translate([x_c - pcb[0]/2, D + 1 - 1.6, H/2 - pcb[1]/2])
-        cube([pcb[0], 1.6, pcb[1]]);
-    for (c = [0 : colunas - 1], s = [-1, 1])
-        color(["red", "white", "blue"][(c + (s > 0 ? 0 : 1)) % 3])
-        translate([x_c + (c - (colunas - 1)/2) * passo_led, D + 1 - 1.6, H/2 + s*dz_fileira])
-        rotate([90, 0, 0]) cylinder(d = 10, h = 7);
+    fitas();
     color("silver") translate([0, D + 1, 0]) cube([L, t_al, H]);
 }
 
@@ -364,7 +387,7 @@ module braco_corredica() {
                 translate([L_corr - 2, dy_corr - w_aba/2, -fenda/2 - b_sup]) cube([1, w_aba, fenda + b_sup + b_inf]);
             }
         }
-        for (x = [15 : 10 : 125]) translate([x, 0, -10]) cylinder(d = d_pino, h = 20);
+        for (x = [15 : 10 : 125]) translate([x, -10, 0]) rotate([-90, 0, 0]) cylinder(d = d_pino, h = 20);
         translate([-1, 0, 0]) rotate([0, 90, 0]) cylinder(d = 30, h = 1.5, $fn = 4);
     }
     translate([L_corr + 16, 0, 0]) mirror([0, 0, 1]) garfo(20, dy_corr);
@@ -396,7 +419,7 @@ module braco_fixo() {
             for (x = [35, 105]) translate([x, tubo_ext[0]/2 + 2, 0]) presilha_cabo();
         }
         translate([15, -tubo_int[0]/2, -tubo_int[1]/2]) cube([L_fixo, tubo_int[0], tubo_int[1]]);
-        translate([L_fixo - 8, 0, -10]) cylinder(d = d_pino, h = 20);
+        translate([L_fixo - 8, -15, 0]) rotate([-90, 0, 0]) cylinder(d = d_pino, h = 30);
     }
     translate([x_aba_fixo, 0, 0]) aba_articulacao(16, dy_fixo);
 }
@@ -417,29 +440,30 @@ module extensor() {
             }
             translate([L_ext_macho + 10, 0, 0]) barra_arr(L_ext_femea - 10, tubo_ext[0], tubo_ext[1], 5);
         }
-        for (x = [15 : 10 : 55]) translate([x, dy_ext, -10]) cylinder(d = d_pino, h = 20);
+        for (x = [15 : 10 : 55]) translate([x, dy_ext - 10, 0]) rotate([-90, 0, 0]) cylinder(d = d_pino, h = 20);
         translate([L_ext_macho + 15, -tubo_int[0]/2, -tubo_int[1]/2]) cube([L_ext_femea, tubo_int[0], tubo_int[1]]);
-        translate([L_ext_macho + L_ext_femea - 8, 0, -10]) cylinder(d = d_pino, h = 20);
+        translate([L_ext_macho + L_ext_femea - 8, -15, 0]) rotate([-90, 0, 0]) cylinder(d = d_pino, h = 30);
         translate([-1, dy_ext, 0]) rotate([0, 90, 0]) cylinder(d = 30, h = 1.5, $fn = 4);
     }
 }
 
 // ---------------------------------------------------------------------
-// ENGATE: língua 14×8 (arestas r1) que entra no soquete da doca + garfo.
+// ENGATE: língua 16×11 (arestas r1; v0.5: era 14×8) que entra no soquete da doca + garfo.
 // Local: ponta da língua em x=0, z=0 é o fundo do canal da doca.
-dy_eng = (w_aba - 14) / 2;
+w_lingua = 16; h_lingua = 11;
+dy_eng = (w_aba - w_lingua) / 2;
 z_eng = fenda/2 + b_inf;   // centro da fenda acima do fundo do canal
 module engate() {
     difference() {
         union() {
-            translate([0, 0, 4]) barra_arr(28, 14, 8, 1);
+            translate([0, 0, h_lingua/2]) barra_arr(28, w_lingua, h_lingua, 1);
             hull() {
-                translate([24, 0, 4]) barra_arr(1, 14, 8, 1);
+                translate([24, 0, h_lingua/2]) barra_arr(1, w_lingua, h_lingua, 1);
                 translate([30, dy_eng - w_aba/2, 0]) cube([1, w_aba, z_eng + fenda/2 + b_sup]);
             }
         }
-        translate([12, 0, -1]) cylinder(d = d_pino_doca, h = 10);
-        translate([-1, 0, 4]) rotate([0, 90, 0]) cylinder(d = 24, h = 1.2, $fn = 4); // chanfro
+        translate([12, 0, -1]) cylinder(d = d_pino_doca, h = h_lingua + 2);
+        translate([-1, 0, h_lingua/2]) rotate([0, 90, 0]) scale([1, (w_lingua + 10) / (h_lingua + 10), 1]) cylinder(d = h_lingua + 10, h = 1.2, $fn = 4); // chanfro
     }
     translate([28 + 18, 0, z_eng]) garfo(20, dy_eng);
 }
@@ -459,28 +483,28 @@ module doca() {
             hull() {
                 for (q = parafusos_doca) translate([q[0], q[1], 0])
                     hull() for (dx = [-folga_oblongo, folga_oblongo]) translate([dx, 0, 0]) cylinder(d = 22, h = e_doca);
-                translate([x_sq, -13, 0]) placa_arr(L_sq, 26, e_doca, 4);
+                translate([x_sq, -15, 0]) placa_arr(L_sq, 30, e_doca, 4);
             }
             hull() {
-                translate([x_sq, -12, 0]) placa_arr(L_sq, 24, h_sq - 3, 5);
-                translate([x_sq + 2, -10, 0]) placa_arr(L_sq - 4, 20, h_sq, 4);
+                translate([x_sq, -14, 0]) placa_arr(L_sq, 28, h_sq - 3, 5);
+                translate([x_sq + 2, -12, 0]) placa_arr(L_sq - 4, 24, h_sq, 4);
             }
         }
         for (q = parafusos_doca) translate([q[0], q[1], -1])
             hull() for (dx = [-folga_oblongo, folga_oblongo]) translate([dx, 0, 0]) cylinder(d = d_parafuso_quebra_sol, h = e_doca + 2);
-        translate([x_canal, -7 - 0.2, z_canal]) cube([L_sq, 14.4, h_canal]);
+        translate([x_canal, -w_lingua/2 - 0.2, z_canal]) cube([L_sq, w_lingua + 0.4, h_canal]);
         translate([x_canal + 12, 0, 1]) cylinder(d = d_pino_doca, h = 20);
         translate([x_canal - 3, 0, h_sq - h_ima]) cylinder(d = d_ima, h = 5);
     }
     // dois frisos de 0,4 mm no fundo do canal: a língua entra justa
     // (esmagam um pouco na primeira montagem) e não fica com jogo vertical
-    for (y = [-4.5, 4.5]) difference() {
+    for (y = [-5.5, 5.5]) difference() {
         translate([x_canal + 2, y - 0.6, z_canal - 0.01]) cube([L_sq - 14, 1.2, 0.41]);
         translate([x_canal + 12, 0, 1]) cylinder(d = d_pino_doca + 1, h = 20);
     }
 }
 d_pino_doca = 4.3;     // pino magnético impresso Ø4 (furo vertical na impressão)
-h_canal_doca = 8.6;    // canal da língua (8 mm) com frisos de 0,4 mm no fundo
+h_canal_doca = 11.3;   // canal da língua (11 mm): frisos de 0,4 mm no fundo deixam 10,9 → aperto de 0,1 mm
 function doca_x_pino() = L_lingueta + 12 + 12;
 function doca_h() = e_doca + h_canal_doca + 3.1;
 
@@ -521,63 +545,67 @@ module manopla(base) {
 }
 
 // ---------------------------------------------------------------------
-// CAIXA DE CONTROLE (presa às costas da meia-barra E pelos mesmos
-// parafusos da tampa de alumínio). Local: x ao longo da barra a partir
-// de x_caixa, y=0 encostado no alumínio, z como na carcaça.
-// Corpo em "seixo": cantos r6 no plano x-z e arestas da tampa suavizadas.
-r_caixa = 4.5;
-xs_postes = [30, 85];
-// extrusão de um perfil 2D (x, z) ao longo de +y
-module ext_y(y0, t) translate([0, y0 + t, 0]) rotate([90, 0, 0]) linear_extrude(t) children();
-module perfil_caixa(inset = 0) {
-    zb = z_caixa[0]; zt = z_caixa[1];
-    translate([inset, zb + inset]) offset(r = r_caixa - inset) offset(delta = -(r_caixa - inset))
-        square([L_caixa - 2*inset, zt - zb - 2*inset]);
-}
-module caixa() {
-    pw = 2.2; zb = z_caixa[0]; zt = z_caixa[1];
+// CAIXA DE CONTROLE separada. Local: fundo em z=0, parede dos prensa-cabos
+// em y=0. Imprime de fundo na mesa. A tampa leva o botão.
+cx_ext = [cx_int[0] + 2*p_cx, cx_int[1] + 2*p_cx, cx_int[2] + p_cx];
+r_cx = 5;
+xy_postes = [[p_cx + 4.5, p_cx + 4.5], [cx_ext[0] - p_cx - 4.5, p_cx + 4.5],
+             [p_cx + 4.5, cx_ext[1] - p_cx - 4.5], [cx_ext[0] - p_cx - 4.5, cx_ext[1] - p_cx - 4.5]];
+module ret_arr(c, r) offset(r = r) offset(delta = -r) square(c);
+module caixa_controle() {
     difference() {
         union() {
-            ext_y(0, 2.5) offset(r = 3) offset(delta = -3) square([L_caixa, H]);  // base com abas
-            hull() {
-                ext_y(0, P_caixa - 3) perfil_caixa();
-                ext_y(0, P_caixa) perfil_caixa(0.8);
+            linear_extrude(cx_ext[2]) ret_arr([cx_ext[0], cx_ext[1]], r_cx);
+            // orelhas de fixação (parafuso Ø4 ou abraçadeira/velcro)
+            for (x = [-9, cx_ext[0] + 9]) hull() {
+                translate([x, cx_ext[1]/2, 0]) cylinder(d = 16, h = 3);
+                translate([x < 0 ? 0 : cx_ext[0] - 1, cx_ext[1]/2 - 12, 0]) cube([1, 24, 3]);
             }
         }
-        ext_y(2.5, P_caixa) perfil_caixa(pw);
-        for (p = furos_tampa()) if (p[0] > x_caixa && p[0] < x_caixa + L_caixa)
-            translate([p[0] - x_caixa, -1, p[1]]) rotate([-90, 0, 0]) cylinder(d = d_M3_passante, h = 5);
-        // passagem dos fios da meia-barra E (Ø8 + anel de vedação de silicone)
-        translate([x_prensa - x_caixa, -1, H/2]) rotate([-90, 0, 0]) cylinder(d = 8, h = 5);
-        translate([-1, 2.5 + 14, H/2]) rotate([0, 90, 0]) cylinder(d = 12.7, h = pw + 2);
+        translate([p_cx, p_cx, p_cx]) linear_extrude(cx_ext[2]) ret_arr([cx_int[0], cx_int[1]], r_cx - 2);
+        for (x = [-9, cx_ext[0] + 9]) translate([x, cx_ext[1]/2, -1]) hull() {
+            translate([0, -4, 0]) cylinder(d = 4.5, h = 5);
+            translate([0, 4, 0]) cylinder(d = 4.5, h = 5);
+        }
+        // prensa-cabos PG9
+        for (x = xs_pg) translate([x, -1, p_cx + z_pg]) rotate([-90, 0, 0]) cylinder(d = d_pg9, h = p_cx + 2);
+        // rasgos para abraçadeira (3,0 × 1,6 mm) dos dois lados de cada módulo
+        for (m = modulos) let(o = m[1], c = m[2], cy = o[1] + c[1]/2)
+            for (x = [o[0] - 2.5, o[0] + c[0] + 1]) translate([p_cx + x, p_cx + cy - 2, -1]) cube([1.6, 4, p_cx + 2]);
     }
-    // postes da tampa, encostados nas paredes longas (longe dos prensa-cabos)
-    for (x = xs_postes, z = [zb + pw + 2.8, zt - pw - 2.8])
-        difference() {
-            translate([x, 2.5, z]) rotate([-90, 0, 0]) cylinder(d = 7, h = P_caixa - 2.5);
-            translate([x, 10, z]) rotate([-90, 0, 0]) cylinder(d = d_M3_piloto, h = P_caixa);
+    // bolsos: muretas de 2 mm em volta de cada placa (folga de 0,5 mm)
+    for (m = modulos) let(o = m[1], c = m[2])
+        translate([p_cx + o[0] - 1.7, p_cx + o[1] - 1.7, p_cx - 0.01]) linear_extrude(2) difference() {
+            ret_arr([c[0] + 3.4, c[1] + 3.4], 1);
+            translate([1.2, 1.2]) square([c[0] + 1, c[1] + 1]);
+            // passagem da abraçadeira
+            translate([-1, c[1]/2 - 1.3]) square([c[0] + 6, 6]);
         }
+    // postes da tampa
+    for (q = xy_postes) translate([q[0], q[1], 0]) difference() {
+        cylinder(d = 8, h = cx_ext[2]);
+        translate([0, 0, 6]) cylinder(d = d_M3_piloto, h = cx_ext[2]);
+    }
 }
-module tampa_caixa() {
-    pw = 2.2; zb = z_caixa[0]; zt = z_caixa[1];
+module tampa_controle() {
     difference() {
         union() {
             hull() {
-                translate([0, -zb, 0]) linear_extrude(0.01) perfil_caixa(1.5);
-                translate([0, -zb, 1.2]) linear_extrude(1.3) perfil_caixa(0.3);
+                linear_extrude(0.01) offset(delta = -1) ret_arr([cx_ext[0], cx_ext[1]], r_cx);
+                translate([0, 0, 1]) linear_extrude(1.6) ret_arr([cx_ext[0], cx_ext[1]], r_cx);
             }
-            // ressalto que entra na caixa (centragem)
-            translate([0, -zb, 2.5]) linear_extrude(2) difference() {
-                perfil_caixa(pw + folga);
-                perfil_caixa(pw + folga + 1.6);
+            // ressalto de centragem
+            translate([p_cx + folga, p_cx + folga, 2.6]) linear_extrude(2) difference() {
+                ret_arr([cx_int[0] - 2*folga, cx_int[1] - 2*folga], r_cx - 2);
+                translate([1.6, 1.6]) ret_arr([cx_int[0] - 2*folga - 3.2, cx_int[1] - 2*folga - 3.2], r_cx - 3);
             }
         }
-        for (x = xs_postes, z = [pw + 2.8, zt - zb - pw - 2.8]) {
-            translate([x, z, -1]) cylinder(d = d_M3_passante, h = 10);
-            translate([x, z, 2.5]) cylinder(d = 8.6, h = 5);   // folga do ressalto nos postes
+        for (q = xy_postes) {
+            translate([q[0], q[1], -1]) cylinder(d = d_M3_passante, h = 10);
+            translate([q[0], q[1], -0.01]) cylinder(d1 = 6.5, d2 = d_M3_passante, h = 1.6); // escareado
+            translate([q[0], q[1], 2.6]) cylinder(d = 9, h = 5);
         }
-        translate([L_caixa/2, (zt - zb)/2, -1]) cylinder(d = d_botao, h = 10);
-        translate([L_caixa - 24, (zt - zb)/2, -1]) cylinder(d = 12.7, h = 10);
+        translate([p_cx + xy_botao[0], p_cx + xy_botao[1], -1]) cylinder(d = d_botao, h = 10);
     }
 }
 
@@ -613,7 +641,6 @@ module meia_barra_montada(lado = "E") {
             translate([x_arm, D/2, z_arm - fenda/2 - b_sup]) rotate([180, 0, 0]) manopla("porca");
             translate([x_art, y_art, z_arm - fenda/2 - b_sup]) rotate([180, 0, 0]) manopla("porca");
         }
-        if (lado == "E") color("teal") translate([x_caixa, D + 1 + t_al, 0]) caixa();
     }
 }
 
@@ -622,6 +649,8 @@ module montagem() {
     translate([2 * L + 140, 0, 0]) meia_barra_montada("D");
     // retrovisor interno (referência)
     color("black", 0.4) translate([L + 70 - 35, 40, -25]) cube([70, 25, 60]);
+    // caixa de controle (fica sob o painel; aqui só para referência de tamanho)
+    color("teal") translate([L + 70 - cx_ext[0]/2, 120, -150]) caixa_controle();
 }
 
 // ---------------------------------------------------------------------
@@ -641,5 +670,5 @@ else if (peca == "doca") doca();
 else if (peca == "pino") pino_impressao();
 else if (peca == "manopla_parafuso") manopla("parafuso");
 else if (peca == "manopla_porca") manopla("porca");
-else if (peca == "caixa") rotate([90, 0, 0]) caixa();
-else if (peca == "tampa_caixa") tampa_caixa();
+else if (peca == "caixa_controle") caixa_controle();
+else if (peca == "tampa_controle") tampa_controle();

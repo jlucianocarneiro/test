@@ -1,23 +1,30 @@
 // =====================================================================
 // Rotolight LED — controlador estroboscópico (Arduino Nano / ATmega328P)
 //
-// 4 zonas (esq. externa, esq. interna, dir. interna, dir. externa) ×
-// 3 cores (vermelho, azul, branco) = 12 canais low-side (MOSFET AO3400A).
-// Cada canal acende 2 strings de 3 LEDs a 350 mA (reguladores NSI50350).
+// v0.6: 4 zonas (esq. externa, esq. interna, dir. interna, dir. externa) ×
+// 3 cores (vermelho, azul, branco) = 12 canais low-side, pela placa pronta
+// eletechsup OPMSC12 (entrada PNP 3,3–8 V, saída NPN, optoacoplada).
+// Cada canal acende um trecho de 100 mm de fita de LED 12 V (2835,
+// 120 LED/m, 5 mm): ~0,08 A a 12 V por canal.
 //
-// Regra de corrente: cada zona acende no máximo UMA cor por vez
-// (pico = 4 zonas × 0,7 A = 2,8 A). Os padrões são codificados por zona,
-// então a regra é garantida pela própria estrutura dos dados.
+// Regra de acendimento: cada zona acende no máximo UMA cor por vez. Com
+// isso ficam no máximo 4 entradas da OPMSC12 ligadas ao mesmo tempo
+// (4 × 8–15 mA saindo do Nano), dentro do limite do ATmega328P. Os padrões
+// são codificados por zona, então a regra é garantida pelos próprios dados.
 //
-// Botão (D2 → GND, pulsador 12 mm IP67 na tampa da caixa de controle):
+// PWM por software a ~250 Hz (abaixo dos 2 kHz da OPMSC12). Testar no
+// osciloscópio ou a olho se o nível 12,5 % ainda acende de forma estável.
+//
+// Botão (D2 → GND, pulsador metálico 12 mm na tampa da caixa de controle):
 //   toque curto (< 0,6 s)   → próximo padrão
 //   toque longo (0,6–2,5 s) → próxima combinação de cores
 //   muito longo (> 2,5 s)   → alterna modo DIA (100 %) / NOITE (31 %)
 // A escolha fica gravada na EEPROM.
 //
-// Proteção térmica: NTC 10k (B3950) na placa de LEDs esquerda, em A6
-// com pull-up de 10k. Acima de 70 °C limita a 31 %; acima de 85 °C
-// limita a 12,5 %; volta ao normal abaixo de 65 °C.
+// Proteção térmica: NTC 10k (B3950) colado na tampa de alumínio da
+// meia-barra esquerda, entre as fitas; chega à caixa pelo cabo de 10 vias,
+// em A6 com pull-up de 10k. Acima de 70 °C limita a 31 %; acima de 85 °C
+// limita a 12,5 %; volta ao normal abaixo de 65 °C. Sem sensor: 31 %.
 // =====================================================================
 #include <EEPROM.h>
 #include <avr/pgmspace.h>

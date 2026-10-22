@@ -1,7 +1,9 @@
 # 1 — Pesquisa de componentes e decisões de projeto
 
 Projeto: Rotolight LED para parabrisa de viatura descaracterizada (PCDF, 8ª DP)
-Versão: v0.4 (projeto, ainda não fabricado), 22/10/2026 — forma orgânica, correções das auditorias independentes e doca ancorada em dois parafusos
+Versão: v0.6 (projeto, ainda não fabricado), 22/10/2026: fita de LED, caixa de controle separada com módulos prontos e braço reforçado.
+
+> **Leia primeiro a seção 1.11.** Na v0.6 a eletrônica da barra mudou. As seções 1.2 a 1.5 (LEDs 3535, CCR NSI50350, MOSFET AO3400A, PCB, lentes TIR) e 1.8 (cabos) ficam como registro da pesquisa da v0.5 e foram **substituídas** pela seção 1.11.
 
 > Valores marcados com **(confirmar)** vêm de datasheet de distribuidor ou de estimativa de engenharia e têm de ser conferidos no datasheet oficial ou em bancada antes da compra/fabricação.
 
@@ -172,3 +174,55 @@ Configuração sugerida para PETG funcional: 4–6 paredes, 5 camadas sólidas e
 - A doca sob pressão do parafuso, em PETG, pode **fluir (creep)** no calor. Se a barra começar a folgar, refazer a doca em **chapa de alumínio de 2 mm** (o desenho serve de gabarito).
 - **Plano B** (carros onde o suporte não permite a doca): abraçadeira na haste do quebra-sol, numa versão futura, se necessário.
 - **Airbag de cortina:** em muitos carros ele corre pela borda do teto junto à coluna A. A doca e o braço **não podem ficar no caminho do airbag**. Conferir no manual do veículo antes de instalar.
+
+---
+
+## 1.11 Revisão v0.6: fita de LED, módulos prontos e caixa separada
+
+**Por que mudou.** A banca reprovou a lista de compras da v0.5 por um defeito fatal: os 24 reguladores NSI50350 (SMC, 7 × 6 mm) não cabiam na placa de LEDs de 207 × 24 mm entre as lentes Ø10. Não existe CCR de 350 mA menor. O usuário decidiu:
+1. usar **fita de LED** no lugar da placa de LEDs de potência;
+2. usar **placas prontas** da Shopee e do AliExpress nos subcircuitos;
+3. tirar a caixa de controle da barra e montá-la **separada**, sob o painel.
+
+**Fita de LED.**
+- Fita 12 V, 2835, 120 LED/m, **5 mm** de largura, colada direto no alumínio, que é o dissipador.
+- Três fileiras por meia-barra (VM em cima, BR no meio, AZ embaixo), cada uma com dois trechos de 100 mm (zona externa e interna) = 72 LEDs por meia-barra.
+- A largura de 5 mm deixa faixas de 3 mm acima e abaixo para os fios. A de 8 mm não deixaria.
+- **Compromisso aceito:** cerca de 1 W por canal contra ~6 W antes, e sem óptica. O brilho ao sol é bem menor, e o teste ao sol (doc 04, seção 4.10) é eliminatório.
+- Se faltar brilho, a primeira troca é por uma fita de ≥ 14,4 W/m do mesmo tamanho, sem mudar o CAD.
+- A fita tem resistores por grupo de 3 LEDs. Por isso a corrente sobe com a tensão do carro: a 14,4 V, cerca de +40 % nos vermelhos e mais nos azuis e brancos. O ciclo dos flashes e o limite térmico por NTC compensam. Medir na bancada.
+
+**Caixa de controle separada.**
+- A caixa tem 219 × 115 × 34 mm e fica sob o painel, perto do acendedor. Assim o para-brisa fica sem esse peso e calor, e a caixa não aparece por fora.
+- Cada meia-barra liga à caixa pelo próprio cabo de 10 vias, com **GX16-10 em linha** perto da barra. O mesmo conector e a mesma pinagem servem nos dois lados.
+- Os módulos assentam em bolsos rasos e são presos com VHB e abraçadeira. Isso evita depender da posição dos furos de fixação, que os anúncios não informam.
+
+**Módulos escolhidos** (pesquisa no doc 05):
+
+| Função | Módulo | Por quê |
+|---|---|---|
+| 12 saídas low-side | eletechsup **OPMSC12** (entrada PNP 3,3–8 V, saída NPN) | Única placa pronta de 12 canais com ficha técnica: optoacoplada, 5 A por canal, PWM até 2 kHz. O firmware usa ~250 Hz. |
+| 5 V para o Nano | buck **Waveshare 6–36 V** (ou MP1584EN) | Substitui o LDO LM2936 em TO-92, que passaria de 125 °C de junção a 80 °C de ambiente |
+| Inversão de polaridade | módulo de diodo ideal **LTC4359** | Bloqueia a inversão sem queimar fusível |
+| Transientes | **5KP16A** (5 kW) + 470 µF nos bornes | O SMBJ18A (600 W) era pequeno para o carro |
+| Ligações do Nano | adaptador de bornes "Nano terminal adapter" | Elimina a placa perfurada |
+
+**Corrente nas entradas da OPMSC12.** Cada entrada pede 8–15 mA do pino do Nano. O firmware acende no máximo uma cor por zona, ou seja, 4 entradas ao mesmo tempo, até 60 mA no total. Isso fica dentro do limite do ATmega328P.
+
+**Fusível.** O consumo caiu para ~0,6 A no pior caso. O fusível do plugue passa a ser de **3 A**, no formato do porta-fusível do plugue comprado.
+
+**Cabos.**
+
+| Trecho | Cabo | Conector / vedação |
+|---|---|---|
+| Acendedor → caixa (3 m) | PP 2 × 0,75 mm² | Plugue com fusível 3 A; PG9 na caixa |
+| Caixa → perto de cada meia-barra (~1,5 m, ×2) | Manga 10 vias 24 AWG, cobre | PG9 na caixa; **fêmea** GX16-10 na ponta |
+| Rabicho de cada meia-barra (0,3 m, ×2) | Manga 10 vias 24 AWG | Plugue GX16-10; **PG7 (rosca 8 mm, contraporca ≤ SW17)** no alumínio; capa retirada dentro da barra |
+| Dentro da barra | Silicone 26 AWG | Nas faixas livres de 3 mm |
+
+**Braço reforçado (correções da auditoria da v0.4).**
+- Corrediça e tubo giraram 90°: seção de 8 × 12 mm de pé, com a trava M4 atravessando na horizontal, perto da linha neutra.
+- A língua do engate passou de 14 × 8 para 16 × 11 mm, num canal de 16,4 × 11,3 mm com frisos de 0,4 mm (aperto de ~0,1 mm).
+- As abas de articulação passaram de 8 para 10 mm (M5 × 25).
+- Estimativa por razão de módulos de seção a 5 g, a reconferir na banca: corrediça ~29 MPa (era 67), língua ~35 MPa (era 80), aba 31–39 MPa (era 49).
+
