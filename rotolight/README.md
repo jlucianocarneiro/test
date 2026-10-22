@@ -4,7 +4,7 @@ Projeto modular de barra de luz de emergência com **144 LEDs em fita** (vermelh
 
 Desenho **orgânico**: a frente de cada meia-barra acompanha a curvatura do para-brisa (raio medido no carro, parâmetro `R_vidro`), as arestas e pontas são arredondadas e as peças de fixação têm transições suaves.
 
-Status: **v0.7 em andamento.** A barra virou **uma só, ao longo do topo do para-brisa** (passa acima do retrovisor), com **fita RGB endereçável WS2815 IP67** colada numa barra chata de alumínio 1" × 1/8" e presa por **dois trilhos impressos** e **duas tampas de ponta**. A **controladora** é uma caixa mínima (≈ 95 × 55 × 31 mm) com 3 botões: pisca vermelho, pisca metade azul / metade vermelho e branco fixo. Os braços e as docas saíram; o **suporte** é a próxima etapa. Nesta etapa o limite da mesa da impressora foi deixado de lado (trilho de 1100 mm). **Os docs 01–05 abaixo ainda descrevem a v0.6** e serão atualizados ao fechar a v0.7.
+Status: **v0.8 em andamento (barra para aprovação).** Barra única ao longo do topo do para-brisa, com a fita **SEZO WS2812B** (5 V, 144 LED/m, IP65, 1 m) numa **câmara fechada encostada no vidro**: aba curta em cima, aba longa embaixo (acompanham a inclinação do para-brisa, `ang_vidro`), barra chata de alumínio 3/4" × 1/8" atrás e duas tampas de ponta. Corte de 23,25 × 52,3 mm (vidro a 30°). Veja `docs/07_barra_v08.md`. A **controladora** (caixa mínima com 3 botões) está parada até a aprovação da barra; o **suporte** vem depois. O limite da mesa da impressora foi deixado de lado nesta etapa. **Os docs 01–05 ainda descrevem a v0.6.**
 
 ![Controladora](cad/controladora.png)
 

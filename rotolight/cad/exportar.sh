@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 OUT="${1:-exportados}"; mkdir -p "$OUT"
-PECAS="trilho tampa_ponta gabarito_furacao caixa_controle tampa_controle"
+PECAS="trilho_inf trilho_sup tampa_ponta gabarito_furacao caixa_controle tampa_controle"
 for p in $PECAS; do
   echo ">> $p"; openscad -q -D "peca=\"$p\"" -o "$OUT/$p.stl" rotolight.scad
 done

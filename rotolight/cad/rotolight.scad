@@ -2,28 +2,31 @@
 // Rotolight LED — barra estroboscópica para parabrisa de viatura (PCDF)
 // Projeto paramétrico. Unidade: mm. OpenSCAD 2021.01+
 //
-// v0.7: BARRA ÚNICA ao longo do topo do para-brisa, passando acima do
-// retrovisor, só com o básico: dois trilhos impressos que seguram a fita RGB endereçável
-// escolhida (SEZO WS2812B, 5 V, 144 LED/m, 1 m, IP65 com revestimento de silicone), a ligação e o cabo
-// que sai para a controladora. A fita já é impermeável: não há janela nem
-// policarbonato na frente. Braços, docas, ventosas e pontos de fixação
-// saíram nesta versão (a fixação será definida depois). O limite da mesa
-// da impressora foi deixado de lado nesta etapa (peça única de L_barra).
+// v0.8: a barra única da v0.7 com um corte novo, compacto, que se encosta
+// na INCLINAÇÃO do para-brisa (esboço do Luciano): a fita fica numa câmara
+// fechada por todos os lados — vidro na frente, aba curta em cima, aba
+// longa embaixo e a barra de alumínio atrás. A luz só sai pelo vidro e não
+// ofusca os ocupantes; o reflexo da fita no vidro (que desce para a
+// frente) cai na aba de baixo, preta e fosca.
 //
-// Corte (y = 0 voltado para o vidro, y = D para a cabine):
-//   a peça estrutural é a barra chata de alumínio 1" × 1/8" (fundo,
-//   dissipador e rigidez), com a fita colada na face da frente. Dois TRILHOS
-//   impressos iguais (o de cima e o de baixo são a mesma peça virada)
-//   abraçam as bordas do alumínio por ranhuras e cobrem as bordas da fita;
-//   duas TAMPAS DE PONTA iguais fecham as pontas e prendem os trilhos com
-//   parafusos M3. O alumínio fica exposto ao ar da cabine atrás. A barra
-//   acompanha o arco do para-brisa em planta (R_vidro): alumínio, fita e
-//   trilhos ficam finos no sentido em que vergam.
-//   Os trilhos imprimem deitados (perfil de 4 mm de altura), sem suporte.
+// Corte (y = 0 na ponta da aba de baixo, y cresce para a CABINE; z para cima):
+//   ALUMÍNIO: barra chata 3/4" × 1/8", de pé. É a parede de trás da câmara
+//   (opaca), a espinha que dá rigidez e o dissipador, com a face de trás no
+//   ar da cabine. A fita vai colada na face da frente.
+//   TRILHO DE BAIXO: aba longa que vai até o vidro, com ranhura que abraça a
+//   borda de baixo do alumínio.
+//   TRILHO DE CIMA: aba curta que vai até o vidro, com ranhura que abraça a
+//   borda de cima do alumínio.
+//   As pontas das duas abas ficam sobre a reta do vidro (ang_vidro), com
+//   faces inclinadas que recebem tiras de EVA de e_eva.
+//   TAMPAS DE PONTA iguais fecham as pontas e prendem os trilhos (M3).
+//   A barra acompanha o arco do para-brisa em planta (R_vidro).
+// Impressão: trilho_inf com a aba na mesa; trilho_sup de cabeça para baixo
+// (o topo na mesa). Nenhum dos dois precisa de suporte.
 //
-// Uso:  openscad -D 'peca="trilho"' -o trilho.stl rotolight.scad
-// Peças: montagem, trilho (×2), tampa_ponta (×2), gabarito_furacao,
-//        caixa_controle, tampa_controle
+// Uso:  openscad -D 'peca="trilho_inf"' -o trilho_inf.stl rotolight.scad
+// Peças: montagem, trilho_inf, trilho_sup, tampa_ponta (×2),
+//        gabarito_furacao, caixa_controle, tampa_controle
 // =====================================================================
 
 peca = "montagem";
@@ -34,33 +37,43 @@ folga = 0.3;          // folga de encaixe por lado (A1, bico 0.4, PETG)
 /* [Barra] */
 L_barra = 1100;       // comprimento (PROVISÓRIO: medir no carro)
 R_vidro = 3000;       // raio do para-brisa em planta (medir: R = c²/(8·f))
-r_frente = 2;         // raio das arestas da frente
-r_tras = 2;           // raio das arestas de trás
+ang_vidro = 30;       // inclinação do para-brisa sobre a horizontal, no topo (MEDIR com o inclinômetro do celular)
+e_eva = 2;            // EVA nas pontas das abas, entre a barra e o vidro
 
-/* [Alumínio (fundo e dissipador)] */
-w_al = 25.4;          // barra chata 1" × 1/8"
+/* [Alumínio (parede de trás e dissipador)] */
+w_al = 19.05;         // barra chata 3/4" × 1/8"
 t_al = 3.18;
 g_al = 0.2;           // folga por lado na ranhura
-lab = 1.6;            // espessura do lábio de trás
-sob_lab = 2.0;        // quanto o lábio e o ombro cobrem o alumínio em cada borda
-p_tb = 2.0;           // parede de cima e de baixo, sobre a ranhura
+lab = 1.6;            // espessura dos lábios da ranhura
+sob = 2.0;            // quanto cada lábio cobre a borda do alumínio
+p_base = 2.0;         // fundo da ranhura (em cima e embaixo)
+p_aba = 1.6;          // espessura da aba de baixo
+p_ponta = 2.6;        // espessura das pontas que encostam no vidro (recebem o EVA)
+avanco_sup = 7;       // quanto a aba de cima passa à frente do alumínio
 
 /* [Fita SEZO WS2812B IP65, 1 m] */
 w_fita = 12;          // largura com o silicone (MEDIR a fita comprada)
 e_fita = 3;           // espessura com o silicone (MEDIR)
 L_fita = 1000;        // 1 rolo = 1 m = 144 LEDs
-x_fita = [L_barra - 36 - L_fita, L_barra - 36];  // a ponta x = L tem o PG7; as línguas das tampas ocupam 8 mm em cada ponta
+x_fita = [L_barra - 36 - L_fita, L_barra - 36];  // a ponta x = L tem o PG7
 x_pg7 = L_barra - 22;         // PG7 pelo alumínio (cabo para a caixa); contraporca até SW17
+x_sem_labio = [L_barra - 34, L_barra - 11];   // trecho sem lábios: cabem a contraporca (frente) e o sextavado do PG7 (trás)
 d_M3_piloto = 2.5;
 d_M3_passante = 3.4;
 
-H = w_al + 2 * (g_al + p_tb);        // altura total (29,8)
-D = lab + t_al + 2 * g_al + e_fita + 2.5;   // profundidade: o trilho passa 2,5 mm da fita (cabe a contraporca do PG7 de 5 mm)
 // derivados do corte
-z_g = [(H - w_al) / 2 - g_al, (H + w_al) / 2 + g_al];     // ranhura do alumínio (z)
-y_g = [D - lab - t_al - 2 * g_al, D - lab];               // ranhura do alumínio (y)
-z_c = [z_g[0] + sob_lab, z_g[1] - sob_lab];                // cavidade e abertura de trás (z)
-y_parafuso_ponta = y_g[0] / 2;   // parafusos da tampa da ponta, no meio da língua
+tg = tan(ang_vidro);
+z_al = [p_base, p_base + w_al];                 // alumínio (z), apoiado no fundo da ranhura de baixo
+z_teto = z_al[1] + g_al;                        // fundo da ranhura de cima
+H = z_teto + p_base;                            // altura total
+y_top = H / tg;                                 // ponta da aba de cima (a de baixo fica em y = 0)
+y_al = [y_top + avanco_sup, y_top + avanco_sup + t_al];   // faces do alumínio (frente, trás)
+D = y_al[1] + g_al + lab;                       // profundidade total
+z_fita = (z_al[0] + z_al[1]) / 2;               // centro da fita (meio do alumínio)
+z_u = z_teto - 0.6;                             // face de baixo da aba de cima, à frente do lábio
+z_ev = H - 0.8;                                 // a face do EVA da aba de cima desce até aqui
+y_parafuso_ponta = y_al[0] - 4.5;               // parafusos das tampas da ponta
+function y_vidro(z) = z / tg;                   // reta das pontas das abas (o vidro fica e_eva à frente)
 
 // ---------------------------------------------------------------------
 module hexagono(af, h) { cylinder(d = af / cos(30), h = h, $fn = 6); }
@@ -75,6 +88,21 @@ function arco(cy, cz, r, a0, n = 6) = r < 0.05 ? [[cy, cz]] : [for (i = [0 : n])
 function ret(y0, y1, z0, z1, rf = 0.01, rb = 0.01) = concat(
     arco(y0 + rf, z0 + rf, rf, 180), arco(y1 - rb, z0 + rb, rb, 270),
     arco(y1 - rb, z1 - rb, rb, 0),   arco(y0 + rf, z1 - rf, rf, 90));
+
+// Polígono com cantos boleados: pts = [[y, z, raio], ...]; raio 0 = canto vivo.
+// Vale para cantos convexos e côncavos (o arco é tangente às duas arestas).
+function _u(v) = v / norm(v);
+function _ang(v) = atan2(v[1], v[0]);
+function _boleia(p0, p1, p2, r, n) = let(
+        u1 = _u(p0 - p1), u2 = _u(p2 - p1), m = acos(u1 * u2) / 2,
+        d = r / tan(m), c = p1 + _u(u1 + u2) * r / sin(m),
+        a1 = _ang(p1 + u1 * d - c), a2 = _ang(p1 + u2 * d - c),
+        da = (a2 - a1 + 540) % 360 - 180)
+    [for (k = [0 : n]) c + r * [cos(a1 + da * k / n), sin(a1 + da * k / n)]];
+function boleado(pts, n = 6) = let(N = len(pts)) [for (i = [0 : N - 1]) let(
+        p0 = [pts[(i + N - 1) % N][0], pts[(i + N - 1) % N][1]],
+        p1 = [pts[i][0], pts[i][1]], p2 = [pts[(i + 1) % N][0], pts[(i + 1) % N][1]])
+    each (pts[i][2] > 0 ? _boleia(p0, p1, p2, pts[i][2], n) : [p1])];
 
 // sólido varrido ao longo do arco (um único poliedro); x é a posição ao longo da corda
 module loft(x0, x1, perfil, passo = 10) {
@@ -95,52 +123,86 @@ module loft(x0, x1, perfil, passo = 10) {
 module no_arco(x) translate([x, flecha(x), 0]) rotate([0, 0, atan((x - L_barra / 2) / R_vidro)]) children();
 
 // ---------------------------------------------------------------------
-// TRILHO (o de baixo; o de cima é a mesma peça girada 180° em torno do
-// eixo y). Perfil de altura z_c[0]: base de p_tb + ombro na frente (até a
-// ranhura) e lábio atrás. Furos M3 passantes nas duas pontas para as tampas.
-// perfil do trilho (y, z), anti-horário, todo arredondado: base com
-// bordas de raio 2, ombro da frente descendo em curva até a fita, lábio de
-// trás com topo boleado e a ranhura do alumínio entre os dois.
-function perfil_trilho() = let(zt = z_c[0], zg = z_g[0], r = 1.8, rl = 0.7)
-    concat(
-        arco(r, r, r, 180),                 // canto de baixo, frente
-        arco(D - r, r, r, 270),             // canto de baixo, trás
-        arco(D - rl, zt - rl, rl, 0),       // topo do lábio, por fora
-        arco(y_g[1] + rl, zt - rl, rl, 90), // topo do lábio, por dentro
-        [[y_g[1], zg], [y_g[0], zg]],       // fundo da ranhura
-        arco(y_g[0] - rl, zt - rl, rl, 0),  // ombro junto à ranhura
-        // ombro descendo em curva suave até a frente (sem quina)
-        [for (i = [1 : 7]) let(t = i / 8) [(y_g[0] - rl) * (1 - t), zt - (zt - r) * t * t]]);
-module trilho() {
-    difference() {
-        loft(0, L_barra, perfil_trilho());
-        for (x = [5, L_barra - 5]) no_arco(x) translate([0, y_parafuso_ponta, -1]) cylinder(d = d_M3_passante, h = z_c[0] + 2);
-    }
-}
-module trilho_sup() translate([L_barra, 0, H]) rotate([0, 180, 0]) mirror([0, 0, 0]) trilho();
+// TRILHO DE BAIXO: aba longa até o vidro. Perfil (y, z) anti-horário:
+// fundo reto (face da mesa), ranhura com lábios boleados, concordância
+// côncava descendo do lábio da frente para a aba fina, e a ponta engrossada
+// (p_ponta) com a face da frente na reta do vidro, para o EVA.
+function perfil_inf() = let(yf = y_al[0] - g_al, yt = y_al[1] + g_al, zl = p_base + sob)
+    boleado([
+        [y_vidro(0.5), 0, 0],                         // ponta, embaixo (testa de 0,5 mm)
+        [D - 1.2, 0, 0], [D, 1.2, 0.5],               // canto de trás: chanfro de 45° (aresta na mesa)
+        [D, zl, 0.7],                                 // topo do lábio de trás
+        [yt, zl, 0.5],
+        [yt, p_base, 0], [yf, p_base, 0],             // fundo da ranhura
+        [yf, zl, 0.5],                                // topo do lábio da frente
+        [yf - lab, zl, 0.7],
+        [yf - lab, p_aba, 1.5],                       // concordância côncava do lábio com a aba
+        [y_vidro(p_ponta) + 6, p_aba, 3],             // aba fina
+        [y_vidro(p_ponta) + 1.5, p_ponta, 1],         // ponta engrossada
+        [y_vidro(p_ponta), p_ponta, 0.6],             // topo da ponta: a face do EVA desce na reta do vidro
+        [y_vidro(0.5), 0.5, 0.3]]);
 
-// TAMPA DA PONTA (igual nas duas pontas): placa de 3 mm no contorno da barra
-// com língua que entra entre os trilhos, à frente do alumínio; 2 parafusos
-// M3 × 8 pelos trilhos (em cima e embaixo). Local: face externa em x = 0,
-// língua para -x.
+// TRILHO DE CIMA: aba curta até o vidro (perfil (y, z) anti-horário):
+// face de baixo em z_u, ponta com face curta para o EVA e chanfro de 45°
+// por baixo (de cabeça para baixo na mesa, nada passa de 45°), lábio da frente descendo sobre o alumínio, ranhura,
+// lábio de trás, topo reto (vai para a mesa) e ponta na reta do vidro.
+function perfil_sup() = let(yf = y_al[0] - g_al, yt = y_al[1] + g_al, zl = z_teto - sob)
+    boleado([
+        [y_vidro(z_ev) + (z_ev - z_u), z_u, 0.6],      // ponta: chanfro de 45° por baixo (imprime sem suporte)
+        [yf - lab, z_u, 0.7],
+        [yf - lab, zl, 0.7],                          // lábio da frente
+        [yf, zl, 0.5],
+        [yf, z_teto, 0], [yt, z_teto, 0],             // fundo da ranhura
+        [yt, zl, 0.5],
+        [D, zl, 0.7],                                 // lábio de trás
+        [D, H - 1.2, 0.5], [D - 1.2, H, 0],           // canto de trás: chanfro de 45° (aresta na mesa)
+        [y_top, H, 0.3],                              // ponta, em cima
+        [y_vidro(z_ev), z_ev, 0.4]]);                 // face do EVA (na reta do vidro)
+
+// recorte dos lábios no trecho do PG7 (região acima/abaixo do fundo da ranhura)
+module sem_labio(sup) {
+    zz = sup ? [z_teto - sob - 0.5, z_teto - 0.01] : [p_base + 0.01, p_base + sob + 0.5];
+    loft(x_sem_labio[0], x_sem_labio[1], ret(y_al[0] - g_al - lab - 2.5, D + 1, zz[0], zz[1]), 5);
+}
+module furos_ponta(sup) {
+    for (x = [5, L_barra - 5]) no_arco(x) translate([0, y_parafuso_ponta, sup ? z_u - 1 : -1]) cylinder(d = d_M3_passante, h = H);
+}
+module trilho_inf() difference() { loft(0, L_barra, perfil_inf()); sem_labio(false); furos_ponta(false); }
+module trilho_sup() difference() { loft(0, L_barra, perfil_sup()); sem_labio(true); furos_ponta(true); }
+
+// TAMPA DA PONTA (igual nas duas pontas): placa de 3 mm no contorno do
+// corte (fecha a câmara e encosta no vidro pelo EVA) com língua que entra
+// na câmara, à frente do alumínio; 2 parafusos M3 × 8, um por baixo (pela
+// aba) e um por cima (pela aba de cima). Local: face externa em x = 0,
+// língua para -x; o plano (y, z) do corte é o mesmo dos trilhos.
+module corte_2d() { polygon(perfil_inf()); polygon(perfil_sup()); }
+module camara_2d() difference() {
+    hull() corte_2d();
+    corte_2d();
+    translate([y_al[0], -1]) square([D, H + 2]);       // alumínio e o que fica atrás dele
+}
+module no_plano_yz() multmatrix([[0, 0, 1, 0], [1, 0, 0, 0], [0, 1, 0, 0]]) children();   // (y, z) do 2D → (y, z) da peça, extrusão em x
 module tampa_ponta() {
     p = 8;   // comprimento da língua
     difference() {
         union() {
-            // placa externa no contorno da barra
-            rotate([0, 90, 0]) mirror([1, 0, 0]) linear_extrude(3)
-                polygon([for (q = ret(0, D, 0, H, r_frente, r_tras)) [q[1], q[0]]]);
-            // língua: preenche a cavidade na ponta (o alumínio encosta na face interna)
-            translate([-p, folga, z_c[0] + folga]) cube([p, y_g[0] - 2 * folga, z_c[1] - z_c[0] - 2 * folga]);
+            no_plano_yz() linear_extrude(3) offset(r = 0.6) offset(delta = -0.6) hull() corte_2d();
+            translate([-p, 0, 0]) no_plano_yz() linear_extrude(p + 0.01) offset(delta = -folga) camara_2d();
         }
-        for (z = [z_c[0] + folga - 0.01, z_c[1] - folga - 6]) translate([-5, y_parafuso_ponta, z]) cylinder(d = d_M3_piloto, h = 6.01);
+        translate([-5, y_parafuso_ponta, p_base + folga - 0.01]) cylinder(d = d_M3_piloto, h = 6);
+        translate([-5, y_parafuso_ponta, z_u - folga - 6]) cylinder(d = d_M3_piloto, h = 6.01);
     }
 }
 
-// Fita e alumínio (visualização)
+// Fita, alumínio, EVA e vidro (visualização)
 module fantasma_interno() {
-    color("white") loft(x_fita[0], x_fita[1], ret(y_g[0] - e_fita, y_g[0], H/2 - w_fita/2, H/2 + w_fita/2, 2, 2), 20);
-    color("silver") loft(0.3, L_barra - 0.3, ret(y_g[0] + g_al, y_g[0] + g_al + t_al, H/2 - w_al/2, H/2 + w_al/2), 20);
+    color("white") loft(x_fita[0], x_fita[1], ret(y_al[0] - e_fita, y_al[0], z_fita - w_fita/2, z_fita + w_fita/2, 1.5, 0.3), 20);
+    color("silver") loft(0.3, L_barra - 0.3, ret(y_al[0], y_al[1], z_al[0], z_al[1]), 20);
+}
+module vidro() {   // vidro de 5 mm, e_eva à frente da reta das pontas
+    s = e_eva / sin(ang_vidro);
+    color("lightblue", 0.25) loft(-40, L_barra + 40,
+        [[-s - 60 / tg, -60], [-s + (H + 40) / tg, H + 40], [-s - 5 / sin(ang_vidro) + (H + 40) / tg, H + 40], [-s - 5 / sin(ang_vidro) - 60 / tg, -60]], 20);
 }
 
 // GABARITO de furação do alumínio: marca o furo Ø12,7 do PG7 a partir da
@@ -247,18 +309,20 @@ module tampa_controle() {     // tampa: tudo acima de z_corte (vira de cabeça p
 
 // ---------------------------------------------------------------------
 module montagem() {
-    color("dimgray") { trilho(); trilho_sup(); }
+    color("dimgray") { trilho_inf(); trilho_sup(); }
     fantasma_interno();
     color("gray") { no_arco(L_barra) tampa_ponta(); no_arco(0) mirror([1, 0, 0]) tampa_ponta(); }
+    vidro();
     // retrovisor interno (referência: a barra passa por cima)
-    color("black", 0.4) translate([L_barra / 2 - 35, 20, -80]) cube([70, 25, 60]);
+    color("black", 0.4) translate([L_barra / 2 - 35, D - 25, -80]) cube([70, 25, 60]);
 }
 
 // ---------------------------------------------------------------------
 // Seletor de peças (orientadas para impressão)
 if (peca == "montagem") montagem();
-else if (peca == "trilho") trilho();        // deitado na mesa (imprimir 2)
-else if (peca == "tampa_ponta") rotate([0, 90, 0]) tampa_ponta();   // placa na mesa (imprimir 2)
+else if (peca == "trilho_inf") trilho_inf();                                  // aba na mesa
+else if (peca == "trilho_sup") translate([0, 0, H]) rotate([180, 0, 0]) trilho_sup();   // topo na mesa
+else if (peca == "tampa_ponta") rotate([0, 90, 0]) tampa_ponta();             // placa na mesa (imprimir 2)
 else if (peca == "gabarito_furacao") gabarito_furacao();
 else if (peca == "caixa_controle") caixa_controle();   // fundo na mesa
 else if (peca == "tampa_controle") translate([0, 0, cx_int[2] + p_cx]) rotate([180, 0, 0]) tampa_controle();   // topo na mesa
