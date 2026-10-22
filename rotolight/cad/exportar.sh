@@ -3,8 +3,16 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 OUT="${1:-exportados}"; mkdir -p "$OUT"
-PECAS="trilho_inf trilho_sup tampa_ponta gabarito_furacao caixa_controle tampa_controle"
-for p in $PECAS; do
+# nº de trechos de cada trilho (igual ao n_seg do .scad)
+NSEG=5
+# trilhos: divididos em trechos que cabem na A1 (macho/fêmea entre eles)
+for r in trilho_inf trilho_sup; do
+  for s in $(seq 1 "$NSEG"); do
+    echo ">> ${r}_$s"; openscad -q -D "peca=\"$r\"" -D "seg=$s" -o "$OUT/${r}_$s.stl" rotolight.scad
+  done
+done
+# demais peças (inteiras)
+for p in tampa_ponta gabarito_furacao caixa_controle tampa_controle; do
   echo ">> $p"; openscad -q -D "peca=\"$p\"" -o "$OUT/$p.stl" rotolight.scad
 done
 

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="560" viewBox="0 0 980 560" font-family="Arial">
+<defs><marker id="m" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z"/></marker></defs>
+<rect width="980" height="560" fill="#fff"/>
+<text x="490" y="30" font-size="19" text-anchor="middle">Rotolight v_08 — emenda dos trilhos (vista de cima, no lado da cabine)</text>
+
+<!-- régua total -->
+<text x="490" y="58" font-size="13" text-anchor="middle" fill="#555">cada trilho (1100 mm) = 5 trechos de 220 mm; emenda macho/fêmea de 10 mm, escondida atrás do alumínio</text>
+
+<!-- TRECHO ESQUERDO (macho) -->
+<g>
+  <rect x="70" y="150" width="360" height="150" fill="#d9d9d9" stroke="#333"/>
+  <text x="250" y="130" font-size="14" text-anchor="middle">trecho da esquerda</text>
+  <!-- ressalto (boss) atrás -->
+  <rect x="300" y="150" width="130" height="40" fill="#c2c2c2" stroke="#333"/>
+  <text x="300" y="210" font-size="11" fill="#666">ressalto (boss)</text>
+  <!-- lingueta macho avança 10 mm -->
+  <rect x="430" y="158" width="70" height="24" fill="#7fae7f" stroke="#2f6f2f"/>
+  <text x="520" y="150" font-size="13" fill="#2f6f2f">MACHO (lingueta)</text>
+  <text x="520" y="168" font-size="12" fill="#2f6f2f">avança 10 mm</text>
+</g>
+
+<!-- TRECHO DIREITO (fêmea) -->
+<g>
+  <rect x="560" y="330" width="360" height="150" fill="#cfe0ef" stroke="#2a6f97"/>
+  <text x="740" y="510" font-size="14" text-anchor="middle">trecho da direita</text>
+  <!-- ressalto com fenda fêmea -->
+  <rect x="560" y="330" width="130" height="40" fill="#b9cfe2" stroke="#2a6f97"/>
+  <rect x="560" y="338" width="74" height="24" fill="#fff" stroke="#2a6f97" stroke-dasharray="4 3"/>
+  <text x="560" y="392" font-size="11" fill="#2a6f97">ressalto (boss)</text>
+  <text x="450" y="348" font-size="13" fill="#2a6f97" text-anchor="end">FÊMEA (fenda)</text>
+  <text x="450" y="366" font-size="12" fill="#2a6f97" text-anchor="end">folga 0,25 mm/lado</text>
+  <line x1="455" y1="350" x2="558" y2="350" stroke="#2a6f97" stroke-width="0.8"/>
+</g>
+
+<!-- seta de montagem -->
+<line x1="500" y1="250" x2="595" y2="330" stroke="#000" stroke-width="1.5" marker-end="url(#m)"/>
+<text x="548" y="300" font-size="13" transform="rotate(40 548 300)">encaixa deslizando</text>
+
+<!-- cota 10 mm -->
+<line x1="430" y1="200" x2="500" y2="200" stroke="#000" marker-start="url(#m)" marker-end="url(#m)"/>
+<text x="465" y="218" font-size="12" text-anchor="middle">10</text>
+
+<text x="490" y="545" font-size="12" text-anchor="middle" fill="#555">o alumínio contínuo passa reto por dentro de todos os trechos e alinha a barra; silicone na ranhura + cola na lingueta</text>
+</svg>

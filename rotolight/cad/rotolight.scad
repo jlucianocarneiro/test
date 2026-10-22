@@ -40,6 +40,13 @@ R_vidro = 3000;       // raio do para-brisa em planta (medir: R = c²/(8·f))
 ang_vidro = 30;       // inclinação do para-brisa sobre a horizontal, no topo (MEDIR com o inclinômetro do celular)
 e_eva = 2;            // EVA nas pontas das abas, entre a barra e o vidro
 
+/* [Divisão para a mesa A1 (256 mm)] */
+n_seg = 5;            // nº de trechos de cada trilho (1100/5 = 220 mm, cabe na A1)
+seg = 0;              // trecho a exportar: 0 = trilho inteiro; 1..n_seg = um trecho
+j_ov = 10;            // sobreposição do macho na junta (mm)
+j_bl = 12;            // comprimento do ressalto (boss) embutido em cada lado da junta
+j_folga = 0.25;       // folga do encaixe macho/fêmea por lado
+
 /* [Alumínio (parede de trás e dissipador)] */
 w_al = 19.05;         // barra chata 3/4" × 1/8"
 t_al = 3.18;
@@ -169,6 +176,59 @@ module furos_ponta(sup) {
 }
 module trilho_inf() difference() { loft(0, L_barra, perfil_inf()); sem_labio(false); furos_ponta(false); }
 module trilho_sup() difference() { loft(0, L_barra, perfil_sup()); sem_labio(true); furos_ponta(true); }
+
+// ---------------------------------------------------------------------
+// DIVISÃO EM TRECHOS PARA A A1, com junta de sobreposição (macho/fêmea)
+// ---------------------------------------------------------------------
+// Cada trilho (1100 mm) é cortado em n_seg trechos. A junta fica num
+// ressalto atrás do alumínio (lado da cabine, escondido): o trecho à
+// esquerda termina num MACHO (lingueta que avança j_ov) e o da direita
+// começa numa FÊMEA (fenda que o recebe). A lingueta atravessa toda a
+// altura do ressalto (paredes verticais), então imprime sem suporte. O
+// alumínio contínuo, dentro da ranhura de todos os trechos, é a espinha
+// que alinha tudo; o silicone da ranhura cola cada trecho ao alumínio.
+function xc(i) = L_barra * i / n_seg;              // posição do corte i
+
+// faixa (z) com material atrás do alumínio, onde mora a junta, por trilho
+function j_z(sup) = sup ? [z_teto - sob, H] : [0, p_base + sob];
+j_yc = D + 0.5;      // centro da lingueta em y (atrás do lábio, não toca o alumínio)
+j_wy = 4;            // largura da lingueta em y
+
+module junta_boss(x, dir, sup) {                   // ressalto atrás, altura cheia do trilho
+    z = j_z(sup);
+    no_arco(x) translate([dir > 0 ? 0.5 : -j_bl - 0.5, y_al[1] + g_al - 0.3, z[0]])
+        cube([j_bl, (D + 2.6) - (y_al[1] + g_al - 0.3), z[1] - z[0]]);   // recuado 0,5 mm da face (não toca o outro trecho nem fica coplanar)
+}
+module junta_macho(x, sup) {                       // lingueta saindo +x (avança j_ov)
+    z = j_z(sup);
+    no_arco(x) translate([-j_bl, j_yc - j_wy / 2, z[0] + 0.6])
+        cube([j_bl + j_ov, j_wy, (z[1] - z[0]) - 1.2]);
+}
+module junta_femea(x, sup) {                        // fenda que recebe a lingueta (com folga)
+    z = j_z(sup);
+    no_arco(x) translate([-1, j_yc - j_wy / 2 - j_folga, z[0] + 0.6 - j_folga])
+        cube([j_ov + 1, j_wy + 2 * j_folga, (z[1] - z[0]) - 1.2 + 2 * j_folga]);
+}
+
+// corpo do trecho: o próprio loft entre xa e xb (pontas já fechadas), sem
+// os recortes do PG7/furos quando fora do trecho (viram no-op)
+module corpo_trecho(sup, xa, xb) difference() {
+    loft(xa, xb, sup ? perfil_sup() : perfil_inf());
+    sem_labio(sup); furos_ponta(sup);
+}
+module trecho(sup, j) {                            // j = 1..n_seg
+    xa = xc(j - 1); xb = xc(j);
+    difference() {
+        union() {
+            corpo_trecho(sup, xa, xb);
+            if (j < n_seg) { junta_boss(xb, -1, sup); junta_macho(xb, sup); }   // ponta direita interna: macho
+            if (j > 1) junta_boss(xa, 1, sup);                                  // ponta esquerda interna: fêmea (boss)
+        }
+        if (j > 1) junta_femea(xa, sup);                                        // recebe o macho do trecho anterior
+    }
+}
+module trilho_inf_trecho(j) trecho(false, j);
+module trilho_sup_trecho(j) trecho(true, j);
 
 // TAMPA DA PONTA (igual nas duas pontas): placa de 3 mm no contorno do
 // corte (fecha a câmara e encosta no vidro pelo EVA) com língua que entra
@@ -320,8 +380,8 @@ module montagem() {
 // ---------------------------------------------------------------------
 // Seletor de peças (orientadas para impressão)
 if (peca == "montagem") montagem();
-else if (peca == "trilho_inf") trilho_inf();                                  // aba na mesa
-else if (peca == "trilho_sup") translate([0, 0, H]) rotate([180, 0, 0]) trilho_sup();   // topo na mesa
+else if (peca == "trilho_inf") { if (seg > 0) trilho_inf_trecho(seg); else trilho_inf(); }                 // aba na mesa
+else if (peca == "trilho_sup") translate([0, 0, H]) rotate([180, 0, 0]) { if (seg > 0) trilho_sup_trecho(seg); else trilho_sup(); }   // topo na mesa
 else if (peca == "tampa_ponta") rotate([0, 90, 0]) tampa_ponta();             // placa na mesa (imprimir 2)
 else if (peca == "gabarito_furacao") gabarito_furacao();
 else if (peca == "caixa_controle") caixa_controle();   // fundo na mesa
