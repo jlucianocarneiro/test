@@ -24,16 +24,16 @@ D  = 15;              // profundidade da bandeja plástica
 t_al = 3.18;          // espessura da tampa traseira de alumínio (1/8")
 p_frente = 2.4;       // parede frontal (6 perímetros de 0.4)
 p_tb = 6;             // paredes superior/inferior (recebem parafusos M3; junta ≥ 1,2 mm ao lado do furo)
-p_ext = 5;            // paredes das pontas
+p_ext = 6;            // paredes das pontas (junta ≥ 1,3 mm ao lado do furo)
 
 /* [LEDs e óptica] */
 passo_led = 11;       // passo entre LEDs (lente TIR Ø10)
 colunas = 18;         // 18 colunas × 2 fileiras = 36 LEDs por meia-barra
 dz_fileira = 5.5;     // meia distância entre as duas fileiras
-x_c = 109.5;          // centro do campo de LEDs ao longo da barra
+x_c = 110;            // centro do campo de LEDs ao longo da barra
 janela = [203, 22];   // abertura frontal
 lente_pc = [207, 25, 2]; // placa de policarbonato colada por dentro
-pcb = [207, 24];      // placa de LEDs (alumínio), x de 6 a 213
+pcb = [207, 24];      // placa de LEDs (alumínio), x de 6,5 a 213,5
 
 /* [Forma orgânica] */
 R_vidro = 3000;       // raio do para-brisa em planta (medir no carro, ver flecha())
@@ -94,7 +94,7 @@ function furos_tampa() = concat(
     [for (x = xs_borda) [x, p_tb/2]],
     [for (x = xs_borda) [x, H - p_tb/2]],
     [[p_ext/2, H/2 + 10], [L - p_ext/2, H/2 + 10]]); // acima do furo M5 da junta
-x_prensa = 222;        // passagem dos fios pela tampa de alumínio (PG7 na meia-barra D; Ø8 + anel de vedação na E)
+x_prensa = 222.5;        // passagem dos fios pela tampa de alumínio (PG7 na meia-barra D; Ø8 + anel de vedação na E)
 
 // ---------------------------------------------------------------------
 module hexagono(af, h) { cylinder(d = af / cos(30), h = h, $fn = 6); }
@@ -171,7 +171,7 @@ module casca() {
 module cavidade() {
     xs = [for (x = [p_ext : 6 : L - p_ext]) x];
     xs2 = concat(xs, xs[len(xs) - 1] < L - p_ext ? [L - p_ext] : []);
-    loft(xs2, [for (x = xs2) perfil(frente(x) + p_frente, D + 2, p_tb, H - p_tb, 2, 0.5)]);
+    loft(xs2, [for (x = xs2) perfil(frente(x) + p_frente, D + 2, p_tb, H - p_tb, 0.5, 0.5)]);
 }
 
 // Aba da ventosa: disco paralelo ao vidro, unido à barra por um pescoço
@@ -215,8 +215,10 @@ module carcaca() {
         translate([x_c - janela[0]/2, -1, H/2 - janela[1]/2])
             cube([janela[0], p_frente + flecha(0) + 2, janela[1]]);
         // furos-piloto M3 para a tampa de alumínio
+        // furos-piloto M3 rasos, para não atravessar a frente arredondada:
+        // 9,5 mm nas bordas (M3×12 entra 7,8 mm; M3×16 da caixa, 9,3 mm) e 8 mm nas pontas
         for (p = furos_tampa()) translate([p[0], D + 0.01, p[1]])
-            rotate([90, 0, 0]) cylinder(d = d_M3_piloto, h = 13.5); // M3×16 entra 11,8 mm
+            rotate([90, 0, 0]) cylinder(d = d_M3_piloto, h = (p[0] < p_ext || p[0] > L - p_ext) ? 8 : 9.5);
         // furo M5 da junta (cego: não atravessa para a cavidade)
         translate([-L_ressalto - h_dente - 1, D/2, H/2]) rotate([0, 90, 0])
             cylinder(d = d_M5, h = L_ressalto + h_dente + 1 + 3);
@@ -253,7 +255,7 @@ module fantasma_interno() {
 module junta_vedacao() {
     difference() {
         cube([L, H, 1]);
-        translate([p_ext - 0.5, p_tb - 0.5, -1]) cube([L - 2*p_ext + 1, H - 2*p_tb + 1, 3]);
+        translate([p_ext, p_tb, -1]) cube([L - 2*p_ext, H - 2*p_tb, 3]);
         for (p = furos_tampa()) translate([p[0], p[1], -1]) cylinder(d = d_M3_passante, h = 3);
     }
 }
@@ -385,12 +387,13 @@ module braco_fixo() {
                 translate([-5, dy_fixo - w_aba/2, -t_aba/2]) cube([1, w_aba, t_aba]);
                 translate([4, 0, 0]) barra_arr(1, tubo_ext[0], tubo_ext[1], 5);
             }
+            // presilhas antes do furo do tubo: o furo as recorta por dentro
+            for (x = [35, 105]) translate([x, tubo_ext[0]/2 + 2, 0]) presilha_cabo();
         }
         translate([15, -tubo_int[0]/2, -tubo_int[1]/2]) cube([L_fixo, tubo_int[0], tubo_int[1]]);
         translate([L_fixo - 8, 0, -10]) cylinder(d = d_pino, h = 20);
     }
     translate([x_aba_fixo, 0, 0]) aba_articulacao(16, dy_fixo);
-    for (x = [35, 105]) translate([x, tubo_ext[0]/2 + 2, 0]) presilha_cabo();
 }
 
 // EXTENSOR (opcional, modular): macho como a corrediça numa ponta, fêmea
@@ -430,7 +433,7 @@ module engate() {
                 translate([30, dy_eng - w_aba/2, 0]) cube([1, w_aba, z_eng + fenda/2 + b_sup]);
             }
         }
-        translate([12, 0, -1]) cylinder(d = d_pino, h = 10);
+        translate([12, 0, -1]) cylinder(d = d_pino_doca, h = 10);
         translate([-1, 0, 4]) rotate([0, 90, 0]) cylinder(d = 24, h = 1.2, $fn = 4); // chanfro
     }
     translate([28 + 18, 0, z_eng]) garfo(20, dy_eng);
@@ -442,7 +445,7 @@ module engate() {
 // braço. Canal para o engate, furo do pino e alojamento do ímã.
 // Base da lingueta em z=0.
 module doca() {
-    x_sq = L_lingueta; L_sq = 38; z_canal = e_doca; h_canal = 8 + 2*0.4;
+    x_sq = L_lingueta; L_sq = 35; z_canal = e_doca; h_canal = h_canal_doca;
     h_sq = z_canal + h_canal + 3.1;
     x_canal = x_sq + 12;
     difference() {
@@ -459,19 +462,26 @@ module doca() {
         hull() for (x = [2, 12]) translate([x, 0, -1]) cylinder(d = d_parafuso_quebra_sol, h = 5);
         translate([x_canal, -7 - 0.2, z_canal]) cube([L_sq, 14.4, h_canal]);
         translate([x_canal + 12, 0, 1]) cylinder(d = d_pino_doca, h = 20);
-        translate([x_canal - 5, 0, h_sq - h_ima]) cylinder(d = d_ima, h = 5);
+        translate([x_canal - 3, 0, h_sq - h_ima]) cylinder(d = d_ima, h = 5);
+    }
+    // dois frisos de 0,4 mm no fundo do canal: a língua entra justa
+    // (esmagam um pouco na primeira montagem) e não fica com jogo vertical
+    for (y = [-4.5, 4.5]) difference() {
+        translate([x_canal + 2, y - 0.6, z_canal - 0.01]) cube([L_sq - 14, 1.2, 0.41]);
+        translate([x_canal + 12, 0, 1]) cylinder(d = d_pino_doca + 1, h = 20);
     }
 }
 d_pino_doca = 4.3;     // pino magnético impresso Ø4 (furo vertical na impressão)
+h_canal_doca = 8.6;    // canal da língua (8 mm) com frisos de 0,4 mm no fundo
 function doca_x_pino() = L_lingueta + 12 + 12;
-function doca_h() = e_doca + 8.8 + 3.1;
+function doca_h() = e_doca + h_canal_doca + 3.1;
 
 // PINO de trava com cabeça imantada
 module pino() {
-    comp = 3.1 + 8.8 + 1.3;
+    comp = 3.1 + h_canal_doca + 1.3;
     hull() {
         cylinder(d = 14, h = 3);
-        translate([-17, 0, 0]) cylinder(d = 14, h = 3);
+        translate([-15, 0, 0]) cylinder(d = 14, h = 3);
     }
     translate([0, 0, 3]) {
         cylinder(d = 4.0, h = comp - 0.6);
@@ -481,7 +491,7 @@ module pino() {
 module pino_impressao() {
     difference() {
         pino();
-        translate([-17, 0, -0.01]) cylinder(d = d_ima, h = h_ima);
+        translate([-15, 0, -0.01]) cylinder(d = d_ima, h = h_ima);
     }
 }
 
@@ -498,7 +508,7 @@ module manopla(base) {
         }
         translate([0, 0, -1]) cylinder(d = d_M5, h = 12);
         if (base == "parafuso") translate([0, 0, 10 - h_cabeca_M5]) hexagono(porca_M5_af, 5);
-        else translate([0, 0, -0.01]) hexagono(porca_M5_af, h_porca_trava);
+        else translate([0, 0, -0.01]) hexagono(8.05, h_porca_trava);   // DIN 985 (s = 8) prensada
     }
 }
 
@@ -523,7 +533,7 @@ module caixa() {
             ext_y(0, 2.5) offset(r = 3) offset(delta = -3) square([L_caixa, H]);  // base com abas
             hull() {
                 ext_y(0, P_caixa - 3) perfil_caixa();
-                ext_y(0, P_caixa) perfil_caixa(1.5);
+                ext_y(0, P_caixa) perfil_caixa(0.8);
             }
         }
         ext_y(2.5, P_caixa) perfil_caixa(pw);

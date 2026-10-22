@@ -47,7 +47,7 @@ Os **preços são faixas estimadas** (out/2026, R$, varejo nacional ou AliExpres
 | 28 | Conector aviação GX16-2 (macho + fêmea de cabo) | 1 par | 15–25 |
 | 29 | Conector aviação GX16-8 (macho + fêmea de cabo) | 1 par | 15–30 |
 | 30 | Prensa-cabo PG7 (nylon, IP68) | 3 | 8–15 |
-| 30a | Passa-fio/anel de vedação de silicone para furo Ø8 (passagem alumínio → caixa) | 1 | 3 |
+| 30a | Silicone neutro em volta dos fios na passagem Ø8 (alumínio → caixa); a passagem tem 5,7 mm de espessura e fica dentro da caixa | — | — |
 | 31 | Espaguete termorretrátil sortido | 1 kit | 15 |
 
 ## 2.4 Mecânica (compradas)
@@ -56,8 +56,8 @@ Os **preços são faixas estimadas** (out/2026, R$, varejo nacional ou AliExpres
 |---|---|---|---|---|
 | 32 | Barra chata de alumínio 1-1/2" × 1/8" (38,1 × 3,18 mm) | 2 × 238 mm | tampa traseira/dissipador; vende-se em barra de 1 m | 25–50 |
 | 33 | Chapa de policarbonato 2 mm transparente (preferir com UV) | 2 × (207 × 25 mm) | cortar com estilete e régua | 15–40 |
-| 34 | Parafuso M3 × 16 inox, cabeça panela/Phillips | 18 (+6) | tampa de alumínio (12 por meia-barra; na esquerda, 6 deles são os M3 × 20 da linha 35) | 10–20 |
-| 35 | Parafuso M3 × 20 inox | 6 | atravessam a base da caixa de controle | 5 |
+| 34 | Parafuso M3 × 12 inox, cabeça panela/Phillips | 18 (+6) | tampa de alumínio (12 por meia-barra; na esquerda, 6 deles são os M3 × 16 da linha 35). Furo-piloto raso (9,5 mm; 8 mm nas pontas): parafuso mais longo fura a frente arredondada | 10–20 |
+| 35 | Parafuso M3 × 16 inox | 6 | atravessam a base da caixa de controle | 5 |
 | 36 | Parafuso M3 × 10 autoatarraxante para plástico | 4 | tampa da caixa | 3 |
 | 37 | Parafuso sextavado M5 × 25 (DIN 933) inox | 2 | rosáceas (atravessa manopla + adaptador até a porca cativa) | 3–6 |
 | 37a | Parafuso sextavado M5 × 20 (DIN 933) inox | 4 | articulações (cabeça cativa no garfo) | 4–8 |

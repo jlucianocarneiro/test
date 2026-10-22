@@ -1,7 +1,7 @@
 # 1 — Pesquisa de componentes e decisões de projeto
 
 Projeto: Rotolight LED para parabrisa de viatura descaracterizada (PCDF, 8ª DP)
-Versão: v0.2 (projeto, ainda não fabricado), 22/10/2026 — forma orgânica e correções da auditoria independente
+Versão: v0.3 (projeto, ainda não fabricado), 22/10/2026 — forma orgânica e correções das auditorias independentes (rodadas 1 e 2)
 
 > Valores marcados com **(confirmar)** vêm de datasheet de distribuidor ou de estimativa de engenharia e têm de ser conferidos no datasheet oficial ou em bancada antes da compra/fabricação.
 
@@ -101,7 +101,7 @@ O resistor do vermelho tira parte do calor de cima do CCR. Com o motor desligado
 | **PCB de alumínio (MCPCB) 1 camada, 1,6 mm, 207 × 24 mm, uma por meia-barra (idênticas)** | **Escolhido.** A JLCPCB fabrica alumínio de 1 camada; uma placa longa elimina fios entre módulos |
 | Módulos segmentados (6 cabeças por lado) | Mais conectores e mais pontos de falha; só vale se a placa longa ficar cara |
 
-Placa de LEDs: **207 × 24 mm** (x de 6 a 213 mm a partir da ponta externa). Nela ficam 36 LEDs, 12 CCRs (DPAK), 4 resistores de 8,2 Ω 2512, 1 NTC 10 k (só a placa esquerda precisa) e os pads de saída (12V, 6 retornos, NTC).
+Placa de LEDs: **207 × 24 mm** (x de 6,5 a 213,5 mm a partir da ponta externa). Nela ficam 36 LEDs, 12 CCRs (DPAK), 4 resistores de 8,2 Ω 2512, 1 NTC 10 k (só a placa esquerda precisa) e os pads de saída (12V, 6 retornos, NTC).
 A placa portadora do Nano (FR4) leva os 12 MOSFETs, o LM2936, o TVS e os capacitores. Para o protótipo serve placa perfurada com os AO3400A em adaptadores SOT-23→DIP.
 
 **Pendente:** desenhar as duas placas no KiCad (o esquema elétrico está no doc 03).
@@ -158,7 +158,7 @@ Configuração sugerida para PETG funcional: 4–6 paredes, 5 camadas sólidas e
 
 - Janela: PC colado com silicone neutro (cura acética ataca o PC e os contatos: **não usar**)
 - Tampa traseira: junta impressa em TPU de 1 mm + 12 parafusos M3, com espaçamento ≤ 55 mm
-- Passagens de cabo: prensa-cabos PG7
+- Passagens de cabo: prensa-cabos PG7; na passagem Ø8 do alumínio para a caixa, silicone neutro
 - O FDM não é estanque por natureza: 5+ paredes e, se preciso, verniz/selador nas faces internas
 - **Ensaio caseiro tipo IPX5:** jato de mangueira (bico ~6 mm), 3 min de cada lado, a 2,5–3 m; abrir e inspecionar. Poeira: a junta + PG7 devem bastar para IP5X. É um ensaio indicativo, não uma certificação.
 
@@ -167,8 +167,8 @@ Configuração sugerida para PETG funcional: 4–6 paredes, 5 camadas sólidas e
 ## 1.10 Fixação no quebra-sol (avaliação)
 
 - **Escolhido:** "doca" presa **sob o suporte do quebra-sol**, aproveitando **um dos parafusos originais** (furo oblongo de 12 mm de curso para ajuste). Só o trecho que fica preso sob o suporte (`L_lingueta`, 16 mm por padrão) tem 2,5 mm; dali em diante a doca tem a altura toda do soquete (14,4 mm), porque é essa seção que recebe o momento do braço. Instala uma vez com chave; depois, **a barra entra e sai sem ferramentas** (encaixe + pino magnético).
-- **Por que mudou (v0.2):** na v0.1 a lingueta de 26 × 2,5 mm ia do parafuso ao soquete e levava todo o momento do braço em balanço (≈ 1,7 N·m): ≈ 62 MPa a 1 g, acima da resistência do PETG (~45–50 MPa). Agora a seção crítica é a do soquete, ≈ 11 MPa a 5 g. **Medir no carro** até onde o suporte do quebra-sol cobre a lingueta e ajustar `L_lingueta`: o degrau tem de ficar logo na borda do suporte.
+- **Por que mudou (v0.2):** na v0.1 a lingueta de 26 × 2,5 mm ia do parafuso ao soquete e levava todo o momento do braço em balanço (≈ 1,7 N·m): ≈ 62 MPa a 1 g, acima da resistência do PETG (~45–50 MPa). **Atenção (auditoria v0.2):** encurtar o trecho fino não basta. O momento do braço continua passando pela seção de 2,5 mm na borda do suporte (≈ 65 MPa a 1 g), a não ser que o suporte do quebra-sol aperte a lingueta com rigidez até essa borda, o que só o carro real responde. Para aguentar com folga, a doca precisa ser de **alumínio** (lingueta de 5 mm, parafuso do quebra-sol 5 mm mais longo) ou ancorada nos **dois** parafusos do suporte. **Medir no carro** até onde o suporte do quebra-sol cobre a lingueta e ajustar `L_lingueta`: o degrau tem de ficar logo na borda do suporte.
 - O parafuso original pode ficar curto com a doca embaixo: medir e, se preciso, usar um parafuso de mesma rosca 3 mm mais longo.
 - A doca sob pressão do parafuso, em PETG, pode **fluir (creep)** no calor. Se a barra começar a folgar, refazer a doca em **chapa de alumínio de 2 mm** (o desenho serve de gabarito).
-- **Plano B** (carros onde o suporte não permite a doca): abraçadeira na haste do quebra-sol. Fica para uma v0.2, se necessário.
+- **Plano B** (carros onde o suporte não permite a doca): abraçadeira na haste do quebra-sol, numa versão futura, se necessário.
 - **Airbag de cortina:** em muitos carros ele corre pela borda do teto junto à coluna A. A doca e o braço **não podem ficar no caminho do airbag**. Conferir no manual do veículo antes de instalar.

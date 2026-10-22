@@ -4,7 +4,7 @@ Projeto modular de barra de luz de emergência com **72 LEDs** (vermelho, azul, 
 
 Desenho **orgânico**: a frente de cada meia-barra acompanha a curvatura do para-brisa (raio medido no carro, parâmetro `R_vidro`), as arestas e pontas são arredondadas e as peças de fixação têm transições suaves.
 
-Status: **v0.2, projeto.** Nada foi fabricado nem testado em bancada. Falta desenhar as PCBs (KiCad) e fazer o teste térmico (ver "Pendências").
+Status: **v0.3, projeto.** Nada foi fabricado nem testado em bancada. Falta desenhar as PCBs (KiCad) e fazer o teste térmico (ver "Pendências").
 
 ![Meia-barra montada](cad/meia_barra_frente.png)
 
@@ -73,4 +73,4 @@ Parâmetros que dependem do carro (topo do `.scad`): `R_vidro`, `d_parafuso_queb
 5. **Medidas do veículo** (parafuso do quebra-sol, airbag de cortina, folga do forro) ainda não conferidas num carro real.
 6. Firmware testado **só em simulação no PC** (lógica dos padrões e limite de corrente); falta gravar e testar no Nano.
 7. **Peso acima da meta:** a auditoria estimou ~570 g no mínimo e ~700 g realista (barra + braços, sem cabo), contra a meta de 500 g. O alumínio sozinho pesa ~150 g. Baixar o peso pede uma decisão de projeto (ver relatório da avaliação).
-8. **Rigidez:** com a ventosa a barra fica apoiada nas duas pontas; sem ela, o braço em balanço tem frequência natural baixa (~3 Hz estimados) e vai tremer. A ventosa é necessária.
+8. **Rigidez e resistência da fixação (bloqueia a aprovação):** a doca de PETG, com 2,5 mm sob o suporte do quebra-sol, leva o momento do braço em balanço e passa da resistência do PETG já a 1 g (~65 MPa, auditoria v0.2). Língua e corrediça passam de 45 MPa a 5 g. Com a ventosa carregando parte do peso os números caem, mas o requisito diz que a ventosa é só auxiliar. Saídas: doca de alumínio de 5 mm, ancoragem nos dois parafusos do suporte, ou aceitar a ventosa como apoio estrutural. **Decisão do usuário.**

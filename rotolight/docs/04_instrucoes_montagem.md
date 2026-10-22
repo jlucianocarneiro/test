@@ -30,7 +30,7 @@ Faixa de ajuste com os valores-padrão: do pino da doca até a ponta externa da 
 
 1. Corte duas barras chatas 1-1/2" × 1/8" com **238 mm**; lixe as rebarbas e arredonde os 4 cantos (lima, raio ~3 mm), para acompanhar a carcaça.
 2. Encaixe o **gabarito de furação** com o batente na ponta externa e marque com punção os 12 furos e o centro da passagem dos fios.
-3. Fure com Ø3,4 mm (parafusos M3). Passagem dos fios em x = 222 mm a partir da ponta externa: **Ø8 na meia-barra esquerda** (os fios vão direto para a caixa) e **Ø12,7 (PG7) na direita**.
+3. Fure com Ø3,4 mm (parafusos M3). Passagem dos fios em x = 222,5 mm a partir da ponta externa: **Ø8 na meia-barra esquerda** (os fios vão direto para a caixa) e **Ø12,7 (PG7) na direita**.
 4. Pinte a face **externa** com spray preto fosco de alta temperatura. A face interna fica nua, porque é onde a placa será colada.
 
 ## 4.3 Placas de LED
@@ -38,22 +38,22 @@ Faixa de ajuste com os valores-padrão: do pino da doca até a ponta externa da 
 1. Solde os LEDs (pasta de solda + soprador ou chapa quente; o ferro sozinho não solda o pad térmico em alumínio), os CCRs, os resistores e o NTC.
 2. **Antes de colar**, teste cada string na bancada com a fonte limitada a 400 mA.
 3. Coloque as lentes TIR (as que têm fita adesiva na base vão direto; as outras, com uma gota de cola de PC/acrílico fora da área óptica).
-4. Cole a placa (207 × 24 mm) no alumínio com adesivo térmico, de x = 6 a 213 mm a partir da ponta externa, centrada na altura. Deixe curar conforme o fabricante.
-5. Solde os fios de silicone 22 AWG nos pads e passe-os pela passagem (Ø8 com anel de silicone na esquerda; PG7 na direita).
+4. Cole a placa (207 × 24 mm) no alumínio com adesivo térmico, de x = 6,5 a 213,5 mm a partir da ponta externa, centrada na altura. Deixe curar conforme o fabricante.
+5. Solde os fios de silicone 22 AWG nos pads e passe-os pela passagem (Ø8 na esquerda, vedada com silicone neutro depois de montada a caixa; PG7 na direita).
 
 ## 4.4 Carcaça
 
 1. Limpe a face interna da janela com álcool isopropílico.
 2. Corte o policarbonato com 207 × 25 mm, retire o filme de um lado e aplique um cordão fino de **silicone neutro** em volta da janela, por dentro. Assente o PC, retire o outro filme e deixe curar por 24 h.
 3. Insira a **porca M5 DIN 934** (4 mm de altura) pelo rasgo de cima do ressalto da junta (ponta externa). Se ficar folgada, pingue cola.
-4. Coloque a junta de TPU, encaixe a tampa de alumínio (com a placa colada) e aperte os 12 parafusos M3 **em cruz**, sem forçar (o PETG espana).
-5. Na meia-barra **esquerda**, os 6 parafusos da região da caixa de controle são **M3 × 20** e atravessam também a base da caixa. Monte a caixa junto neste passo.
+4. Coloque a junta de TPU, encaixe a tampa de alumínio (com a placa colada) e aperte os 12 parafusos **M3 × 12** **em cruz**, sem forçar (o PETG espana). **Não use parafuso mais longo**: o furo-piloto é raso de propósito e um parafuso maior sai pela frente arredondada.
+5. Na meia-barra **esquerda**, os 6 parafusos da região da caixa de controle são **M3 × 16** e atravessam também a base da caixa. Monte a caixa junto neste passo.
 
 ## 4.5 Caixa de controle (só na meia-barra esquerda)
 
 1. Monte a placa do Nano (perfurada ou portadora): LM2936, TVS, capacitores, 12 canais (AO3400A + 100 Ω + 100 kΩ).
 2. Grave o firmware (`firmware/rotolight/rotolight.ino`) pelo USB, **com a placa ainda fora do carro**. No Arduino IDE: placa "Arduino Nano", processador "ATmega328P (Old Bootloader)" para clones CH340.
-3. Ligue os 9 fios da meia-barra esquerda que chegam pelo furo Ø8 da base (com o anel de silicone).
+3. Ligue os 9 fios da meia-barra esquerda que chegam pelo furo Ø8 da base e vede a passagem com silicone neutro.
 4. Na ponta externa da caixa: PG7 + cabo PP 2 × 0,75 mm² + GX16-2 macho.
 5. Na tampa: pulsador 12 mm e PG7 do cabo 8 vias para a meia-barra direita, com o GX16-8 na ponta.
 6. Feche a tampa (4 parafusos M3 × 10 para plástico).
@@ -66,6 +66,8 @@ Faixa de ajuste com os valores-padrão: do pino da doca até a ponta externa da 
 4. Corrediça ↔ adaptador: aba do adaptador no garfo da corrediça + manopla-porca por baixo.
 5. Adaptador ↔ carcaça: o **M5 × 25** entra pela face de fora da **manopla-parafuso** (a cabeça fica no alojamento dela), atravessa a manopla e o adaptador e rosqueia na porca cativa da carcaça. Assim a manopla fica presa entre a cabeça e o adaptador. Os dentes da rosácea (tipo Hirth) engrenam com os LEDs na horizontal e mudam a inclinação em passos de 15°.
 6. Cole um ímã Ø10 × 1,5 na cabeça do pino da doca e outro no alojamento da doca, **com polaridades que se atraem**.
+7. Prense as porcas autotravantes DIN 985 nas manoplas-porca (alojamento de 8,05 mm entre faces: entram justas, com uma prensa ou morsa).
+8. A língua do engate entra justa no canal da doca: os dois frisos de 0,4 mm do fundo esmagam um pouco na primeira montagem e tiram o jogo vertical. Não lixe os frisos.
 
 ## 4.7 Instalação no carro (uma vez, com ferramenta)
 

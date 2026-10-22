@@ -16,7 +16,7 @@ Tensão nominal: 12 V DC do veículo (11,5–14,8 V em operação normal). Corre
                      │  Nano D2  ◄── pulsador (tampa)                      │
                      │  Nano A6  ◄── NTC (placa de LEDs E)                 │
                      └──────┬───────────────────────────────┬──────────────┘
-          fios 22AWG pelo PG7 (direto)            cabo 8 vias + GX16-8
+          fios 22AWG pelo furo Ø8 (direto)        cabo 8 vias + GX16-8
                             ▼                               ▼
                  MEIA-BARRA ESQUERDA              MEIA-BARRA DIREITA
                zonas 0 (ext) e 1 (int)          zonas 2 (int) e 3 (ext)
@@ -67,8 +67,8 @@ NTC:     +5V ──[10k 1%]──●── A6
 
 | Zona | Posição | Vermelho | Azul | Branco | Fio/pino |
 |---|---|---|---|---|---|
-| 0 | esquerda externa | D3 | D4 | D5 | direto (PG7) |
-| 1 | esquerda interna | D6 | D7 | D8 | direto (PG7) |
+| 0 | esquerda externa | D3 | D4 | D5 | direto (furo Ø8) |
+| 1 | esquerda interna | D6 | D7 | D8 | direto (furo Ø8) |
 | 2 | direita interna | D9 | D10 | D11 | GX16-8 pinos 3, 4, 5 |
 | 3 | direita externa | D12 | A0 | A1 | GX16-8 pinos 6, 7, 8 |
 
