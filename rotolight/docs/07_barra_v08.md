@@ -51,14 +51,15 @@ O peso das peças impressas sai do fatiador, que ainda não foi rodado.
    - imprime de cabeça para baixo (o topo na mesa), sem suporte;
    - a face do EVA tem só 0,8 mm de altura (4 camadas). Por causa dela, essas 4 camadas da ponta saem com balanço de 60° e a borda pode cair um pouco; o EVA cobre essa borda.
 5. **EVA de 2 mm** nas duas pontas das abas, que encostam no vidro e vedam a câmara.
-6. **Duas tampas de ponta iguais**:
-   - uma placa no contorno do corte fecha as pontas da câmara e também encosta no vidro;
+6. **Duas tampas de ponta**:
+   - uma placa no contorno do corte fecha cada ponta da câmara e encosta no vidro;
    - a língua da tampa entra na câmara;
-   - cada tampa é presa por 2 parafusos M3 × 8, um por baixo (pela aba) e um por cima.
-7. **Saída do cabo**:
-   - prensa-cabo **PG7** pelo alumínio, a 22 mm da ponta, como na v_07;
-   - o cabo sai por trás, para a cabine;
-   - nesse trecho (de 11 a 34 mm da ponta) os lábios das ranhuras são recortados, para caberem a contraporca na frente e o sextavado do PG7 atrás.
+   - cada tampa é presa por 2 parafusos M3 × 8, um por baixo (pela aba) e um por cima;
+   - uma das tampas é **fechada**; a outra é **vazada** (ponta do cabo).
+7. **Saída do cabo (pela tampa vazada):**
+   - o cabo sai pela **extremidade da barra**, por um furo de Ø 12,5 mm na tampa vazada, na altura da fita;
+   - esse furo recebe um **prensa-cabo PG7** (veda e segura o cabo) e o cabo segue para a controladora;
+   - não há mais PG7 pela lateral do alumínio (saída mais simples e limpa).
 
 Todas as arestas são boleadas. As arestas que ficam na mesa de impressão são chanfradas a 45°, para não precisar de suporte.
 
@@ -73,9 +74,25 @@ O trilho de 1100 mm não cabe na mesa da A1 (256 mm). Cada trilho é dividido em
 
 Os cortes de cima e de baixo ficam nas mesmas posições (220, 440, 660, 880 mm). Dá para alterná-los (um parâmetro) se quiser.
 
-**Peças impressas:** trilho de baixo ×5 trechos, trilho de cima ×5 trechos, tampa_ponta ×2, gabarito ×1. Conferido no modelo: todos os 10 trechos são malhas fechadas, todos cabem na A1 (maior 235,6 mm), zero teto no ar, o rabo de andorinha do inf trava e os encaixes montam sem interferência.
+**Peças impressas:** trilho de baixo ×5 trechos, trilho de cima ×5 trechos, **4 clipes em C**, **2 tampas de ponta** (1 fechada + 1 vazada para o cabo). Conferido no modelo: todos os trechos são malhas fechadas, todos cabem na A1 (maior 235,6 mm), zero teto no ar, o rabo de andorinha do inf trava e os encaixes montam sem interferência.
 
-**Montagem:** encaixe os trechos do inf pelo rabo de andorinha; passe cola (epóxi ou cianoacrilato) nas emendas, inclusive nas de topo do sup; enfie a barra de alumínio contínua na ranhura de todos os trechos antes de a cola curar, para alinhar.
+## Clipes em C (prendem o alumínio e reforçam as emendas)
+
+Sobre cada uma das 4 emendas corre um **clipe em C** de 158 mm que abraça **costas + topo + base** da metade de trás da barra. Função: prender os dois trilhos ao alumínio de vez (capturar o alumínio) e reforçar o rabo de andorinha, coberto por baixo do clipe.
+
+- **Costas vazadas:** o fundo do clipe tem janelas, para o alumínio continuar ventilando (as costas não ficam totalmente cobertas).
+- **Colados:** a cola é que dá a sustentação (epóxi ou cianoacrilato); não precisam travar sozinhos.
+- **Impressão:** deitados, com um pouco de suporte na aba de cima. O suporte fica **escondido** (lado da cabine, por dentro do clipe) e, por ser **colado** (não deslizante), não atrapalha o encaixe. Cada clipe tem ~157 mm e cabe na A1.
+- Folga de 0,3 mm em volta da barra (entra fácil e cola).
+
+São **4 clipes** (um por emenda). Se quiser cobrir também as pontas e o meio dos trechos, dá para adicionar mais — é só repetir.
+
+## Montagem
+
+1. Encaixe os trechos do **inf** pelo rabo de andorinha; os do **sup** topo a topo.
+2. Passe cola nas emendas (inclusive nas de topo do sup).
+3. Enfie a **barra de alumínio** contínua na ranhura de todos os trechos antes de a cola curar, para alinhar.
+4. Passe cola e encaixe os **4 clipes em C** sobre as emendas (abraçando as costas da barra).
 
 ## Materiais só da barra
 
@@ -83,13 +100,13 @@ Os cortes de cima e de baixo ficam nas mesmas posições (220, 440, 660, 880 mm)
 |---|---|
 | Fita SEZO WS2812B 144 LED/m IP65, 1 m | 1 (**já comprada**) |
 | Barra chata de alumínio **3/4" × 1/8"** | 1 × 1100 mm |
-| Prensa-cabo PG7 (contraporca SW15 ou SW17) | 1 |
+| Prensa-cabo PG7 (na tampa vazada, saída do cabo) | 1 |
 | Parafuso M3 × 8 | 4 |
 | Cabo 4 vias 0,5 mm² | ~2 m (medir o caminho até a controladora) |
 | Silicone neutro preto (nas ranhuras: prende e veda a luz) | pouco |
 | Fita de EVA 2 mm × 5 mm, adesiva | 2 × 1,1 m |
 | Tinta spray preta fosca (costas do alumínio, opcional) | pouco |
-| Peças impressas em **PETG preto**: trilho de baixo ×5 trechos, trilho de cima ×5 trechos, tampa_ponta ×2, gabarito ×1 | — |
+| Peças impressas em **PETG preto**: trilho de baixo ×5, trilho de cima ×5, clipe em C ×4, tampa de ponta ×2 (1 fechada + 1 vazada) | — |
 
 **Material:** PETG preto, não PLA. Atrás do para-brisa, ao sol, a temperatura passa de 60 °C e o PLA amolece.
 

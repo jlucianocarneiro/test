@@ -11,8 +11,12 @@ for r in trilho_inf trilho_sup; do
     echo ">> ${r}_$s"; openscad -q -D "peca=\"$r\"" -D "seg=$s" -o "$OUT/${r}_$s.stl" rotolight.scad
   done
 done
-# demais peças (inteiras)
-for p in tampa_ponta gabarito_furacao caixa_controle tampa_controle; do
+# clipes em C sobre as emendas (4, colados; imprimem deitados com pouco suporte)
+for s in $(seq 1 $((NSEG - 1))); do
+  echo ">> clipe_$s"; openscad -q -D "peca=\"clipe\"" -D "seg=$s" -o "$OUT/clipe_$s.stl" rotolight.scad
+done
+# demais peças (inteiras): 2 tampas (uma vazada p/ o cabo) + controladora
+for p in tampa_ponta tampa_ponta_cabo caixa_controle tampa_controle; do
   echo ">> $p"; openscad -q -D "peca=\"$p\"" -o "$OUT/$p.stl" rotolight.scad
 done
 

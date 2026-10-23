@@ -216,10 +216,12 @@ module junta_macho(x, sup) intersection() {
     loft(x - 1.5, x + j_dd, sup ? perfil_sup() : perfil_inf());   // atravessa 1,5 mm o corpo (sem face coincidente)
     j_prisma(x, sup, 0);
 }
-// corpo do trecho: o próprio loft entre xa e xb (pontas já fechadas)
+// corpo do trecho: o próprio loft entre xa e xb (pontas já fechadas).
+// O cabo sai pela TAMPA VAZADA da ponta (não há mais PG7 pela lateral),
+// então não se recorta o lábio (sem_labio) — os lábios ficam cheios.
 module corpo_trecho(sup, xa, xb) difference() {
     loft(xa, xb, sup ? perfil_sup() : perfil_inf());
-    sem_labio(sup); furos_ponta(sup);
+    furos_ponta(sup);
 }
 module trecho(sup, j) {                            // j = 1..n_seg
     xa = xc(j - 1); xb = xc(j);
@@ -240,6 +242,31 @@ module trecho(sup, j) {                            // j = 1..n_seg
 module trilho_inf_trecho(j) trecho(false, j);
 module trilho_sup_trecho(j) trecho(true, j);
 
+// ---------------------------------------------------------------------
+// CLIPES EM C (prendem o alumínio e reforçam as emendas; colados)
+// ---------------------------------------------------------------------
+// Peças compridas que correm ao longo da barra (acompanhando o arco) e
+// abraçam costas + topo + base só da metade de trás. As costas são
+// vazadas (janelas) para o alumínio ventilar. Vão 4 clipes de clipe_lx,
+// centrados nas 4 emendas, cobrindo cada rabo de andorinha e avançando
+// nos dois trechos. São COLADOS (a cola dá a sustentação); imprimem
+// deitados (a aba de cima pede um pouco de suporte, que fica escondido
+// atrás e, por ser colado, não atrapalha o encaixe).
+clipe_t = 2.6;        // parede do clipe
+clipe_folga = 0.3;    // folga em volta da barra
+clipe_lx = 158;       // comprimento de cada clipe
+clipe_vent_p = 24;    // passo das janelas de ventilação no fundo
+clipe_vent_w = 16;    // largura de cada janela
+clipe_xs = [for (i = [1 : n_seg - 1]) xc(i)];   // centros = emendas (220, 440, 660, 880)
+
+module clipe_c(xa, xb) difference() {
+    loft(xa, xb, ret(D - 9, D + 2.5, -clipe_t, H + clipe_t, 0.8, 0.8));          // casca externa
+    loft(xa - 2, xb + 2, ret(D - 9.6, D + 0.1 + clipe_folga, -clipe_folga, H + clipe_folga));  // cavidade da barra (folga), aberta na frente
+    for (x = [xa + clipe_vent_p/2 : clipe_vent_p : xb - 2])                       // janelas de ventilação no fundo
+        no_arco(x) translate([-clipe_vent_w/2, D - 0.5, H/2 - 7]) cube([clipe_vent_w, 4, 14]);
+}
+module clipe_n(i) clipe_c(clipe_xs[i] - clipe_lx/2, clipe_xs[i] + clipe_lx/2);   // i = 0..n_seg-2
+
 // TAMPA DA PONTA (igual nas duas pontas): placa de 3 mm no contorno do
 // corte (fecha a câmara e encosta no vidro pelo EVA) com língua que entra
 // na câmara, à frente do alumínio; 2 parafusos M3 × 8, um por baixo (pela
@@ -257,11 +284,20 @@ module tampa_ponta() {
     difference() {
         union() {
             no_plano_yz() linear_extrude(3) offset(r = 0.6) offset(delta = -0.6) hull() corte_2d();
-            translate([-p, 0, 0]) no_plano_yz() linear_extrude(p + 0.01) offset(delta = -folga) camara_2d();
+            translate([-p, 0, 0]) no_plano_yz() linear_extrude(p + 0.3) offset(delta = -folga) camara_2d();   // sobrepõe a placa 0,3 mm (um corpo só)
         }
         translate([-5, y_parafuso_ponta, p_base + folga - 0.01]) cylinder(d = d_M3_piloto, h = 6);
         translate([-5, y_parafuso_ponta, z_u - folga - 6]) cylinder(d = d_M3_piloto, h = 6.01);
     }
+}
+// TAMPA DA PONTA VAZADA (ponta do cabo): igual à tampa, com um furo que
+// atravessa a língua e a placa para o cabo sair pela extremidade da barra.
+// Furo Ø d_cabo para um prensa-cabo PG7 (veda e segura o cabo). Fica na
+// câmara, à frente do alumínio, na altura da fita.
+d_cabo = 12.5;   // furo do cabo/PG7 na tampa vazada
+module tampa_ponta_cabo() difference() {
+    tampa_ponta();
+    translate([-10, y_al[0] - 7, z_fita]) rotate([0, 90, 0]) cylinder(d = d_cabo, h = 16);
 }
 
 // Fita, alumínio, EVA e vidro (visualização)
@@ -381,7 +417,8 @@ module tampa_controle() {     // tampa: tudo acima de z_corte (vira de cabeça p
 module montagem() {
     color("dimgray") { trilho_inf(); trilho_sup(); }
     fantasma_interno();
-    color("gray") { no_arco(L_barra) tampa_ponta(); no_arco(0) mirror([1, 0, 0]) tampa_ponta(); }
+    color("gray") { no_arco(L_barra) tampa_ponta_cabo(); no_arco(0) mirror([1, 0, 0]) tampa_ponta(); }   // ponta do cabo = tampa vazada
+    color("orange") for (i = [0 : len(clipe_xs) - 1]) clipe_n(i);   // 4 clipes em C sobre as emendas
     vidro();
     // retrovisor interno (referência: a barra passa por cima)
     color("black", 0.4) translate([L_barra / 2 - 35, D - 25, -80]) cube([70, 25, 60]);
@@ -392,7 +429,9 @@ module montagem() {
 if (peca == "montagem") montagem();
 else if (peca == "trilho_inf") { if (seg > 0) trilho_inf_trecho(seg); else trilho_inf(); }                 // aba na mesa
 else if (peca == "trilho_sup") translate([0, 0, H]) rotate([180, 0, 0]) { if (seg > 0) trilho_sup_trecho(seg); else trilho_sup(); }   // topo na mesa
-else if (peca == "tampa_ponta") rotate([0, 90, 0]) tampa_ponta();             // placa na mesa (imprimir 2)
+else if (peca == "clipe") clipe_n(seg - 1);                                   // clipe em C (seg = 1..4; imprime deitado, pouco suporte na aba de cima)
+else if (peca == "tampa_ponta") rotate([0, 90, 0]) tampa_ponta();             // placa na mesa (ponta sem cabo)
+else if (peca == "tampa_ponta_cabo") rotate([0, 90, 0]) tampa_ponta_cabo();   // placa na mesa (ponta do cabo, vazada)
 else if (peca == "gabarito_furacao") gabarito_furacao();
 else if (peca == "caixa_controle") caixa_controle();   // fundo na mesa
 else if (peca == "tampa_controle") translate([0, 0, cx_int[2] + p_cx]) rotate([180, 0, 0]) tampa_controle();   // topo na mesa
