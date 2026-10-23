@@ -43,13 +43,12 @@ e_eva = 2;            // EVA nas pontas das abas, entre a barra e o vidro
 /* [Divisão para a mesa A1 (256 mm)] */
 n_seg = 5;            // nº de trechos de cada trilho (1100/5 = 220 mm, cabe na A1)
 seg = 0;              // trecho a exportar: 0 = trilho inteiro; 1..n_seg = um trecho
-j_ov = 16;            // sobreposição da lingueta (mm)
-j_tm = 1.6;           // espessura da lingueta horizontal (a aba)
-j_cl = 0.2;           // folga vertical entre a lingueta e o teto
-j_tooth = 0.9;        // altura do dente (trava por clique)
-j_tx = 3.5;           // comprimento do dente no sentido x
-j_ty = 3.0;           // largura do dente no sentido y
-j_folga = 0.25;       // folga lateral do encaixe por lado
+j_dd = 12;            // profundidade do rabo de andorinha no sentido x (mm)
+// o trilho de baixo (inf) tem a aba larga; o de cima (sup) é um flange curto,
+// então cada um tem o rabo de andorinha na sua própria faixa de y
+j_dc_inf = 22; j_wn_inf = 18; j_wt_inf = 28;   // centro / pescoço / ponta (inf, aba larga)
+j_dc_sup = 43; j_wn_sup = 3;  j_wt_sup = 8;    // centro / pescoço / ponta (sup, só o lábio de cima)
+j_folga = 0.2;        // folga do encaixe por lado (deslizante)
 
 /* [Alumínio (parede de trás e dissipador)] */
 w_al = 19.05;         // barra chata 3/4" × 1/8"
@@ -182,66 +181,41 @@ module trilho_inf() difference() { loft(0, L_barra, perfil_inf()); sem_labio(fal
 module trilho_sup() difference() { loft(0, L_barra, perfil_sup()); sem_labio(true); furos_ponta(true); }
 
 // ---------------------------------------------------------------------
-// DIVISÃO EM TRECHOS PARA A A1, com junta de LINGUETA HORIZONTAL + CLIQUE
+// DIVISÃO EM TRECHOS PARA A A1, com emenda em RABO DE ANDORINHA
 // ---------------------------------------------------------------------
-// Cada trilho (1100 mm) é cortado em n_seg trechos. A emenda é uma
-// sobreposição horizontal: o trecho da esquerda termina numa LINGUETA larga
-// (a própria parte plana da seção — a aba) que avança j_ov; o da direita
-// recebe essa lingueta por baixo de um TETO atrás (lado da cabine) e tem a
-// parte plana recortada para a lingueta entrar rente. No alto da lingueta há
-// um DENTE que encaixa com clique numa FENDA (janela) do teto, travando a
-// emenda. O alumínio contínuo corre na ranhura de todos os trechos e alinha
-// a barra; cola na lingueta + silicone na ranhura fixam tudo.
-//
-// Em inf a parte plana é embaixo (z=0) e o teto/ranhura em cima; em sup é o
-// contrário (a peça imprime virada). As funções abaixo trocam o sinel de z.
+// Cada trilho (1100 mm) é cortado em n_seg trechos. A emenda é um rabo de
+// andorinha largo na parte plana da seção: o trecho da esquerda avança uma
+// LINGUETA trapezoidal (pescoço estreito na face de corte, ponta larga
+// dentro da fêmea) e o da direita tem o rasgo correspondente. A lingueta
+// atravessa TODA a espessura do trilho (paredes verticais), então imprime
+// sem suporte e sem nenhuma face horizontal no ar. A ponta larga trava
+// contra os ombros da fêmea (não sai por tração ao longo da barra). Os
+// trechos encaixam deslizando um no outro; o alumínio contínuo, na ranhura,
+// impede que se separem no sentido da espessura, e o silicone/cola fixam.
 function xc(i) = L_barra * i / n_seg;              // posição do corte i
-j_inf_top = p_base + sob;                          // topo do perfil de baixo (4 mm)
-j_sup_bot = z_teto - sob;                          // base do perfil de cima
-function j_flatz(sup) = sup ? [H - j_tm, H + 1] : [-1, j_tm];                 // faixa z da lingueta (parte plana)
-function j_roofz(sup) = sup ? [j_sup_bot, H - j_tm - j_cl] : [j_tm + j_cl, j_inf_top];   // faixa z do teto (lado da ranhura)
-function j_toothz(sup) = sup ? [H - j_tm - j_tooth, H - j_tm] : [j_tm, j_tm + j_tooth];   // z do dente (da lingueta p/ o teto)
-j_yt = y_al[1] + g_al;         // início do lábio de trás (y)
-j_ty_c = D - 1.5;              // centro do dente/janela em y (sob o teto)
-j_xt = j_ov - 5;               // posição x do dente dentro da sobreposição (local ao no_arco)
 
-// LINGUETA (macho): a parte plana do perfil, estendida j_ov em +x
-module junta_lingueta(x, sup) {
-    fz = j_flatz(sup);
-    intersection() {
-        loft(x, x + j_ov, sup ? perfil_sup() : perfil_inf());
-        no_arco(x) translate([-1, -300, fz[0]]) cube([j_ov + 2, 600, fz[1] - fz[0]]);
-    }
-}
-// DENTE (macho): cunha no alto da lingueta — rampa de entrada no lado +x,
-// face de trava reta no lado -x (segura contra o arranque)
-module junta_dente(x, sup) {
-    tz = j_toothz(sup); zbase = sup ? tz[1] : tz[0]; ztip = sup ? tz[0] : tz[1];
-    xt = j_xt;
-    no_arco(x) hull() {
-        translate([xt, j_ty_c - j_ty / 2, zbase]) cube([0.8, j_ty, 0.001]);        // -x, base
-        translate([xt, j_ty_c - j_ty / 2, ztip]) cube([0.8, j_ty, 0.001]);         // -x, ponta (trava reta)
-        translate([xt + j_tx, j_ty_c - j_ty / 2, zbase]) cube([0.001, j_ty, 0.001]); // +x, rampa até a base
-    }
-}
-// TETO (fêmea): laje atrás, sobre a lingueta, que carrega a janela do dente
-module junta_teto(x, sup) {
-    rz = j_roofz(sup);
-    no_arco(x) translate([0, j_yt - 0.5, min(rz[0], rz[1])])
-        cube([j_ov - 1, (D + 2) - (j_yt - 0.5), abs(rz[1] - rz[0])]);
-}
-// recorte na fêmea: tira a parte plana (lingueta + folga) e abre a janela
-module junta_recorte(x, sup) {
-    fz = j_flatz(sup); rz = j_roofz(sup);
-    // espaço da lingueta (parte plana) + folga vertical
-    zl = sup ? [H - j_tm - j_cl, H + 2] : [-2, j_tm + j_cl];
-    no_arco(x) translate([-1, -300, min(zl[0], zl[1])]) cube([j_ov + 1.3, 600, abs(zl[1] - zl[0])]);
-    // janela do dente, atravessando o teto
-    xt = j_xt;
-    no_arco(x) translate([xt - j_folga, j_ty_c - j_ty / 2 - j_folga, min(rz[0], rz[1]) - 1])
-        cube([j_tx + 2 * j_folga, j_ty + 2 * j_folga, abs(rz[1] - rz[0]) + 2]);
+// trapézio do rabo de andorinha em (x, y) local do corte, anti-horário
+// (pescoço em x=0, ponta larga em x=j_dd). delta engorda p/ a folga da fêmea.
+function j_dc(sup) = sup ? j_dc_sup : j_dc_inf;
+function j_wn(sup) = sup ? j_wn_sup : j_wn_inf;
+function j_wt(sup) = sup ? j_wt_sup : j_wt_inf;
+function j_trap(sup, delta = 0) = let(c = j_dc(sup), wn = j_wn(sup), wt = j_wt(sup)) [
+    [-1.5, c - wn / 2 - delta], [j_dd + delta, c - wt / 2 - delta],
+    [j_dd + delta, c + wt / 2 + delta], [-1.5, c + wn / 2 + delta]];
+// faixa z onde mora o rabo de andorinha: inf = altura cheia; sup = só o
+// lábio acima da ranhura (abaixo disso o material é partido pela ranhura)
+function j_pz(sup) = sup ? [z_teto + 0.15, H + 1] : [-1, H + 1];
+// prisma do rabo de andorinha (paredes verticais, imprime sem suporte)
+module j_prisma(x, sup, delta = 0) {
+    pz = j_pz(sup);
+    no_arco(x) translate([0, 0, pz[0]]) linear_extrude(pz[1] - pz[0]) polygon(j_trap(sup, delta));
 }
 
+// LINGUETA (macho): o perfil recortado pelo trapézio, avançando j_dd em +x
+module junta_macho(x, sup) intersection() {
+    loft(x - 1.5, x + j_dd, sup ? perfil_sup() : perfil_inf());   // atravessa 1,5 mm o corpo (sem face coincidente)
+    j_prisma(x, sup, 0);
+}
 // corpo do trecho: o próprio loft entre xa e xb (pontas já fechadas)
 module corpo_trecho(sup, xa, xb) difference() {
     loft(xa, xb, sup ? perfil_sup() : perfil_inf());
@@ -252,10 +226,9 @@ module trecho(sup, j) {                            // j = 1..n_seg
     difference() {
         union() {
             corpo_trecho(sup, xa, xb);
-            if (j < n_seg) { junta_lingueta(xb, sup); junta_dente(xb, sup); }   // ponta direita: lingueta + dente
-            if (j > 1) junta_teto(xa, sup);                                     // ponta esquerda: teto da fêmea
+            if (j < n_seg) junta_macho(xb, sup);    // ponta direita: lingueta rabo de andorinha
         }
-        if (j > 1) junta_recorte(xa, sup);                                      // abre o espaço da lingueta e a janela
+        if (j > 1) j_prisma(xa, sup, j_folga);           // ponta esquerda: rasgo da fêmea (com folga)
     }
 }
 module trilho_inf_trecho(j) trecho(false, j);
