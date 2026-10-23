@@ -223,12 +223,18 @@ module corpo_trecho(sup, xa, xb) difference() {
 }
 module trecho(sup, j) {                            // j = 1..n_seg
     xa = xc(j - 1); xb = xc(j);
-    difference() {
+    // O trilho de baixo (inf) leva o rabo de andorinha (aba larga, trava firme).
+    // O de cima (sup) é um flange curto com ranhura: um rabo de andorinha ali
+    // cria teto no ar e fica frágil (reprovado pela banca). Por isso o sup usa
+    // JUNTA DE TOPO colada — o alumínio contínuo na ranhura é que alinha os
+    // trechos, e a cola/silicone fixa. Imprime sem nenhuma saliência no ar.
+    if (sup) corpo_trecho(sup, xa, xb);
+    else difference() {
         union() {
             corpo_trecho(sup, xa, xb);
             if (j < n_seg) junta_macho(xb, sup);    // ponta direita: lingueta rabo de andorinha
         }
-        if (j > 1) j_prisma(xa, sup, j_folga);           // ponta esquerda: rasgo da fêmea (com folga)
+        if (j > 1) j_prisma(xa, sup, j_folga);      // ponta esquerda: rasgo da fêmea (com folga)
     }
 }
 module trilho_inf_trecho(j) trecho(false, j);

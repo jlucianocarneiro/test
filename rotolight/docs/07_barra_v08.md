@@ -64,18 +64,18 @@ Todas as arestas são boleadas. As arestas que ficam na mesa de impressão são 
 
 ## Divisão em trechos para a Bambu Lab A1
 
-O trilho de 1100 mm não cabe na mesa da A1 (256 mm). Cada trilho (o de cima e o de baixo) é dividido em **5 trechos de 220 mm**, com **encaixe de sobreposição (macho/fêmea)** entre eles, no estilo que você sugeriu (como os encaixes de cano PVC):
+O trilho de 1100 mm não cabe na mesa da A1 (256 mm). Cada trilho é dividido em **5 trechos de 220 mm**. A emenda foi validada por uma banca técnica (auditoria independente), que reprovou as primeiras versões e levou ao desenho atual:
 
-- O encaixe fica num **ressalto atrás do alumínio** (lado da cabine, escondido) — não mexe no perfil visível nem na frente.
-- O trecho da esquerda termina numa **lingueta (macho)** que avança 10 mm; o da direita começa numa **fenda (fêmea)** que a recebe, com 0,25 mm de folga por lado.
-- A lingueta atravessa toda a altura do ressalto (paredes verticais), então o encaixe **imprime sem suporte**, na mesma orientação deitada dos trilhos.
-- Na montagem, passa-se cola (epóxi ou cianoacrilato) nas linguetas.
+- **Trilho de baixo (inf): emenda em rabo de andorinha.** Na parte plana e larga da seção, o trecho da esquerda avança uma **lingueta trapezoidal** (pescoço estreito na face de corte, ponta larga dentro da fêmea) e o da direita tem o rasgo. A lingueta atravessa **toda a espessura** do trilho, com **paredes verticais** — imprime sem suporte e sem nenhuma face no ar. A ponta larga (27,6 mm) **não passa pela boca estreita** da fêmea (18,4 mm), então **trava** e os trechos não se separam ao longo da barra.
+- **Trilho de cima (sup): junta de topo colada.** O sup é um flange curto com a ranhura no meio; um rabo de andorinha ali criaria um teto no ar (não imprime limpo) e ficaria frágil. Por isso os trechos do sup **encostam topo a topo** e são colados — o **alumínio contínuo** é que alinha.
 
-**O que segura a barra montada:** a **barra de alumínio é contínua** (uma peça só de 1100 mm) e corre dentro da ranhura de todos os trechos. É ela a espinha que **alinha** tudo e dá a rigidez; o silicone da ranhura cola cada trecho impresso ao alumínio. Os encaixes macho/fêmea mantêm os trechos nivelados e no lugar durante a montagem. Então nenhuma emenda fica sendo o ponto fraco: o alumínio passa reto por todas.
+**O que segura a barra montada:** a **barra de alumínio é contínua** (uma peça só de 1100 mm) e corre dentro da ranhura de todos os trechos. É ela a espinha que **alinha** tudo e dá a rigidez; o silicone da ranhura cola cada trecho ao alumínio. O rabo de andorinha do inf trava a emenda principal; no sup, a cola + o alumínio resolvem. Nenhuma emenda é o ponto fraco: o alumínio passa reto por todas.
 
-Os cortes dos trilhos de cima e de baixo ficam nas mesmas posições (220, 440, 660, 880 mm). Se preferir que fiquem **alternados** (emendas de cima e de baixo em posições diferentes, para a barra ficar ainda mais rígida), é um ajuste de um parâmetro — me avise.
+Os cortes de cima e de baixo ficam nas mesmas posições (220, 440, 660, 880 mm). Dá para alterná-los (um parâmetro) se quiser.
 
-**Peças impressas agora:** trilho de baixo ×5 trechos, trilho de cima ×5 trechos, tampa_ponta ×2, gabarito ×1. Conferido no modelo: todos os 10 trechos são malhas fechadas, todos cabem na A1 (o maior tem 235,8 mm, já contando a lingueta), e os encaixes têm a folga certa (sem interferência).
+**Peças impressas:** trilho de baixo ×5 trechos, trilho de cima ×5 trechos, tampa_ponta ×2, gabarito ×1. Conferido no modelo: todos os 10 trechos são malhas fechadas, todos cabem na A1 (maior 235,6 mm), zero teto no ar, o rabo de andorinha do inf trava e os encaixes montam sem interferência.
+
+**Montagem:** encaixe os trechos do inf pelo rabo de andorinha; passe cola (epóxi ou cianoacrilato) nas emendas, inclusive nas de topo do sup; enfie a barra de alumínio contínua na ranhura de todos os trechos antes de a cola curar, para alinhar.
 
 ## Materiais só da barra
 
