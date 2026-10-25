@@ -1176,9 +1176,14 @@ function routeActs(day,i){
 }
 function renderDist(lat,lng){
   const s=POINTS.map(p=>({...p,d:hav(lat,lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d);
-  document.getElementById('distL').innerHTML=s.map(p=>p.d<0.03
+  const pHtml=s.map(p=>p.d<0.03
     ?`<div class="di"><span class="dn">${p.name}</span><span class="dv">aqui</span></div>`
     :`<div class="di"><span class="dn">${p.name}</span><span class="dv">${fD(p.d)}${p.d<WALK_KM?' · a pé':' · Uber'}</span>${goLinks(p,p.d)}</div>`).join('');
+  const pl=PLACES.map(p=>({...p,d:hav(lat,lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d);
+  const plHtml=pl.map(p=>p.d<0.03
+    ?`<div class="di"><span class="dn">${p.ic} ${p.name}</span><span class="dv">aqui</span></div>`
+    :`<div class="di"><span class="dn">${p.ic} ${p.name}</span><span class="dv">${fD(p.d)}${p.d<WALK_KM?' · a pé':' · Uber'}</span>${goLinks(p,p.d)}</div>`).join('');
+  document.getElementById('distL').innerHTML=pHtml+'<div class="st" style="margin-top:18px">Estabelecimentos</div>'+plHtml;
 }
 
 // ===========================
