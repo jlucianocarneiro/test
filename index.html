@@ -107,8 +107,8 @@ a{color:var(--accent);text-decoration:none}
 .mp-place.tipo-cerv{border-color:#ca8a04;background:#fefce8}.mp-place.tipo-churrasco{border-color:#b91c1c;background:#fecaca}
 .mp-place.tipo-bar{border-color:#7c3aed;background:#ede9fe}.mp-place.tipo-atracao{border-color:#0891b2;background:#cffafe}
 .mp-place.tipo-fondue{border-color:#ea580c;background:#fff7ed}.mp-place.tipo-massa{border-color:#16a34a;background:#dcfce7}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .mp-place{background:var(--card);border-color:var(--border)}}
-:root[data-theme="dark"] .mp-place{background:var(--card);border-color:var(--border)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .mp-place.tipo-rest{border-color:#b45309;background:#422006}:root:not([data-theme="light"]) .mp-place.tipo-pizza{border-color:#b91c1c;background:#450a0a}:root:not([data-theme="light"]) .mp-place.tipo-choco{border-color:#7e22ce;background:#3b0764}:root:not([data-theme="light"]) .mp-place.tipo-cafe{border-color:#a16207;background:#422006}:root:not([data-theme="light"]) .mp-place.tipo-cerv{border-color:#15803d;background:#052e16}:root:not([data-theme="light"]) .mp-place.tipo-churrasco{border-color:#9f1239;background:#4c0519}:root:not([data-theme="light"]) .mp-place.tipo-bar{border-color:#0e7490;background:#083344}:root:not([data-theme="light"]) .mp-place.tipo-atracao{border-color:#4f46e5;background:#1e1b4b}:root:not([data-theme="light"]) .mp-place.tipo-fondue{border-color:#c2410c;background:#431407}:root:not([data-theme="light"]) .mp-place.tipo-massa{border-color:#15803d;background:#052e16}}
+:root[data-theme="dark"] .mp-place.tipo-rest{border-color:#b45309;background:#422006}:root[data-theme="dark"] .mp-place.tipo-pizza{border-color:#b91c1c;background:#450a0a}:root[data-theme="dark"] .mp-place.tipo-choco{border-color:#7e22ce;background:#3b0764}:root[data-theme="dark"] .mp-place.tipo-cafe{border-color:#a16207;background:#422006}:root[data-theme="dark"] .mp-place.tipo-cerv{border-color:#15803d;background:#052e16}:root[data-theme="dark"] .mp-place.tipo-churrasco{border-color:#9f1239;background:#4c0519}:root[data-theme="dark"] .mp-place.tipo-bar{border-color:#0e7490;background:#083344}:root[data-theme="dark"] .mp-place.tipo-atracao{border-color:#4f46e5;background:#1e1b4b}:root[data-theme="dark"] .mp-place.tipo-fondue{border-color:#c2410c;background:#431407}:root[data-theme="dark"] .mp-place.tipo-massa{border-color:#15803d;background:#052e16}
 .mp-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:none;border-radius:12px;background:var(--card);color:var(--text);font-size:1.2rem;box-shadow:0 1px 6px rgba(0,0,0,.3);cursor:pointer}
 .mp-btn.on{background:#1a73e8;color:#fff}
 .mp-btn.on.half{background:var(--card);color:#1a73e8;box-shadow:0 0 0 2px #1a73e8,0 1px 6px rgba(0,0,0,.3)}
@@ -738,7 +738,6 @@ function fitTrack(){
   const t=track(),p=document.querySelector(`.dp[data-day="${curDay}"]`);
   if(t&&p&&t.offsetWidth){
     t.style.minHeight=p.scrollHeight+'px';
-    t.style.height=p.scrollHeight+'px';
   }
 }
 // A new day opens at its top: the sticky date bar's offsetTop moves with it, so use the header height.
@@ -1219,7 +1218,7 @@ function initMap(){
     PLACES.forEach(pl=>{
       const mk=L.marker([pl.lat,pl.lng],{icon:L.divIcon({className:'',html:`<div class="mp-place tipo-${pl.tipo}">${pl.ic}</div>`,iconSize:[28,28],iconAnchor:[14,14]}),title:pl.name,alt:pl.name,keyboard:true,zIndexOffset:-100});
       mk.bindPopup(()=>{const from=here||placeByName('Hotel Bellagio'),km=hav(from.lat,from.lng,pl.lat,pl.lng);
-        return `<b>${pl.name}</b><small style="display:block;margin:-4px 0 6px;color:var(--muted)">${pl.esp}</small>`+(km<0.03?'Vocês estão aqui.':`<small>${fD(km)} ${here?(here.label==='GPS'?'de onde vocês estão':'de '+here.label):'do hotel'}</small><div class="go" style="margin-top:8px"><a href="https://www.google.com/maps/dir/?api=1&destination=${pl.lat},${pl.lng}" target="_blank" rel="noopener" class="uber" style="background:var(--accent)">📍 Rota</a></div>`);},{maxWidth:240,minWidth:180});
+        return `<b>${pl.name}</b><small style="display:block;margin:-4px 0 6px;color:var(--muted)">${pl.esp}</small>`+(km<0.03?'Vocês estão aqui.':`<small>${fD(km)} ${here?(here.label==='GPS'?'de onde vocês estão':'de '+here.label):'do hotel'}</small>`+goLinks(pl,km));},{maxWidth:240,minWidth:180});
       mk.bindTooltip(pl.name,{permanent:false,direction:'right',offset:[8,0],className:'mp-lb'});
       mk.addTo(m);
     });
