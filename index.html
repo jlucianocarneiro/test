@@ -28,7 +28,7 @@ header p{font-size:.78rem;opacity:.85;margin-top:2px}
 .tb:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tb.today::after{content:'';position:absolute;top:5px;right:calc(50% - 15px);width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px var(--card)}
 @media(prefers-reduced-motion:reduce){.days{scroll-behavior:auto!important;transition:none!important}}
-.days{display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;transition:height .25s ease}
+.days{display:flex;align-items:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
 .days::-webkit-scrollbar{display:none}
 .dp{flex:0 0 100%;min-width:0;padding:14px;scroll-snap-align:start;scroll-snap-stop:always}
 #sec-roteiro.sec{padding:0}
@@ -101,6 +101,12 @@ a{color:var(--accent);text-decoration:none}
 .mp-dot{width:14px;height:14px;border-radius:50%;background:var(--brand);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .mp-pin{font-size:30px;line-height:30px;text-align:center;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
 .mp-me{width:16px;height:16px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 2px rgba(26,115,232,.35),0 1px 4px rgba(0,0,0,.4)}
+.mp-place{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;background:var(--card);border:2px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.35);cursor:pointer}
+.mp-place.tipo-rest{border-color:#d97706;background:#fef3c7}.mp-place.tipo-pizza{border-color:#dc2626;background:#fee2e2}
+.mp-place.tipo-choco{border-color:#92400e;background:#fde68a}.mp-place.tipo-cafe{border-color:#b45309;background:#fef3c7}
+.mp-place.tipo-cerv{border-color:#ca8a04;background:#fefce8}.mp-place.tipo-churrasco{border-color:#b91c1c;background:#fecaca}
+.mp-place.tipo-bar{border-color:#7c3aed;background:#ede9fe}.mp-place.tipo-atracao{border-color:#0891b2;background:#cffafe}
+.mp-place.tipo-fondue{border-color:#ea580c;background:#fff7ed}.mp-place.tipo-massa{border-color:#16a34a;background:#dcfce7}
 .mp-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:none;border-radius:12px;background:var(--card);color:var(--text);font-size:1.2rem;box-shadow:0 1px 6px rgba(0,0,0,.3);cursor:pointer}
 .mp-btn.on{background:#1a73e8;color:#fff}
 .mp-btn.on.half{background:var(--card);color:#1a73e8;box-shadow:0 0 0 2px #1a73e8,0 1px 6px rgba(0,0,0,.3)}
@@ -433,6 +439,45 @@ const POINTS=[
   {name:"Rodoviária Gramado",lat:-29.3790,lng:-50.8700,addr:"Rodoviária de Gramado, Av. Borges de Medeiros, 2100, Gramado - RS"},
   {name:"Container Bistrot",lat:-29.3635,lng:-50.8115,addr:"Container Bistrot, Canela - RS"},
 ];
+const PLACES=[
+  {name:"Burger 105",tipo:"rest",ic:"🍔",lat:-29.3654,lng:-50.8127,addr:"Av. Osvaldo Aranha, 181, Canela",esp:"Hambúrgueres artesanais"},
+  {name:"Carne & Osso",tipo:"churrasco",ic:"🥩",lat:-29.3702,lng:-50.8350,addr:"Av. das Hortênsias, 5530, Gramado",esp:"Steakhouse e parrilla"},
+  {name:"Restaurante Bella Gramado",tipo:"rest",ic:"🍽️",lat:-29.3775,lng:-50.8743,addr:"Rua Euzébio Balzaretti, 798, Centro, Gramado",esp:"Pizzas e grelhados"},
+  {name:"Caffè Della Nonna",tipo:"cafe",ic:"☕",lat:-29.3620,lng:-50.9010,addr:"Estrada Linha Bonita, 2490, Gramado",esp:"Café colonial"},
+  {name:"Tempero de Gramado",tipo:"rest",ic:"🍽️",lat:-29.3785,lng:-50.8725,addr:"Av. Borges de Medeiros, 1327, Gramado",esp:"Restaurante"},
+  {name:"St. Gallen",tipo:"fondue",ic:"🧀",lat:-29.3738,lng:-50.8605,addr:"Av. das Hortênsias, 1122, Centro, Gramado",esp:"Restaurante e fondue"},
+  {name:"Hector Pizzaria",tipo:"pizza",ic:"🍕",lat:-29.3798,lng:-50.8750,addr:"Av. Borges de Medeiros, 1791, Gramado",esp:"Pizzaria temática"},
+  {name:"Hard Rock Café",tipo:"bar",ic:"🎸",lat:-29.3755,lng:-50.8710,addr:"Rua Wilma Dinnebier, 180, Gramado",esp:"Restaurante temático"},
+  {name:"Colosseo",tipo:"massa",ic:"🍝",lat:-29.3770,lng:-50.8760,addr:"Rua Coberta, Gramado",esp:"Italiano, massas e risotos"},
+  {name:"Chocoá Chocolates",tipo:"choco",ic:"🍫",lat:-29.3768,lng:-50.8755,addr:"Centro, Gramado",esp:"Chocolateria"},
+  {name:"Cervejaria Farol",tipo:"cerv",ic:"🍺",lat:-29.3760,lng:-50.8730,addr:"Centro, Gramado",esp:"Cervejaria artesanal"},
+  {name:"Cervejaria Felsen",tipo:"cerv",ic:"🍺",lat:-29.3422,lng:-50.8478,addr:"Complexo Jolimont, Canela",esp:"Cervejaria no complexo Jolimont"},
+  {name:"Blend Massas",tipo:"massa",ic:"🍝",lat:-29.3772,lng:-50.8748,addr:"Centro, Gramado",esp:"Massas artesanais"},
+  {name:"Boteco do Bill",tipo:"bar",ic:"🍻",lat:-29.3766,lng:-50.8740,addr:"Centro, Gramado",esp:"Boteco e bar"},
+  {name:"Carlito's Restaurante",tipo:"fondue",ic:"🧀",lat:-29.3765,lng:-50.8735,addr:"Centro, Gramado",esp:"Restaurante e fondue"},
+  {name:"Garden Grill Fondue",tipo:"fondue",ic:"🧀",lat:-29.3762,lng:-50.8728,addr:"Centro, Gramado",esp:"Fondue"},
+  {name:"Garden Grill Parrilla",tipo:"churrasco",ic:"🥩",lat:-29.3761,lng:-50.8726,addr:"Centro, Gramado",esp:"Steakhouse e parrilla"},
+  {name:"Gaúcho Grill",tipo:"churrasco",ic:"🥩",lat:-29.3758,lng:-50.8720,addr:"Centro, Gramado",esp:"Churrasco e parrilla"},
+  {name:"Tapiocaria Gramado",tipo:"rest",ic:"🫓",lat:-29.3774,lng:-50.8752,addr:"Centro, Gramado",esp:"Tapiocas e lanches"},
+  {name:"Torre Café Colonial",tipo:"cafe",ic:"☕",lat:-29.3756,lng:-50.8715,addr:"Centro, Gramado",esp:"Café colonial"},
+  {name:"Magnólia Restaurante Bar Cine",tipo:"bar",ic:"🎬",lat:-29.3778,lng:-50.8758,addr:"Centro, Gramado",esp:"Restaurante, bar e cinema"},
+  {name:"Fundo da Grota",tipo:"churrasco",ic:"🥩",lat:-29.3750,lng:-50.8700,addr:"Gramado",esp:"Churrascaria"},
+  {name:"Churrascaria Chama Gaúcha",tipo:"churrasco",ic:"🥩",lat:-29.3748,lng:-50.8695,addr:"Gramado",esp:"Churrascaria"},
+  {name:"Heinz Beer Choperia",tipo:"cerv",ic:"🍺",lat:-29.3764,lng:-50.8738,addr:"Centro, Gramado",esp:"Choperia"},
+  {name:"Black Lake Restobar",tipo:"bar",ic:"🍔",lat:-29.3780,lng:-50.8762,addr:"Centro, Gramado",esp:"Hambúrgueres e restobar"},
+  {name:"Forneria Corleone",tipo:"pizza",ic:"🍕",lat:-29.3776,lng:-50.8756,addr:"Centro, Gramado",esp:"Pizzaria"},
+  {name:"Bistrô da Villa",tipo:"rest",ic:"🍽️",lat:-29.3782,lng:-50.8765,addr:"Centro, Gramado",esp:"Bistrô"},
+  {name:"Alice e o Chapeleiro",tipo:"rest",ic:"🎩",lat:-29.3771,lng:-50.8746,addr:"Centro, Gramado",esp:"Restaurante temático"},
+  {name:"Chocolataria Gramado",tipo:"choco",ic:"🍫",lat:-29.3769,lng:-50.8742,addr:"Centro, Gramado",esp:"Chocolateria"},
+  {name:"Johnny Rockets",tipo:"rest",ic:"🍔",lat:-29.3773,lng:-50.8750,addr:"Centro, Gramado",esp:"Hambúrgueres"},
+  {name:"Olivas de Gramado",tipo:"atracao",ic:"🫒",lat:-29.3700,lng:-50.8500,addr:"Gramado",esp:"Parque de olivicultura e gastronomia"},
+  {name:"Chocoland Fondue",tipo:"fondue",ic:"🍫",lat:-29.3760,lng:-50.8725,addr:"Gramado",esp:"Fondue e experiência temática de chocolate"},
+  {name:"Snowland",tipo:"atracao",ic:"❄️",lat:-29.3936,lng:-50.8391,addr:"RS-235, 9009, Gramado",esp:"Parque temático de neve"},
+  {name:"Fábrica Prawer",tipo:"choco",ic:"🍫",lat:-29.3772,lng:-50.8745,addr:"Centro, Gramado",esp:"Fábrica de chocolates e visitação"},
+  {name:"Lumni Experience",tipo:"atracao",ic:"✨",lat:-29.3767,lng:-50.8737,addr:"Centro, Gramado",esp:"Experiência imersiva"},
+  {name:"O Irlandês",tipo:"churrasco",ic:"🥩",lat:-29.3763,lng:-50.8732,addr:"Centro, Gramado",esp:"Restaurante e steakhouse"},
+];
+
 const PACK=[{"c": "roupa", "ic": "🧥", "t": "Vestuário", "per": true, "tip": "Regra das 3 camadas: segunda pele + suéter ou fleece + casaco corta-vento. Restaurantes e lojas são aquecidos: a camada de fora precisa sair fácil.", "items": [{"id": "casaco", "t": "Casaco quente corta-vento ou impermeável", "q": 1, "n": "noites do Natal Luz e do Nativitaten"}, {"id": "jaqueta-leve", "t": "Jaqueta leve ou fleece", "q": 1, "n": "para os dias de 12°C", "w": "m"}, {"id": "jaqueta-leve", "t": "Jaqueta leve ou cardigan", "q": 1, "n": "para os dias de 12°C", "w": "f"}, {"id": "sueter", "t": "Suéter ou tricô", "q": 2}, {"id": "termica-top", "t": "Blusa térmica (segunda pele)", "q": 2}, {"id": "termica-bottom", "t": "Calça térmica (segunda pele)", "q": 1, "n": "por baixo da calça nas noites", "w": "m"}, {"id": "termica-bottom", "t": "Legging ou meia-calça térmica", "q": 2, "n": "por baixo da calça ou do vestido", "w": "f"}, {"id": "manga-longa", "t": "Camisas ou camisetas de manga longa", "q": 4, "w": "m"}, {"id": "manga-longa", "t": "Blusas de manga longa", "q": 4, "w": "f"}, {"id": "camisetas", "t": "Camisetas", "q": 3, "n": "base das camadas", "w": "m"}, {"id": "camisetas", "t": "Camisetas ou regatas para camadas", "q": 3, "w": "f"}, {"id": "calcas", "t": "Calças jeans ou sarja", "q": 3}, {"id": "jantar", "t": "Look para jantar: camisa e calça mais arrumada", "q": 1, "n": "Cara de Mau e Château D'Geneve", "w": "m"}, {"id": "jantar", "t": "Look para jantar: vestido ou saia de malha + meia-calça térmica", "q": 1, "n": "Cara de Mau e Château D'Geneve", "w": "f"}, {"id": "pijama", "t": "Pijama quente", "q": 1}, {"id": "intimas", "t": "Cuecas", "q": 8, "w": "m"}, {"id": "intimas", "t": "Lingerie", "q": 8, "w": "f"}, {"id": "meias", "t": "Meias comuns", "q": 8}, {"id": "meias-grossas", "t": "Meias grossas de lã", "q": 3, "n": "Snowland e noites frias"}, {"id": "tenis", "t": "Tênis confortável, de preferência impermeável", "q": 1, "n": "Caracol tem 700 degraus"}, {"id": "calcado-noite", "t": "Sapato ou bota para a noite", "q": 1, "w": "m"}, {"id": "calcado-noite", "t": "Bota de cano curto confortável", "q": 1, "n": "evite salto: ruas de pedra", "w": "f"}, {"id": "chinelo", "t": "Chinelo para o hotel", "q": 1}, {"id": "gorro-luvas", "t": "Gorro, cachecol e luvas", "q": 1}, {"id": "chuva", "t": "Guarda-chuva compacto ou capa de chuva", "q": 1}]}, {"c": "pessoal", "ic": "🧴", "t": "Artigos pessoais", "per": true, "tip": "O frio da serra resseca a pele e os lábios, e o sol na altitude queima mesmo com frio.", "items": [{"id": "higiene", "t": "Escova, pasta e fio dental"}, {"id": "desodorante", "t": "Desodorante"}, {"id": "perfume", "t": "Perfume"}, {"id": "barbear", "t": "Barbeador ou lâminas e espuma", "w": "m"}, {"id": "pente", "t": "Pente e gel ou pomada", "w": "m"}, {"id": "maquiagem", "t": "Necessaire de maquiagem e demaquilante", "w": "f"}, {"id": "facial", "t": "Hidratante facial", "w": "f"}, {"id": "cabelo", "t": "Escova de cabelo, secador ou prancha e elásticos", "w": "f"}, {"id": "absorventes", "t": "Absorventes", "w": "f"}, {"id": "acessorios", "t": "Brincos e acessórios para os jantares", "w": "f"}, {"id": "hidratante", "t": "Hidratante corporal"}, {"id": "labial", "t": "Protetor labial"}, {"id": "protetor", "t": "Protetor solar", "n": "sol forte na altitude"}, {"id": "oculos", "t": "Óculos de sol"}, {"id": "remedios", "t": "Remédios de uso contínuo e receita"}, {"id": "farmacinha", "t": "Analgésico, antialérgico e remédio para enjoo", "n": "a estrada da serra tem muitas curvas"}]}, {"c": "tickets", "ic": "🎫", "t": "Tickets e documentos", "per": false, "tip": "Anexem os PDFs no app (botão 🎫 em cada reserva): abrem sem internet e o QR vai em tela cheia.", "items": [{"id": "docs", "t": "RG ou CNH dos dois", "n": "pedidos no Snowland, no Cara de Mau e nos embarques"}, {"id": "checkin-latam", "t": "Check-in LATAM LA3432 e cartão de embarque (ida, 24/10)", "n": "abre 48h antes: 22/10 · escolher os assentos"}, {"id": "checkin-gol", "t": "Check-in GOL G3 1795 e cartão de embarque (volta, 31/10)", "n": "abre 48h antes: 29/10 · assentos 10E e 10F"}, {"id": "citral", "t": "Passagens Citral ida e volta", "n": "poltronas 3-4 e 5-6"}, {"id": "bagagem-ida", "t": "Roupas da Greice na 2ª mala despachada do Luciano (ida)", "n": "na LATAM ela só tem mala de mão de 12 kg"}, {"id": "hotel", "t": "Voucher do Bellagio", "n": "Booking 5024.178.207"}, {"id": "snowland", "t": "2 ingressos Snowland (26/10)", "n": "check-in 11:00 · documento com foto"}, {"id": "jolimont", "t": "Ingressos Jolimont + Felsen (29/10)", "n": "LB32077972 · LB32078275"}, {"id": "caracol", "t": "Comprar ingressos do Parque do Caracol (online)", "n": "ainda falta!"}, {"id": "nativitaten", "t": "2 ingressos Nativitaten, Setor Ouro (29/10)"}, {"id": "caramau", "t": "Reserva Cara de Mau (30/10, entrada 21:30)", "n": "Mesa 68 · documento obrigatório"}, {"id": "anexar", "t": "Anexar todos os ingressos no app"}, {"id": "prime", "t": "App Prime Gourmet ativo e logado"}, {"id": "salas-vip", "t": "Priority Pass e Dragon Pass"}, {"id": "cartoes", "t": "Cartões de crédito e um pouco de dinheiro"}]}, {"c": "outros", "ic": "📦", "t": "Outros", "per": false, "tip": "Sugestões de quem já foi: espaço sobrando na mala para chocolates e vinhos, e um cadeado para a Fonte do Amor Eterno.", "items": [{"id": "carregadores", "t": "Celulares e carregadores"}, {"id": "powerbank", "t": "Power bank carregado"}, {"id": "mochila", "t": "Mochila pequena para os passeios"}, {"id": "garrafa", "t": "Garrafinha de água"}, {"id": "sacola", "t": "Sacola ou mala extra para chocolates e vinhos"}, {"id": "vinhos", "t": "Plástico-bolha ou meias para proteger os vinhos", "n": "líquidos acima de 100 ml só na mala despachada"}, {"id": "roupa-suja", "t": "Saco para roupa suja"}, {"id": "cadeado", "t": "Cadeado para a Fonte do Amor Eterno 💕"}, {"id": "previsao", "t": "Checar a previsão do tempo na véspera"}, {"id": "uber-pinos", "t": "Conferir os pinos do Uber de cada passeio"}, {"id": "funcionamento", "t": "Conferir funcionamento: Château (dom 25) e Snowland (seg 26)"}, {"id": "orcamento", "t": "Definir um orçamento diário com folga"}, {"id": "casa", "t": "Em casa: lixo, geladeira, tomadas e janelas"}]}];
 // Old flat checklist, kept only to migrate saved ticks (index -> new item ids)
 const CHECKS=[
@@ -617,6 +662,18 @@ const KB = [
   {k:["pórtico","portico","portal"],a:"Gramado tem dois pórticos de entrada: um na via de Nova Petrópolis e outro na via de Taquara. São pontos clássicos de foto, gratuitos. Reparem na chegada com a Citral em 24/10; a via de Nova Petrópolis é a RS-235, a mesma do Snowland."},
   {k:["catedral","catedral de pedra"],a:"A Catedral de Pedra (Nossa Senhora de Lourdes) fica na Praça João Corrêa, no centro de Canela, em estilo gótico inglês. Entrada gratuita. Está no roteiro de 29/10 às 15:00, a pé depois do almoço no Container Bistrot."},
   {k:["mala","bagagem","embalagem","o que levar","roupa","roupas","vestir"],a:"A aba Check tem a mala completa, com versão masculina e feminina para frio moderado (6 a 12°C), em quatro grupos: vestuário, artigos pessoais, tickets e documentos, e outros. Regra das 3 camadas: segunda pele, suéter ou fleece e casaco corta-vento. Dicas de mala: meias grossas para Snowland, agasalhos para noites frias (5-10°C), protetor solar (altitude!), power bank. Na volta: chocolates e vinhos na mala despachada (embrulhar bem!), líquidos >100ml na despachada. Carregar celulares 100%."},
+  {k:["onde comer","restaurante","sugestão","sugestao","comer","jantar","almoçar","almocar"],a:"Gramado e Canela têm dezenas de ótimos restaurantes. Algumas sugestões fora do roteiro: Carne & Osso (steakhouse na Av. das Hortênsias, 5530), St. Gallen (fondue na Av. das Hortênsias, 1122), Hector Pizzaria (temática, Av. Borges de Medeiros, 1791), Hard Rock Café (Rua Wilma Dinnebier, 180), Bella Gramado (pizzas e grelhados, Rua Euzébio Balzaretti, 798), Bistrô da Villa, Alice e o Chapeleiro (temático), Carlito's (fondue), Gaúcho Grill e Fundo da Grota (churrasco). Todos estão marcados no mapa na aba Local."},
+  {k:["hamburger","hambúrguer","hamburguer","burger","lanche"],a:"Para hambúrgueres em Gramado: Burger 105 (Av. Osvaldo Aranha, 181 em Canela, artesanais), Black Lake Restobar (centro de Gramado) e Johnny Rockets (rede americana, centro). Todos marcados no mapa."},
+  {k:["pizza","pizzaria","forneria"],a:"Pizzarias na região: Cara de Mau (vocês já têm reserva dia 30/10), Hector Pizzaria (temática, Av. Borges de Medeiros, 1791) e Forneria Corleone (centro de Gramado). Marcadas no mapa."},
+  {k:["cerveja","choperia","cervejaria artesanal","chope","chopp"],a:"Cervejarias da região: Cervejaria Felsen (no complexo da Jolimont, vocês visitam dia 29), Cervejaria Farol (centro de Gramado), Heinz Beer Choperia (centro). Todas no mapa."},
+  {k:["café colonial","cafeteria","café da tarde","cafe colonial"],a:"Opções de café colonial: vocês já vão ao Bela Vista dia 28. Outras opções: Caffè Della Nonna (Estrada Linha Bonita, 2490), Torre Café Colonial (centro). Marcadas no mapa."},
+  {k:["massa","massas","italiano","pasta"],a:"Para massas: Colosseo (vocês jantam lá dia 24, Prime 2x1, Rua Coberta), Blend Massas (centro). Opções de massas artesanais marcadas no mapa."},
+  {k:["fondue alternativa","outro fondue","fondue opção"],a:"Além do Château D'Geneve (dia 25), outras opções de fondue: St. Gallen (Av. das Hortênsias, 1122), Carlito's, Garden Grill Fondue, Chocoland (fondue de chocolate). Todos no mapa."},
+  {k:["churrasco","churrascaria","carne","parrilla"],a:"Churrascarias e steakhouses: Texas Gramado (vocês vão dia 27, Prime 2x1), Carne & Osso (Av. das Hortênsias, 5530), O Irlandês, Gaúcho Grill, Garden Grill Parrilla, Fundo da Grota e Chama Gaúcha. Marcados no mapa."},
+  {k:["chocolateria","bombom","trufa","chocolate loja"],a:"Chocolaterias: Prawer (a mais antiga, visitação dia 27), Chocoá Chocolates, Chocolataria Gramado, Chocoland (fondue de chocolate). Lugano e Florybal também no centro. Marcadas no mapa."},
+  {k:["bar","boteco","noite","happy hour","drink"],a:"Bares e vida noturna: Boteco do Bill, Hard Rock Café (Rua Wilma Dinnebier, 180), Black Lake Restobar, Magnólia Restaurante Bar Cine (restaurante, bar e cinema), Heinz Beer Choperia. Marcados no mapa."},
+  {k:["olivas","azeite","oliveira"],a:"Olivas de Gramado: parque de olivicultura e gastronomia com degustação de azeites, produtos artesanais e passeio entre oliveiras. Uma boa opção para manhã livre. Marcado no mapa."},
+  {k:["lumni","experiência imersiva","imersivo"],a:"Lumni Experience: atração de experiência imersiva em Gramado, com projeções e tecnologia. Boa opção para tardes livres. Marcada no mapa."},
 ];
 
 // ===========================
@@ -677,7 +734,10 @@ function markDay(d){
 // Height follows the visible day, so a short day does not leave a blank tail.
 function fitTrack(){
   const t=track(),p=document.querySelector(`.dp[data-day="${curDay}"]`);
-  if(t&&p&&t.offsetWidth)t.style.height=p.offsetHeight+'px';
+  if(t&&p&&t.offsetWidth){
+    t.style.minHeight=p.scrollHeight+'px';
+    t.style.height=p.scrollHeight+'px';
+  }
 }
 // A new day opens at its top: the sticky date bar's offsetTop moves with it, so use the header height.
 function toDayTop(){
@@ -1153,6 +1213,14 @@ function initMap(){
       mk.bindTooltip(pt.name,{permanent:true,direction:'right',offset:[8,0],className:'mp-lb'});
       mk.addTo(m);MAP.pins[pt.name]=mk;
     });
+    // Establishments: specialty-based markers (separate from itinerary POINTS)
+    PLACES.forEach(pl=>{
+      const mk=L.marker([pl.lat,pl.lng],{icon:L.divIcon({className:'',html:`<div class="mp-place tipo-${pl.tipo}">${pl.ic}</div>`,iconSize:[28,28],iconAnchor:[14,14]}),title:pl.name,alt:pl.name,keyboard:true,zIndexOffset:-100});
+      mk.bindPopup(()=>{const from=here||placeByName('Hotel Bellagio'),km=hav(from.lat,from.lng,pl.lat,pl.lng);
+        return `<b>${pl.name}</b><small style="display:block;margin:-4px 0 6px;color:var(--muted)">${pl.esp}</small>`+(km<0.03?'Vocês estão aqui.':`<small>${fD(km)} ${here?(here.label==='GPS'?'de onde vocês estão':'de '+here.label):'do hotel'}</small><div class="go" style="margin-top:8px"><a href="https://www.google.com/maps/dir/?api=1&destination=${pl.lat},${pl.lng}" target="_blank" rel="noopener" class="uber" style="background:var(--accent)">📍 Rota</a></div>`);},{maxWidth:240,minWidth:180});
+      mk.bindTooltip(pl.name,{permanent:false,direction:'right',offset:[8,0],className:'mp-lb'});
+      mk.addTo(m);
+    });
     // Labels only from street level up: at city scale they pile on top of each other.
     const lb=()=>el.classList.toggle('mp-hide-lb',m.getZoom()<15);m.on('zoomend',lb);lb();
     MAP.m=m;
@@ -1478,6 +1546,20 @@ RESERVAS CONFIRMADAS:
 - Jolimont + Felsen Beer 29/10: combo Beer Tour Felsen + Tour Jolimont com taça, 2 ingressos (LB32077972, LB32078275). Tour Jolimont 9h–16h45, Felsen 10h–17h, mesmo complexo em Canela
 
 Ao sugerir programas, evite os erros comuns de turista em Gramado: orçamento apertado, ingresso comprado na hora, roteiro corrido demais, pouca roupa de frio, só atrações pagas e esquecer Canela.
+
+RESTAURANTES E ESTABELECIMENTOS DA REGIÃO (sugestões extras, não incluídos no roteiro — sugira quando perguntarem onde comer ou o que fazer):
+Fondues: St. Gallen (Av. das Hortênsias, 1122), Carlito's, Garden Grill Fondue, Chocoland.
+Churrasco/Parrilla: Carne & Osso (Av. das Hortênsias, 5530), O Irlandês, Gaúcho Grill, Garden Grill Parrilla, Fundo da Grota, Chama Gaúcha.
+Pizzarias: Hector Pizzaria (Av. Borges de Medeiros, 1791), Forneria Corleone.
+Massas: Blend Massas, Colosseo (já no roteiro, Prime 2x1).
+Hambúrgueres: Burger 105 (Canela), Black Lake Restobar, Johnny Rockets.
+Cafés coloniais: Caffè Della Nonna (Estrada Linha Bonita, 2490), Torre Café Colonial.
+Cervejarias: Cervejaria Farol, Heinz Beer Choperia, Cervejaria Felsen (junto à Jolimont).
+Chocolaterias: Chocoá Chocolates, Chocolataria Gramado, Fábrica Prawer (visitação).
+Bares: Boteco do Bill, Hard Rock Café (Rua Wilma Dinnebier, 180), Magnólia Bar Cine.
+Outros: Bella Gramado (pizzas e grelhados), Alice e o Chapeleiro (temático), Bistrô da Villa, Tapiocaria Gramado, Tempero de Gramado.
+Atrações: Olivas de Gramado (olivicultura e gastronomia), Lumni Experience (imersiva), Chocoland (fondue temático).
+Todos estão marcados no mapa da aba Local.
 
 Responda de forma concisa, prática e amigável, em texto simples (sem markdown, listas com asteriscos ou emojis), porque a resposta pode ser lida em voz alta. Dê informações históricas e culturais quando relevante. Sugira alternativas se o clima estiver ruim. Lembre do Prime 2×1 quando for relevante. Não mencione descontos para policiais ou servidores.
 
