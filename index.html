@@ -1179,11 +1179,14 @@ function renderDist(lat,lng){
   const pHtml=s.map(p=>p.d<0.03
     ?`<div class="di"><span class="dn">${p.name}</span><span class="dv">aqui</span></div>`
     :`<div class="di"><span class="dn">${p.name}</span><span class="dv">${fD(p.d)}${p.d<WALK_KM?' · a pé':' · Uber'}</span>${goLinks(p,p.d)}</div>`).join('');
-  const pl=PLACES.map(p=>({...p,d:hav(lat,lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d);
+  const hid=hiddenPlaces();
+  const vis=PLACES.filter(p=>!hid.includes(p.name));
+  const pl=vis.map(p=>({...p,d:hav(lat,lng,p.lat,p.lng)})).sort((a,b)=>a.d-b.d);
   const plHtml=pl.map(p=>p.d<0.03
     ?`<div class="di"><span class="dn">${p.ic} ${p.name}</span><span class="dv">aqui</span></div>`
     :`<div class="di"><span class="dn">${p.ic} ${p.name}</span><span class="dv">${fD(p.d)}${p.d<WALK_KM?' · a pé':' · Uber'}</span>${goLinks(p,p.d)}</div>`).join('');
-  document.getElementById('distL').innerHTML=pHtml+'<div class="st" style="margin-top:18px">Estabelecimentos</div>'+plHtml;
+  const restore=hid.length?`<div style="text-align:center;margin-top:10px"><button onclick="restoreAllPlaces()" style="font-size:12px;padding:4px 12px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--muted);cursor:pointer">${hid.length} oculto${hid.length>1?'s':''} · restaurar todos</button></div>`:'';
+  document.getElementById('distL').innerHTML=pHtml+'<div class="st" style="margin-top:18px">Estabelecimentos</div>'+plHtml+restore;
 }
 
 // ===========================
@@ -1191,7 +1194,30 @@ function renderDist(lat,lng){
 // © OpenStreetMap). Loaded on the first visit to the tab; falls back to online OSM tiles.
 // ===========================
 const MAP_BOUNDS=[[-29.43,-50.93],[-29.27,-50.78]];
-const MAP={m:null,p:null,pins:{},me:null,acc:null,watch:null,follow:false,btn:null,focus:null};
+const MAP={m:null,p:null,pins:{},placeMk:{},me:null,acc:null,watch:null,follow:false,btn:null,focus:null};
+function hiddenPlaces(){try{return JSON.parse(localStorage.getItem('hidPlaces')||'[]')}catch{return[]}}
+function toggleHidePlace(name){
+  const h=hiddenPlaces(),i=h.indexOf(name);
+  if(i>=0)h.splice(i,1);else h.push(name);
+  try{localStorage.setItem('hidPlaces',JSON.stringify(h))}catch{}
+  if(MAP.m){
+    const mk=MAP.placeMk[name];
+    if(mk){if(h.includes(name))MAP.m.removeLayer(mk);else mk.addTo(MAP.m);}
+  }
+  if(MAP.m)MAP.m.closePopup();
+  const distL=document.getElementById('distL');
+  if(distL&&distL.innerHTML)refreshDist();
+}
+function restoreAllPlaces(){
+  try{localStorage.removeItem('hidPlaces')}catch{}
+  Object.values(MAP.placeMk).forEach(mk=>{if(MAP.m&&!MAP.m.hasLayer(mk))mk.addTo(MAP.m);});
+  if(MAP.m)MAP.m.closePopup();
+  refreshDist();
+}
+function refreshDist(){
+  const ref=here||placeByName('Hotel Bellagio');
+  if(ref)renderDist(ref.lat,ref.lng);
+}
 function loadScript(src){
   return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=()=>rej(new Error(src));document.head.appendChild(sc);});
 }
@@ -1220,12 +1246,14 @@ function initMap(){
       mk.addTo(m);MAP.pins[pt.name]=mk;
     });
     // Establishments: specialty-based markers (separate from itinerary POINTS)
+    const hid=hiddenPlaces();
     PLACES.forEach(pl=>{
       const mk=L.marker([pl.lat,pl.lng],{icon:L.divIcon({className:'',html:`<div class="mp-place tipo-${pl.tipo}">${pl.ic}</div>`,iconSize:[28,28],iconAnchor:[14,14]}),title:pl.name,alt:pl.name,keyboard:true,zIndexOffset:-100});
       mk.bindPopup(()=>{const from=here||placeByName('Hotel Bellagio'),km=hav(from.lat,from.lng,pl.lat,pl.lng);
-        return `<b>${pl.name}</b><small style="display:block;margin:-4px 0 6px;color:var(--muted)">${pl.esp}</small>`+(km<0.03?'Vocês estão aqui.':`<small>${fD(km)} ${here?(here.label==='GPS'?'de onde vocês estão':'de '+here.label):'do hotel'}</small>`+goLinks(pl,km));},{maxWidth:240,minWidth:180});
+        return `<b>${pl.name}</b><small style="display:block;margin:-4px 0 6px;color:var(--muted)">${pl.esp}</small>`+(km<0.03?'Vocês estão aqui.':`<small>${fD(km)} ${here?(here.label==='GPS'?'de onde vocês estão':'de '+here.label):'do hotel'}</small>`+goLinks(pl,km))+`<button onclick="toggleHidePlace('${pl.name.replace(/'/g,"\\'")}')" style="display:block;margin:8px 0 0;padding:4px 10px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--muted);cursor:pointer;width:100%">Ocultar do mapa</button>`;},{maxWidth:240,minWidth:180});
       mk.bindTooltip(pl.name,{permanent:false,direction:'right',offset:[8,0],className:'mp-lb'});
-      mk.addTo(m);
+      if(!hid.includes(pl.name))mk.addTo(m);
+      MAP.placeMk[pl.name]=mk;
     });
     // Labels only from street level up: at city scale they pile on top of each other.
     const lb=()=>el.classList.toggle('mp-hide-lb',m.getZoom()<15);m.on('zoomend',lb);lb();
