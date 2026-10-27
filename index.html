@@ -1597,6 +1597,8 @@ Todos estão marcados no mapa da aba Local.
 
 Responda em texto simples (sem markdown, listas com asteriscos ou emojis), porque a resposta pode ser lida em voz alta. Fale como guia presencial acompanhando o casal: com entusiasmo natural, contando histórias, puxando curiosidades. Quando perguntarem sobre um lugar, prato ou atração, vá além da informação básica — conte quem trouxe, como surgiu, o que significa na cultura da serra (imigração alemã e italiana, tradição gaúcha, Natal Luz). Use a localização GPS do viajante para contextualizar quando relevante. Não repita informações já ditas na conversa. Sugira alternativas se o clima estiver ruim. Lembre do Prime 2×1 quando for relevante. Não mencione descontos para policiais ou servidores.
 
+REGRA ABSOLUTA: nunca deixe a resposta incompleta. Termine sempre com uma frase conclusiva. Se o assunto for extenso, seja mais conciso, mas SEMPRE conclua o raciocínio. Uma resposta curta e completa é infinitamente melhor que uma longa e cortada no meio.
+
 ${weatherContext()}
 
 ${timeContext()}`;
@@ -1694,7 +1696,7 @@ Cruze a imagem com a localização GPS acima para identificar o que aparece. Se 
 Fale como guia presencial: com entusiasmo natural, apontando e contando. Descreva o que está diante deles quando a descrição puxa uma história ("Reparem nos entalhes em madeira: isso é enxaimel, técnica que os colonos alemães trouxeram..."), mas nunca só por descrever. Cada detalhe visual deve puxar um fio — origem, curiosidade, época, pessoa. Conte quem trouxe, como surgiu, o que mudou. Feche com uma dica de quem conhece o lugar.
 
 ${SPOKEN}
-Texto corrido, narração de guia, no máximo 250 palavras. Não repita informações já ditas.`;
+Texto corrido, narração de guia, no máximo 250 palavras. Não repita informações já ditas. NUNCA deixe a resposta incompleta — termine sempre com uma frase conclusiva.`;
 }
 
 async function callAPI(messages,image){
@@ -1714,20 +1716,20 @@ async function callAPI(messages,image){
     const r=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:1024,system:buildSystemPrompt(),messages:msgs})
+      body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:2048,system:buildSystemPrompt(),messages:msgs})
     });
     const d=await r.json().catch(()=>({}));
     if(!r.ok||d.error) throw new Error(apiError(r.status,d.error&&d.error.message));
     const text=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
     if(!text) throw new Error('A IA respondeu vazio. Tente reformular a pergunta.');
-    return d.stop_reason==='max_tokens'?text+'\n\n(resposta cortada — peça "continue")':text;
+    return text;
   }
 
   if(provider==='gemini'){
     // Gemini calls the assistant "model"; the photo goes inline next to the last question.
     const contents=messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
     if(image)contents[contents.length-1].parts.unshift({inline_data:{mime_type:'image/jpeg',data:image.dataUrl.split(',')[1]}});
-    const body=JSON.stringify({systemInstruction:{parts:[{text:buildSystemPrompt()}]},contents,generationConfig:{maxOutputTokens:1024}});
+    const body=JSON.stringify({systemInstruction:{parts:[{text:buildSystemPrompt()}]},contents,generationConfig:{maxOutputTokens:2048}});
     let r,d;
     // The pinned model may be retired one day: fall back to Google's rolling alias.
     for(const model of ['gemini-2.5-flash','gemini-flash-latest']){
@@ -1741,7 +1743,7 @@ async function callAPI(messages,image){
     const c=d.candidates&&d.candidates[0];
     const text=(c&&c.content&&c.content.parts||[]).map(p=>p.text||'').join('').trim();
     if(!text) throw new Error(c&&c.finishReason==='SAFETY'?'O Gemini bloqueou esta resposta. Tente reformular.':'A IA respondeu vazio. Tente reformular a pergunta.');
-    return c.finishReason==='MAX_TOKENS'?text+'\n\n(resposta cortada — peça "continue")':text;
+    return text;
   }
 
   if(provider==='openai'){
@@ -1750,14 +1752,14 @@ async function callAPI(messages,image){
     const r=await fetch('https://api.openai.com/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:1024,messages:[{role:'system',content:buildSystemPrompt()},...msgs]})
+      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:2048,messages:[{role:'system',content:buildSystemPrompt()},...msgs]})
     });
     const d=await r.json().catch(()=>({}));
     if(!r.ok||d.error) throw new Error(apiError(r.status,d.error&&d.error.message));
     const c=d.choices&&d.choices[0];
     const text=(c&&c.message&&c.message.content||'').trim();
     if(!text) throw new Error('A IA respondeu vazio. Tente reformular a pergunta.');
-    return c.finish_reason==='length'?text+'\n\n(resposta cortada — peça "continue")':text;
+    return text;
   }
   return null;
 }
@@ -1838,7 +1840,7 @@ async function askAI(q,image,speakIt){
       if(image){input=photoPrompt(q);opts.images=[image.blob];}
       else input=[...chatHistory.slice(-8),{role:'user',content:`${buildSystemPrompt()}\n\n${placeContext()}\n\nPergunta do viajante: ${q}`}];
       const r=await sampleFn(input,opts);
-      text=r.truncated?r.text+'\n\n(resposta cortada)':r.text;src='Claude';
+      text=r.text;src='Claude';
     } else {
       const content=image?photoPrompt(q):`${placeContext()}\n\n${q}`;
       text=await callAPI([...chatHistory.slice(-8),{role:'user',content}],image);
