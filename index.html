@@ -276,12 +276,12 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 .ficha-body{font-size:.78rem;color:var(--muted)}
 .ficha-row{padding:2px 0}
 .ficha-footer{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
-.ficha-vote{min-height:32px;padding:4px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:.75rem;font-weight:600;cursor:pointer}
+.ficha-vote{min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:.75rem;font-weight:600;cursor:pointer}
 .ficha-vote:hover{border-color:var(--accent)}
 .ficha-voted{background:var(--accent-l);border-color:var(--accent);color:var(--accent)}
-.ficha-rot-btn{min-height:32px;padding:4px 10px;border:1px solid var(--green);border-radius:8px;background:var(--green-l);color:var(--green);font-size:.72rem;font-weight:600;cursor:pointer}
+.ficha-rot-btn{min-height:44px;padding:8px 10px;border:1px solid var(--green);border-radius:8px;background:var(--green-l);color:var(--green);font-size:.72rem;font-weight:600;cursor:pointer}
 .ficha-rot-btn.added{border-color:var(--muted);background:var(--bg);color:var(--muted)}
-.ficha-del{min-height:32px;padding:4px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--muted);font-size:.72rem;cursor:pointer;margin-left:auto}
+.ficha-del{min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--muted);font-size:.72rem;cursor:pointer;margin-left:auto}
 .ficha-del:hover{border-color:#c0392b;color:#c0392b}
 .ficha-dup{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:.82rem}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .ficha-dup{background:#3a2a10;color:#fcd34d;border-color:#92400e}}
@@ -522,14 +522,14 @@ details.fold .cnt.full{background:var(--green);color:#fff}
     <button class="disc-act-btn" onclick="openSuggestForm()">＋ Sugerir passeio</button>
     <button class="disc-act-btn sec-btn" onclick="discView='chat';renderDiscussion()">💬 Chat</button>
   </div>
-  <div id="discDup" class="ficha-dup" hidden></div>
   <div id="discArea"></div>
 </div>
 
 <!-- Suggest form modal -->
 <div id="suggestMenu" class="move-menu" hidden>
-  <div class="move-box" style="padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))">
+  <div class="move-box" style="padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto">
     <h3 style="font-size:1rem;margin-bottom:12px">Sugerir passeio</h3>
+    <div id="sugDup" class="ficha-dup" hidden></div>
     <label class="sug-label">Nome do passeio<input id="sugName" placeholder="Ex: Snowland"></label>
     <label class="sug-label">Tipo
       <select id="sugType">
@@ -865,6 +865,16 @@ function getEffectiveDays(){
     const item=src.items.splice(si,1)[0];
     if(eff[mv.to])eff[mv.to].items.push(item);
   }
+  try{
+    const disc=JSON.parse(localStorage.getItem('gramado-disc'))||{fichas:[]};
+    (disc.fichas||[]).filter(f=>f.inRoteiro&&f.assignedDay).forEach(f=>{
+      const day=String(f.assignedDay);
+      if(eff[day]){
+        const tm=(typeof TIPO_MAP!=='undefined'?TIPO_MAP[f.tipo]:null)||{icon:'📌'};
+        eff[day].items.push({t:'',n:tm.icon+' '+f.name+(f.notes?' — '+f.notes:''),d:f.cost?'Custo: ~R$'+f.cost:'',_origDay:+day,_origIdx:'ficha-'+f.id,_isFicha:true});
+      }
+    });
+  }catch(e){}
   return eff;
 }
 function toggleDone(day,origDay,origIdx,el){
@@ -915,11 +925,13 @@ function renderDays(){
       const acts = it.p ? '<div class="acts"></div>' : '';
       const hint = it.p && it.c==='transport' ? ' <span class="tg tg-f">🚗 Toque: Uber e rota</span>' : '';
       const esc=it.n.replace(/'/g,"\\'");
-      const actBtns=`<div class="ti-actions"><button class="ti-act" onclick="event.stopPropagation();openMoveMenu(${it._origDay},${it._origIdx},'${esc}')">📅 Mover</button><button class="ti-act" onclick="event.stopPropagation();openEditMenu(${it._origDay},${it._origIdx})">✏️ Editar</button><button class="ti-act del" onclick="event.stopPropagation();openDeleteMenu(${it._origDay},${it._origIdx},'${esc}')">🗑️ Excluir</button></div>`;
+      const isFicha=!!it._isFicha;
+      const actBtns=isFicha?'<div class="ti-actions"><span style="font-size:.7rem;color:var(--muted)">Gerencie no Grupo</span></div>':`<div class="ti-actions"><button class="ti-act" onclick="event.stopPropagation();openMoveMenu(${it._origDay},${it._origIdx},'${esc}')">📅 Mover</button><button class="ti-act" onclick="event.stopPropagation();openEditMenu(${it._origDay},${it._origIdx})">✏️ Editar</button><button class="ti-act del" onclick="event.stopPropagation();openDeleteMenu(${it._origDay},${it._origIdx},'${esc}')">🗑️ Excluir</button></div>`;
       const detail = (it.x||it.h||it.p) ? `<div class="tx">${acts}${it.x?it.x.replace(/\n/g,'<br>'):''}${it.h?`<div class="hist">📜 ${it.h}</div>`:''}${actBtns}</div>` : `<div class="tx">${actBtns}</div>`;
       const tk = it.tk ? `<button class="tkchip" data-slot="${it.tk}" onclick="openTickets('${it.tk}')">🎫 Ingresso</button>` : '';
       const checkDone=isDone?'done':'';
-      html += `<div class="ti ${cls}${isDone?' item-done':''}" data-i="${i}" data-orig-day="${it._origDay}" data-orig-idx="${it._origIdx}" onclick="tog(this,event)"><span class="ti-check ${checkDone}" onclick="event.stopPropagation();toggleDone(${day},${it._origDay},${it._origIdx},this)"></span><div class="tt">${it.t}</div><div class="tn">${it.n}</div><div class="td">${it.d}</div>${tags}${movedTag}${hint}${tk}${detail}</div>`;
+      const fichaCheck=isFicha?`<span class="ti-check" style="pointer-events:none;opacity:.3"></span>`:`<span class="ti-check ${checkDone}" onclick="event.stopPropagation();toggleDone(${day},${it._origDay},${it._origIdx},this)"></span>`;
+      html += `<div class="ti ${cls}${isDone?' item-done':''}" data-i="${i}" data-orig-day="${it._origDay}" data-orig-idx="${it._origIdx}" onclick="tog(this,event)">${fichaCheck}<div class="tt">${it.t}</div><div class="tn">${it.n}</div><div class="td">${it.d}</div>${tags}${movedTag}${hint}${tk}${detail}</div>`;
     });
     html += '</div></div>';
   }
@@ -2812,8 +2824,8 @@ function sendDiscMsg(){
   const feed=document.getElementById('discFeed');if(feed)feed.scrollTop=feed.scrollHeight;
 }
 
-function openSuggestForm(){document.getElementById('suggestMenu').hidden=false;}
-function closeSuggestForm(){document.getElementById('suggestMenu').hidden=true;}
+function openSuggestForm(){document.getElementById('sugDup').hidden=true;document.getElementById('suggestMenu').hidden=false;}
+function closeSuggestForm(){document.getElementById('suggestMenu').hidden=true;document.getElementById('sugDup').hidden=true;window._pendingSug=null;}
 
 function checkSuggestDup(name){
   const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
@@ -2834,26 +2846,26 @@ function submitSuggestion(){
   const tipo=document.getElementById('sugType').value;
   const cost=parseFloat(document.getElementById('sugCost').value)||0;
   const notes=document.getElementById('sugNotes').value.trim();
-  const cfg=getConfig();
-  const dupEl=document.getElementById('discDup');
+  const sugDup=document.getElementById('sugDup');
   const dup=checkSuggestDup(name);
   if(dup){
     if(dup._isPlace||dup._isFree){
-      dupEl.innerHTML='⚠️ <strong>'+dup.name+'</strong> já existe no roteiro como atração '+(dup._isFree?'gratuita':'cadastrada')+'.';
+      sugDup.innerHTML='⚠️ <strong>'+dup.name+'</strong> já existe no roteiro como atração '+(dup._isFree?'gratuita':'cadastrada')+'. Escolha outro passeio.';
+      sugDup.hidden=false;
     }else{
-      dupEl.innerHTML='⚠️ Sugestão similar já existe: <strong>'+dup.name+'</strong>. Deseja adicionar mesmo assim? <button onclick="forceSubmitSuggestion()" style="margin-left:8px;padding:4px 10px;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit;cursor:pointer">Sim, adicionar</button>';
+      sugDup.innerHTML='⚠️ Sugestão similar já existe: <strong>'+dup.name+'</strong>. <button onclick="forceSubmitSuggestion()" style="margin-top:6px;display:block;padding:6px 14px;border:1px solid currentColor;border-radius:8px;background:transparent;color:inherit;cursor:pointer;font-weight:600">Sim, adicionar mesmo assim</button>';
+      sugDup.hidden=false;
+      window._pendingSug={name,tipo,cost,notes};
     }
-    dupEl.hidden=false;
-    if(!dup._isPlace&&!dup._isFree){window._pendingSug={name,tipo,cost,notes};return;}
     return;
   }
-  dupEl.hidden=true;
+  sugDup.hidden=true;
   doSubmitSuggestion(name,tipo,cost,notes);
 }
 
 function forceSubmitSuggestion(){
   const s=window._pendingSug;if(!s)return;
-  document.getElementById('discDup').hidden=true;
+  document.getElementById('sugDup').hidden=true;
   doSubmitSuggestion(s.name,s.tipo,s.cost,s.notes);
   window._pendingSug=null;
 }
@@ -2901,40 +2913,25 @@ function assignFichaDay(fid,day){
   const f=d.fichas.find(x=>x.id===fid);if(!f)return;
   f.inRoteiro=true;f.assignedDay=day;
   saveDiscData(d);
-  const tm=TIPO_MAP[f.tipo]||TIPO_MAP.outro;
-  const eff=getEffectiveDays();
-  const dayData=eff[day];
-  if(dayData){
-    const newIdx=dayData.items.length;
-    const k=day+'-ficha-'+f.id;
-    editedItems[k]={t:'',n:tm.icon+' '+f.name+(f.notes?' — '+f.notes:''),d:f.cost?'Custo: ~R$'+f.cost:''};
-    saveEdits();
-  }
   closeAssignDay();renderDiscussion();
+  renderDays();initCarousel();showDay(curDay);
   toast('Adicionado ao dia '+day+'!');
 }
 
 function removeFichaFromRoteiro(fid){
   const d=loadDiscData();
   const f=d.fichas.find(x=>x.id===fid);if(!f)return;
-  if(f.assignedDay){
-    const k=f.assignedDay+'-ficha-'+f.id;
-    delete editedItems[k];saveEdits();
-  }
   f.inRoteiro=false;f.assignedDay=null;
   saveDiscData(d);renderDiscussion();
+  renderDays();initCarousel();showDay(curDay);
   toast('Removido do roteiro');
 }
 
 function deleteFicha(fid){
   const d=loadDiscData();
-  const f=d.fichas.find(x=>x.id===fid);
-  if(f&&f.inRoteiro&&f.assignedDay){
-    const k=f.assignedDay+'-ficha-'+f.id;
-    delete editedItems[k];saveEdits();
-  }
   d.fichas=d.fichas.filter(x=>x.id!==fid);
   saveDiscData(d);renderDiscussion();
+  renderDays();initCarousel();showDay(curDay);
   toast('Ficha excluída');
 }
 
@@ -2981,10 +2978,10 @@ function renderDiscussion(){
     if(f.notes)h+='<div class="ficha-row">📝 '+f.notes.replace(/</g,'&lt;')+'</div>';
     h+='</div>';
     h+='<div class="ficha-footer">';
-    h+='<button class="ficha-vote'+(voted?' ficha-voted':'')+'" onclick="voteFicha(\''+f.id+'\')">👍 '+f.votes.length+'</button>';
-    if(!f.inRoteiro)h+='<button class="ficha-rot-btn" onclick="addFichaToRoteiro(\''+f.id+'\')">＋ Roteiro</button>';
-    else h+='<button class="ficha-rot-btn added" onclick="removeFichaFromRoteiro(\''+f.id+'\')">✓ No roteiro</button>';
-    h+='<button class="ficha-del" onclick="deleteFicha(\''+f.id+'\')">🗑️</button>';
+    h+='<button class="ficha-vote'+(voted?' ficha-voted':'')+'" onclick="voteFicha(\''+f.id+'\')" aria-label="Curtir sugestão">👍 '+f.votes.length+'</button>';
+    if(!f.inRoteiro)h+='<button class="ficha-rot-btn" onclick="addFichaToRoteiro(\''+f.id+'\')" aria-label="Adicionar ao roteiro">＋ Roteiro</button>';
+    else h+='<button class="ficha-rot-btn added" onclick="removeFichaFromRoteiro(\''+f.id+'\')" aria-label="Remover do roteiro">✓ No roteiro</button>';
+    h+='<button class="ficha-del" onclick="deleteFicha(\''+f.id+'\')" aria-label="Excluir sugestão">🗑️</button>';
     h+='</div></div>';
   });
   area.innerHTML=h;
