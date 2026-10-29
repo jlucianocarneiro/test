@@ -259,9 +259,11 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 .ti-check.done::after{content:'✓';font-size:.8rem;font-weight:700;color:#fff}
 .ti.item-done{opacity:.55}
 .ti.item-done .tn{text-decoration:line-through}
-/* Move task button */
-.ti-move{display:inline-flex;align-items:center;gap:4px;min-height:30px;padding:2px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--muted);font-size:.68rem;font-weight:600;cursor:pointer;margin-top:6px}
-.ti-move:hover{border-color:var(--accent);color:var(--accent)}
+/* Task action buttons */
+.ti-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.ti-act{display:inline-flex;align-items:center;gap:4px;min-height:30px;padding:2px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--muted);font-size:.68rem;font-weight:600;cursor:pointer}
+.ti-act:hover{border-color:var(--accent);color:var(--accent)}
+.ti-act.del:hover{border-color:#c0392b;color:#c0392b}
 .move-menu{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:130;display:flex;align-items:flex-end;justify-content:center}
 .move-menu[hidden]{display:none}
 .move-box{background:var(--card);color:var(--text);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
@@ -448,6 +450,34 @@ details.fold .cnt.full{background:var(--green);color:#fff}
     <h3 id="moveTitle">Mover tarefa para...</h3>
     <div class="move-opts" id="moveOpts"></div>
     <button class="move-cancel" onclick="closeMoveMenu()">Cancelar</button>
+  </div>
+</div>
+
+<div id="editMenu" class="move-menu" hidden onclick="if(event.target===this)closeEditMenu()">
+  <div class="move-box" role="dialog" aria-modal="true">
+    <h3 id="editTitle">Editar tarefa</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+      <label style="font-size:.75rem;font-weight:600;color:var(--muted)">Horário
+        <input id="editTime" style="width:100%;margin-top:4px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.88rem" />
+      </label>
+      <label style="font-size:.75rem;font-weight:600;color:var(--muted)">Nome
+        <input id="editName" style="width:100%;margin-top:4px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.88rem" />
+      </label>
+      <label style="font-size:.75rem;font-weight:600;color:var(--muted)">Descrição
+        <input id="editDesc" style="width:100%;margin-top:4px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.88rem" />
+      </label>
+    </div>
+    <button class="move-opt" style="width:100%;background:var(--accent);color:#fff;border-color:var(--accent);margin-bottom:8px" onclick="saveEdit()">Salvar</button>
+    <button class="move-cancel" onclick="closeEditMenu()">Cancelar</button>
+  </div>
+</div>
+
+<div id="deleteMenu" class="move-menu" hidden onclick="if(event.target===this)closeDeleteMenu()">
+  <div class="move-box" role="dialog" aria-modal="true">
+    <h3 id="deleteTitle">Excluir tarefa</h3>
+    <p id="deleteMsg" style="font-size:.85rem;color:var(--muted);margin-bottom:14px">Tem certeza?</p>
+    <button class="move-opt" style="width:100%;background:#c0392b;color:#fff;border-color:#c0392b;margin-bottom:8px" onclick="confirmDelete()">Excluir</button>
+    <button class="move-cancel" onclick="closeDeleteMenu()">Cancelar</button>
   </div>
 </div>
 
@@ -721,17 +751,31 @@ const KB = [
 // ===========================
 // RENDER ITINERARY
 // ===========================
-let doneState={},movedItems=[];
+let doneState={},movedItems=[],editedItems={},deletedItems={};
 function loadTripState(){
   try{const d=localStorage.getItem('gramado-done');if(d)doneState=JSON.parse(d);}catch(e){}
   try{const m=localStorage.getItem('gramado-moves');if(m)movedItems=JSON.parse(m);}catch(e){}
+  try{const e=localStorage.getItem('gramado-edits');if(e)editedItems=JSON.parse(e);}catch(e){}
+  try{const x=localStorage.getItem('gramado-deleted');if(x)deletedItems=JSON.parse(x);}catch(e){}
 }
 function saveDone(){try{localStorage.setItem('gramado-done',JSON.stringify(doneState));}catch(e){}}
 function saveMoves(){try{localStorage.setItem('gramado-moves',JSON.stringify(movedItems));}catch(e){}}
+function saveEdits(){try{localStorage.setItem('gramado-edits',JSON.stringify(editedItems));}catch(e){}}
+function saveDeleted(){try{localStorage.setItem('gramado-deleted',JSON.stringify(deletedItems));}catch(e){}}
 function getEffectiveDays(){
   const eff={};
   for(const[day,data] of Object.entries(DAYS)){
-    eff[day]={...data,items:data.items.map((it,i)=>({...it,_origDay:+day,_origIdx:i}))};
+    eff[day]={...data,items:data.items.map((it,i)=>{
+      const k=day+'-'+i;
+      if(deletedItems[k])return null;
+      const base={...it,_origDay:+day,_origIdx:i};
+      if(editedItems[k]){
+        if(editedItems[k].t)base.t=editedItems[k].t;
+        if(editedItems[k].n)base.n=editedItems[k].n;
+        if(editedItems[k].d!==undefined)base.d=editedItems[k].d;
+      }
+      return base;
+    }).filter(Boolean)};
   }
   for(const mv of movedItems){
     const src=eff[mv.from];
@@ -790,8 +834,9 @@ function renderDays(){
       const movedTag=isMoved?` <span class="tg" style="background:var(--accent-l);color:var(--accent)">↩ do dia ${it._origDay}</span>`:'';
       const acts = it.p ? '<div class="acts"></div>' : '';
       const hint = it.p && it.c==='transport' ? ' <span class="tg tg-f">🚗 Toque: Uber e rota</span>' : '';
-      const moveBtn=`<button class="ti-move" onclick="event.stopPropagation();openMoveMenu(${it._origDay},${it._origIdx},'${it.n.replace(/'/g,"\\'")}')">📅 Mover</button>`;
-      const detail = (it.x||it.h||it.p) ? `<div class="tx">${acts}${it.x?it.x.replace(/\n/g,'<br>'):''}${it.h?`<div class="hist">📜 ${it.h}</div>`:''}${moveBtn}</div>` : `<div class="tx">${moveBtn}</div>`;
+      const esc=it.n.replace(/'/g,"\\'");
+      const actBtns=`<div class="ti-actions"><button class="ti-act" onclick="event.stopPropagation();openMoveMenu(${it._origDay},${it._origIdx},'${esc}')">📅 Mover</button><button class="ti-act" onclick="event.stopPropagation();openEditMenu(${it._origDay},${it._origIdx})">✏️ Editar</button><button class="ti-act del" onclick="event.stopPropagation();openDeleteMenu(${it._origDay},${it._origIdx},'${esc}')">🗑️ Excluir</button></div>`;
+      const detail = (it.x||it.h||it.p) ? `<div class="tx">${acts}${it.x?it.x.replace(/\n/g,'<br>'):''}${it.h?`<div class="hist">📜 ${it.h}</div>`:''}${actBtns}</div>` : `<div class="tx">${actBtns}</div>`;
       const tk = it.tk ? `<button class="tkchip" data-slot="${it.tk}" onclick="openTickets('${it.tk}')">🎫 Ingresso</button>` : '';
       const checkDone=isDone?'done':'';
       html += `<div class="ti ${cls}${isDone?' item-done':''}" data-i="${i}" data-orig-day="${it._origDay}" data-orig-idx="${it._origIdx}" onclick="tog(this,event)"><span class="ti-check ${checkDone}" onclick="event.stopPropagation();toggleDone(${day},${it._origDay},${it._origIdx},this)"></span><div class="tt">${it.t}</div><div class="tn">${it.n}</div><div class="td">${it.d}</div>${tags}${movedTag}${hint}${tk}${detail}</div>`;
@@ -2609,6 +2654,63 @@ function moveTask(toDay){
   renderDays();initCarousel();showDay(scrollDay);
   toast('Tarefa movida para dia '+toDay);
   fitTrack();
+}
+
+// ===========================
+// EDIT TASK
+// ===========================
+let editOrigDay=null,editOrigIdx=null;
+function openEditMenu(origDay,origIdx){
+  editOrigDay=origDay;editOrigIdx=origIdx;
+  const eff=getEffectiveDays();
+  let item=null;
+  for(const[,data] of Object.entries(eff)){
+    item=data.items.find(it=>it._origDay===origDay&&it._origIdx===origIdx);
+    if(item)break;
+  }
+  if(!item)return;
+  document.getElementById('editTitle').textContent='Editar "'+item.n+'"';
+  document.getElementById('editTime').value=item.t||'';
+  document.getElementById('editName').value=item.n||'';
+  document.getElementById('editDesc').value=item.d||'';
+  document.getElementById('editMenu').hidden=false;
+}
+function closeEditMenu(){document.getElementById('editMenu').hidden=true;editOrigDay=null;editOrigIdx=null;}
+function saveEdit(){
+  const k=editOrigDay+'-'+editOrigIdx;
+  const t=document.getElementById('editTime').value.trim();
+  const n=document.getElementById('editName').value.trim();
+  const d=document.getElementById('editDesc').value.trim();
+  if(!n){toast('Nome é obrigatório');return;}
+  editedItems[k]={t,n,d};
+  saveEdits();closeEditMenu();
+  const scrollDay=curDay;
+  renderDays();initCarousel();showDay(scrollDay);
+  toast('Tarefa editada');fitTrack();
+}
+
+// ===========================
+// DELETE TASK
+// ===========================
+let delOrigDay=null,delOrigIdx=null;
+function openDeleteMenu(origDay,origIdx,name){
+  delOrigDay=origDay;delOrigIdx=origIdx;
+  document.getElementById('deleteTitle').textContent='Excluir tarefa';
+  document.getElementById('deleteMsg').textContent='Excluir "'+name+'" do roteiro?';
+  document.getElementById('deleteMenu').hidden=false;
+}
+function closeDeleteMenu(){document.getElementById('deleteMenu').hidden=true;delOrigDay=null;delOrigIdx=null;}
+function confirmDelete(){
+  const k=delOrigDay+'-'+delOrigIdx;
+  deletedItems[k]=true;
+  saveDeleted();
+  delete doneState[k];saveDone();
+  movedItems=movedItems.filter(m=>!(m.from===delOrigDay&&m.idx===delOrigIdx));
+  saveMoves();
+  closeDeleteMenu();
+  const scrollDay=curDay;
+  renderDays();initCarousel();showDay(scrollDay);
+  toast('Tarefa excluída');fitTrack();
 }
 
 // ===========================
