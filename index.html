@@ -1639,16 +1639,22 @@ function timeContext(){
 
 // Build system prompt for API calls
 function buildSystemPrompt(){
-  let itinerary = '';
-  for(const[day,data] of Object.entries(DAYS)){
+  const eff=getEffectiveDays();
+  let itinerary = '', doneList = [];
+  for(const[day,data] of Object.entries(eff)){
     itinerary += `\n## ${data.title}\n${data.sub}\n`;
     data.items.forEach(it=>{
-      itinerary += `- ${it.t}: ${it.n} — ${it.d}`;
+      const done=!!doneState[it._origDay+'-'+it._origIdx];
+      const moved=it._origDay!==+day;
+      itinerary += `- ${done?'[FEITO] ':''}${it.t}: ${it.n} — ${it.d}`;
+      if(moved) itinerary += ` (movido do dia ${it._origDay})`;
       if(it.x) itinerary += ` | ${it.x}`;
       if(it.h) itinerary += ` | História: ${it.h}`;
       itinerary += '\n';
+      if(done) doneList.push(`${it.n} (dia ${day})`);
     });
   }
+  const doneCtx = doneList.length ? `\nATIVIDADES JÁ REALIZADAS (${doneList.length}): ${doneList.join('; ')}. Não sugira nem recomende essas atividades novamente — eles já fizeram.\n` : '';
   return `Você é um guia turístico e agente de viagens virtual para uma viagem a Gramado/RS de 24 a 31 de outubro de 2026.
 
 Viajantes: Luciano e Greice.
@@ -1657,8 +1663,7 @@ Têm Prime Gourmet Club (2×1 em restaurantes/ingressos).
 
 ROTEIRO COMPLETO:
 ${itinerary}
-
-RESERVAS CONFIRMADAS:
+${doneCtx}RESERVAS CONFIRMADAS:
 - Voo ida LATAM LA3432 24/10 BSB 09:30 → POA 12:05 (assentos a escolher; Greice sem mala despachada na ida, Luciano Platinum com 2 × 23 kg)
 - Voo volta GOL G3 1795 31/10 POA 17:30 → BSB (assentos 10E e 10F; 1 × 23 kg por pessoa)
 - Citral POA→Gramado 24/10 14:00, plataforma 43 (poltronas 3-4); Citral Gramado→POA 31/10 12:15, plataforma 02 (poltronas 5-6); as duas linhas passam pelo Aeroporto Salgado Filho (embarque na ida ~14:15, desembarque na volta)
