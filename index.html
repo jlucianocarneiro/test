@@ -57,7 +57,7 @@ details.fold .cnt{font-size:.66rem;padding:1px 7px;border-radius:10px;background
 .dmeta span.free-c{background:var(--blue-l);color:var(--blue)}.dh .sub{font-size:.78rem;color:var(--muted);margin-top:2px}
 .tl{position:relative;padding-left:20px}
 .tl::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--border);border-radius:1px}
-.ti{position:relative;margin-bottom:10px;background:var(--card);border-radius:var(--r);padding:12px 12px 12px 14px;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s}
+.ti{position:relative;margin-bottom:10px;background:var(--card);border-radius:var(--r);padding:12px 42px 12px 14px;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s}
 .ti:active{transform:scale(.985)}
 .ti::before{content:'';position:absolute;left:-18px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--accent-l);border:2px solid var(--accent)}
 .ti.meal::before{border-color:var(--gold);background:var(--gold-l)}
@@ -252,6 +252,37 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 .cfg-btn.confirm{background:#b3261e;border-color:#b3261e;color:#fff}
 .cfg-row select{padding:8px;border:1px solid var(--border);border-radius:8px;font-size:.78rem;background:var(--bg);color:var(--text)}
 .cfg-hint{font-size:.72rem;color:var(--muted);margin:-4px 0 10px 2px}
+/* Task done checkbox */
+.ti-check{position:absolute;top:10px;right:10px;width:26px;height:26px;border:2px solid var(--border);border-radius:7px;background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:all .18s}
+.ti-check:hover{border-color:var(--accent)}
+.ti-check.done{background:var(--green);border-color:var(--green);color:#fff}
+.ti-check.done::after{content:'✓';font-size:.8rem;font-weight:700;color:#fff}
+.ti.item-done{opacity:.55}
+.ti.item-done .tn{text-decoration:line-through}
+/* Move task button */
+.ti-move{display:inline-flex;align-items:center;gap:4px;min-height:30px;padding:2px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--muted);font-size:.68rem;font-weight:600;cursor:pointer;margin-top:6px}
+.ti-move:hover{border-color:var(--accent);color:var(--accent)}
+.move-menu{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:130;display:flex;align-items:flex-end;justify-content:center}
+.move-menu[hidden]{display:none}
+.move-box{background:var(--card);color:var(--text);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.move-box h3{font-size:1rem;margin-bottom:10px}
+.move-box .move-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.move-box .move-opt{min-height:48px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
+.move-box .move-opt:hover{border-color:var(--accent);background:var(--accent-l)}
+.move-box .move-opt.cur{opacity:.4;pointer-events:none}
+.move-box .move-cancel{width:100%;min-height:48px;margin-top:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);font-weight:600;cursor:pointer}
+/* Hourly weather */
+.wh-toggle{background:none;border:none;color:#fff;font-size:.68rem;font-weight:600;cursor:pointer;margin-left:4px;opacity:.8;text-decoration:underline;min-height:36px;padding:6px 8px}
+.wh-toggle:hover{opacity:1}
+#wHourly{background:rgba(0,0,0,.15);border-radius:10px;padding:10px 12px;margin:8px 0 0;font-size:.74rem;color:#fff;max-height:260px;overflow-y:auto}
+#wHourly[hidden]{display:none}
+.wh-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.wh-row:last-child{border-bottom:none}
+.wh-hour{width:40px;font-weight:700;flex-shrink:0}
+.wh-icon{width:24px;text-align:center;flex-shrink:0}
+.wh-temp{width:36px;font-weight:600;flex-shrink:0}
+.wh-rain{flex:1;font-size:.7rem;opacity:.8}
+.wh-desc{flex:1;font-size:.7rem;opacity:.8}
 .toggle{position:relative;width:44px;height:24px;background:var(--border);border-radius:12px;cursor:pointer;transition:background .2s}
 .toggle.on{background:var(--green)}
 .toggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}
@@ -263,7 +294,8 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 <header>
   <h1>🎄 Guia Gramado 2026</h1>
   <p id="hdrSub">24–31 Out · Roteiro Interativo</p>
-  <div id="wBanner"><span id="wIcon">🌤️</span><span id="wText">Carregando clima…</span><button id="wRetry" style="display:none;background:rgba(255,255,255,.25);border:none;color:#fff;min-height:36px;padding:6px 12px;border-radius:8px;font-size:.72rem;font-weight:600;cursor:pointer;margin-left:4px" onclick="weatherRetries=0;fetchWeather()">↻ Tentar</button></div>
+  <div id="wBanner"><span id="wIcon">🌤️</span><span id="wText">Carregando clima…</span><button id="wRetry" style="display:none;background:rgba(255,255,255,.25);border:none;color:#fff;min-height:36px;padding:6px 12px;border-radius:8px;font-size:.72rem;font-weight:600;cursor:pointer;margin-left:4px" onclick="weatherRetries=0;fetchWeather()">↻ Tentar</button><button class="wh-toggle" id="wToggle" onclick="toggleHourly()" hidden>▼ Hora a hora</button></div>
+  <div id="wHourly" hidden></div>
 </header>
 
 <div class="tab-bar" id="tabBar" role="tablist" aria-label="Dias da viagem">
@@ -410,6 +442,14 @@ details.fold .cnt.full{background:var(--green);color:#fff}
   <p id="sheetHint" class="go-note"></p>
   <button class="sheet-close" onclick="closeSheet()">Fechar</button>
 </div></div>
+
+<div id="moveMenu" class="move-menu" hidden onclick="if(event.target===this)closeMoveMenu()">
+  <div class="move-box" role="dialog" aria-modal="true">
+    <h3 id="moveTitle">Mover tarefa para...</h3>
+    <div class="move-opts" id="moveOpts"></div>
+    <button class="move-cancel" onclick="closeMoveMenu()">Cancelar</button>
+  </div>
+</div>
 
 <!-- Bottom nav -->
 <nav class="bn">
@@ -681,20 +721,64 @@ const KB = [
 // ===========================
 // RENDER ITINERARY
 // ===========================
+let doneState={},movedItems=[];
+function loadTripState(){
+  try{const d=localStorage.getItem('gramado-done');if(d)doneState=JSON.parse(d);}catch(e){}
+  try{const m=localStorage.getItem('gramado-moves');if(m)movedItems=JSON.parse(m);}catch(e){}
+}
+function saveDone(){try{localStorage.setItem('gramado-done',JSON.stringify(doneState));}catch(e){}}
+function saveMoves(){try{localStorage.setItem('gramado-moves',JSON.stringify(movedItems));}catch(e){}}
+function getEffectiveDays(){
+  const eff={};
+  for(const[day,data] of Object.entries(DAYS)){
+    eff[day]={...data,items:data.items.map((it,i)=>({...it,_origDay:+day,_origIdx:i}))};
+  }
+  for(const mv of movedItems){
+    const src=eff[mv.from];
+    if(!src)continue;
+    const si=src.items.findIndex(it=>it._origDay===mv.from&&it._origIdx===mv.idx);
+    if(si<0)continue;
+    const item=src.items.splice(si,1)[0];
+    if(eff[mv.to])eff[mv.to].items.push(item);
+  }
+  return eff;
+}
+function toggleDone(day,origDay,origIdx,el){
+  const k=origDay+'-'+origIdx;
+  if(doneState[k]){delete doneState[k];}else{doneState[k]=true;}
+  saveDone();
+  const ti=el.closest('.ti');
+  ti.classList.toggle('item-done',!!doneState[k]);
+  el.classList.toggle('done',!!doneState[k]);
+  updateDayProgress(day);
+}
+function updateDayProgress(day){
+  const dp=document.querySelector(`.dp[data-day="${day}"]`);
+  if(!dp)return;
+  const items=dp.querySelectorAll('.ti');
+  const total=items.length,done=dp.querySelectorAll('.ti.item-done').length;
+  let prog=dp.querySelector('.day-prog');
+  if(!prog){prog=document.createElement('div');prog.className='day-prog';prog.style.cssText='font-size:.7rem;font-weight:600;color:var(--green);margin-top:6px';dp.querySelector('.dh').appendChild(prog);}
+  prog.textContent=done?`✓ ${done}/${total} concluído${done>1?'s':''}`:'';}
 function renderDays(){
+  loadTripState();
   let swiped=false;try{swiped=!!localStorage.getItem('gramado-swiped');}catch(e){}
   const swipeHint=swiped?'':'<div class="swipe-hint">← deslize para os lados para trocar de dia →</div>';
   const container = document.getElementById('sec-roteiro');
+  const eff=getEffectiveDays();
   let html = '';
-  for(const[day,data] of Object.entries(DAYS)){
+  for(const[day,data] of Object.entries(eff)){
     const nConf=data.items.filter(it=>(it.tags||[]).includes('c')).length;
     const nUber=data.items.filter(it=>/Uber/.test(it.n)).length;
     const nFree=data.items.filter(it=>(it.tags||[]).includes('f')).length;
-    const first=data.items[0].t.split('–')[0],last=data.items[data.items.length-1].t.split('–').pop();
+    const first=data.items[0]?data.items[0].t.split('–')[0]:'',last=data.items.length?data.items[data.items.length-1].t.split('–').pop():'';
+    const doneCount=data.items.filter(it=>doneState[it._origDay+'-'+it._origIdx]).length;
+    const progHtml=doneCount?`<div class="day-prog" style="font-size:.7rem;font-weight:600;color:var(--green);margin-top:6px">✓ ${doneCount}/${data.items.length} concluído${doneCount>1?'s':''}</div>`:'<div class="day-prog" style="font-size:.7rem;font-weight:600;color:var(--green);margin-top:6px"></div>';
     const meta=`<div class="dmeta"><span>🕗 ${first} – ${last}</span><span>${data.items.length} paradas</span>${nConf?`<span class="ok">✓ ${nConf} confirmado${nConf>1?'s':''}</span>`:''}${nFree?`<span class="free-c">🆓 ${nFree} grátis</span>`:''}${nUber?`<span>🚗 ${nUber} Uber</span>`:''}</div>`;
-    html += `<div class="dp" data-day="${day}" id="day-${day}" role="tabpanel" aria-labelledby="tab-${day}"><div class="dh"><h2>${data.title}</h2><div class="sub">${data.sub}</div>${meta}</div>${swipeHint}<div class="tl">`;
+    html += `<div class="dp" data-day="${day}" id="day-${day}" role="tabpanel" aria-labelledby="tab-${day}"><div class="dh"><h2>${data.title}</h2><div class="sub">${data.sub}</div>${meta}${progHtml}</div>${swipeHint}<div class="tl">`;
     data.items.forEach((it,i) => {
       const cls = it.c||'';
+      const isDone=!!doneState[it._origDay+'-'+it._origIdx];
       const tags = (it.tags||[]).map(t=>{
         if(t==='p') return '<span class="tg tg-p">👑 Prime 2×1</span>';
         if(t==='c') return '<span class="tg tg-c">✓ Confirmado</span>';
@@ -702,11 +786,15 @@ function renderDays(){
         if(t==='f') return '<span class="tg tg-f">Grátis</span>';
         return '';
       }).join(' ');
+      const isMoved=it._origDay!==+day;
+      const movedTag=isMoved?` <span class="tg" style="background:var(--accent-l);color:var(--accent)">↩ do dia ${it._origDay}</span>`:'';
       const acts = it.p ? '<div class="acts"></div>' : '';
       const hint = it.p && it.c==='transport' ? ' <span class="tg tg-f">🚗 Toque: Uber e rota</span>' : '';
-      const detail = (it.x||it.h||it.p) ? `<div class="tx">${acts}${it.x?it.x.replace(/\n/g,'<br>'):''}${it.h?`<div class="hist">📜 ${it.h}</div>`:''}</div>` : '';
+      const moveBtn=`<button class="ti-move" onclick="event.stopPropagation();openMoveMenu(${it._origDay},${it._origIdx},'${it.n.replace(/'/g,"\\'")}')">📅 Mover</button>`;
+      const detail = (it.x||it.h||it.p) ? `<div class="tx">${acts}${it.x?it.x.replace(/\n/g,'<br>'):''}${it.h?`<div class="hist">📜 ${it.h}</div>`:''}${moveBtn}</div>` : `<div class="tx">${moveBtn}</div>`;
       const tk = it.tk ? `<button class="tkchip" data-slot="${it.tk}" onclick="openTickets('${it.tk}')">🎫 Ingresso</button>` : '';
-      html += `<div class="ti ${cls}" data-i="${i}" onclick="tog(this,event)"><div class="tt">${it.t}</div><div class="tn">${it.n}</div><div class="td">${it.d}</div>${tags}${hint}${tk}${detail}</div>`;
+      const checkDone=isDone?'done':'';
+      html += `<div class="ti ${cls}${isDone?' item-done':''}" data-i="${i}" data-orig-day="${it._origDay}" data-orig-idx="${it._origIdx}" onclick="tog(this,event)"><span class="ti-check ${checkDone}" onclick="event.stopPropagation();toggleDone(${day},${it._origDay},${it._origIdx},this)"></span><div class="tt">${it.t}</div><div class="tn">${it.n}</div><div class="td">${it.d}</div>${tags}${movedTag}${hint}${tk}${detail}</div>`;
     });
     html += '</div></div>';
   }
@@ -950,6 +1038,7 @@ async function fetchWeather(silent){
     const t=Math.round(d.current.temperature_2m),mx=Math.round(d.daily.temperature_2m_max[0]),mn=Math.round(d.daily.temperature_2m_min[0]),rain=d.daily.precipitation_probability_max[0];
     wText.textContent=`${t}°C agora · ${mn}°–${mx}° · ${rain}% chuva`;
     wIcon.textContent=wCodeIcon(d.current.weather_code);
+    document.getElementById('wToggle').hidden=false;
     weatherRetries=0;
   }catch(e){
     showTypicalWeather();
@@ -2486,13 +2575,82 @@ async function addTicketFiles(input){
 }
 
 // ===========================
+// MOVE TASK
+// ===========================
+let moveFrom=null,moveIdx=null;
+function openMoveMenu(origDay,origIdx,name){
+  moveFrom=origDay;moveIdx=origIdx;
+  document.getElementById('moveTitle').textContent='Mover "'+name+'" para...';
+  const opts=document.getElementById('moveOpts');
+  const curDay=findItemDay(origDay,origIdx);
+  opts.innerHTML=Object.entries(DAYS).map(([d,data])=>{
+    const isCur=+d===curDay;
+    const wd=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][new Date(2026,9,+d).getDay()];
+    return `<button class="move-opt${isCur?' cur':''}" onclick="moveTask(${d})">${wd} ${d}/10</button>`;
+  }).join('');
+  document.getElementById('moveMenu').hidden=false;
+}
+function closeMoveMenu(){document.getElementById('moveMenu').hidden=true;moveFrom=null;moveIdx=null;}
+function findItemDay(origDay,origIdx){
+  const mv=movedItems.find(m=>m.from===origDay&&m.idx===origIdx);
+  return mv?mv.to:origDay;
+}
+function moveTask(toDay){
+  movedItems=movedItems.filter(m=>!(m.from===moveFrom&&m.idx===moveIdx));
+  if(toDay!==moveFrom)movedItems.push({from:moveFrom,idx:moveIdx,to:toDay});
+  saveMoves();
+  closeMoveMenu();
+  const scrollDay=curDay;
+  renderDays();initCarousel();showDay(scrollDay);
+  toast('Tarefa movida para dia '+toDay);
+  fitTrack();
+}
+
+// ===========================
+// HOURLY WEATHER
+// ===========================
+function toggleHourly(){
+  const panel=document.getElementById('wHourly');
+  const btn=document.getElementById('wToggle');
+  if(panel.hidden){
+    renderHourly();
+    panel.hidden=false;
+    btn.textContent='▲ Fechar';
+  } else {
+    panel.hidden=true;
+    btn.textContent='▼ Hora a hora';
+  }
+}
+async function renderHourly(){
+  const panel=document.getElementById('wHourly');
+  const w=await freshWeather();
+  if(!w||!w.hourly){panel.innerHTML='<p>Dados por hora indisponíveis.</p>';return;}
+  const now=new Date();
+  const hi=w.hourly.time.findIndex(t=>new Date(t)>now);
+  if(hi<0){panel.innerHTML='<p>Sem previsão disponível.</p>';return;}
+  const hours=w.hourly.time.slice(hi,hi+24);
+  let rows='';
+  hours.forEach((t,i)=>{
+    const idx=hi+i;
+    const h=new Date(t).getHours();
+    const temp=Math.round(w.hourly.temperature_2m[idx]);
+    const rain=w.hourly.precipitation_probability[idx];
+    const code=w.hourly.weather_code[idx];
+    const icon=wCodeIcon(code);
+    const desc=wCodeDesc(code);
+    rows+=`<div class="wh-row"><span class="wh-hour">${String(h).padStart(2,'0')}h</span><span class="wh-icon">${icon}</span><span class="wh-temp">${temp}°C</span><span class="wh-rain">💧${rain}%</span><span class="wh-desc">${desc}</span></div>`;
+  });
+  panel.innerHTML=rows;
+}
+
+// ===========================
 // INIT
 // ===========================
 importHash();
 renderDays();
 initCarousel();
 initToday();
-fetchWeather();freshWeather();
+fetchWeather();freshWeather().then(w=>{if(w&&w.hourly)document.getElementById('wToggle').hidden=false;});
 renderChk();
 renderLocPick();
 loadConfig();
