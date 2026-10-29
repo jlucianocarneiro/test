@@ -264,6 +264,40 @@ details.fold .cnt.full{background:var(--green);color:#fff}
 .ti-act{display:inline-flex;align-items:center;gap:4px;min-height:30px;padding:2px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--muted);font-size:.68rem;font-weight:600;cursor:pointer}
 .ti-act:hover{border-color:var(--accent);color:var(--accent)}
 .ti-act.del:hover{border-color:#c0392b;color:#c0392b}
+/* Discussion tab */
+.disc-actions{display:flex;gap:8px;margin-bottom:14px}
+.disc-act-btn{flex:1;min-height:44px;border:1px solid var(--accent);border-radius:12px;background:var(--accent);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer}
+.disc-act-btn.sec-btn{background:var(--bg);color:var(--accent)}
+.ficha{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:10px;box-shadow:var(--shadow);border-left:4px solid var(--accent)}
+.ficha-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ficha-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;flex-shrink:0}
+.ficha-header strong{font-size:.9rem}
+.ficha-badge{display:inline-block;font-size:.68rem;font-weight:600;background:var(--green-l);color:var(--green);padding:2px 7px;border-radius:6px;margin-left:6px}
+.ficha-body{font-size:.78rem;color:var(--muted)}
+.ficha-row{padding:2px 0}
+.ficha-footer{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
+.ficha-vote{min-height:32px;padding:4px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:.75rem;font-weight:600;cursor:pointer}
+.ficha-vote:hover{border-color:var(--accent)}
+.ficha-voted{background:var(--accent-l);border-color:var(--accent);color:var(--accent)}
+.ficha-rot-btn{min-height:32px;padding:4px 10px;border:1px solid var(--green);border-radius:8px;background:var(--green-l);color:var(--green);font-size:.72rem;font-weight:600;cursor:pointer}
+.ficha-rot-btn.added{border-color:var(--muted);background:var(--bg);color:var(--muted)}
+.ficha-del{min-height:32px;padding:4px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--muted);font-size:.72rem;cursor:pointer;margin-left:auto}
+.ficha-del:hover{border-color:#c0392b;color:#c0392b}
+.ficha-dup{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:.82rem}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .ficha-dup{background:#3a2a10;color:#fcd34d;border-color:#92400e}}
+:root[data-theme="dark"] .ficha-dup{background:#3a2a10;color:#fcd34d;border-color:#92400e}
+.disc-feed{max-height:400px;overflow-y:auto;margin-bottom:8px}
+.disc-msg{padding:8px 12px;margin-bottom:6px;border-radius:12px;background:var(--card);box-shadow:var(--shadow)}
+.disc-msg.dm-me{background:var(--chat-user)}
+.dm-author{display:block;font-size:.7rem;font-weight:700;color:var(--accent);margin-bottom:2px}
+.dm-text{display:block;font-size:.82rem;color:var(--text)}
+.dm-time{display:block;font-size:.65rem;color:var(--muted);margin-top:3px;text-align:right}
+.disc-input-bar{display:flex;gap:6px;padding:10px 0;position:sticky;bottom:72px;background:var(--bg);z-index:10}
+.disc-input-bar input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);font-size:.85rem}
+.disc-input-bar button{padding:10px 16px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:600;font-size:.82rem;cursor:pointer}
+.sug-label{display:block;font-size:.75rem;font-weight:600;color:var(--muted);margin-bottom:10px}
+.sug-label input,.sug-label select,.sug-label textarea{width:100%;margin-top:4px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.85rem;font-family:inherit;box-sizing:border-box}
+.sug-label textarea{resize:vertical;min-height:60px}
 .move-menu{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:130;display:flex;align-items:flex-end;justify-content:center}
 .move-menu[hidden]{display:none}
 .move-box{background:var(--card);color:var(--text);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
@@ -481,10 +515,56 @@ details.fold .cnt.full{background:var(--green);color:#fff}
   </div>
 </div>
 
+<!-- ============ DISCUSSÃO ============ -->
+<div id="sec-discuss" class="sec">
+  <h2 style="font-size:1.1rem;margin-bottom:12px">👥 Grupo — Discussão</h2>
+  <div class="disc-actions">
+    <button class="disc-act-btn" onclick="openSuggestForm()">＋ Sugerir passeio</button>
+    <button class="disc-act-btn sec-btn" onclick="discView='chat';renderDiscussion()">💬 Chat</button>
+  </div>
+  <div id="discDup" class="ficha-dup" hidden></div>
+  <div id="discArea"></div>
+</div>
+
+<!-- Suggest form modal -->
+<div id="suggestMenu" class="move-menu" hidden>
+  <div class="move-box" style="padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))">
+    <h3 style="font-size:1rem;margin-bottom:12px">Sugerir passeio</h3>
+    <label class="sug-label">Nome do passeio<input id="sugName" placeholder="Ex: Snowland"></label>
+    <label class="sug-label">Tipo
+      <select id="sugType">
+        <option value="gastronomia">🍷 Gastronomia</option>
+        <option value="natureza">🌿 Natureza</option>
+        <option value="compras">🛍️ Compras</option>
+        <option value="cultura">🎭 Cultura</option>
+        <option value="aventura">🎿 Aventura</option>
+        <option value="romance">💑 Romance</option>
+        <option value="outro">📌 Outro</option>
+      </select>
+    </label>
+    <label class="sug-label">Custo estimado (R$)<input id="sugCost" type="number" placeholder="0"></label>
+    <label class="sug-label">Observações<textarea id="sugNotes" placeholder="Horário, dica, link…"></textarea></label>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="disc-act-btn" onclick="submitSuggestion()" style="flex:2">Enviar sugestão</button>
+      <button class="disc-act-btn sec-btn" onclick="closeSuggestForm()" style="flex:1">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign day modal -->
+<div id="assignDayMenu" class="move-menu" hidden>
+  <div class="move-box">
+    <h3 style="font-size:1rem;margin-bottom:10px">Adicionar ao roteiro — qual dia?</h3>
+    <div id="assignDayOpts" class="move-opts"></div>
+    <button class="move-cancel" onclick="closeAssignDay()" style="margin-top:10px">Cancelar</button>
+  </div>
+</div>
+
 <!-- Bottom nav -->
 <nav class="bn">
   <button class="nb active" onclick="showSec('roteiro')"><span class="ni">📅</span>Roteiro</button>
   <button class="nb" onclick="showSec('chat')"><span class="ni">💬</span>Guia IA</button>
+  <button class="nb" onclick="showSec('discuss')"><span class="ni">👥</span>Grupo</button>
   <button class="nb" onclick="showSec('local')"><span class="ni">📍</span>Local</button>
   <button class="nb" onclick="showSec('info')"><span class="ni">ℹ️</span>Info</button>
   <button class="nb" onclick="showSec('check')"><span class="ni">✅</span>Check</button>
@@ -925,14 +1005,14 @@ function showSec(name){
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   const s=document.getElementById('sec-'+name);
   if(s)s.classList.add('active');
-  const map={roteiro:0,chat:1,local:2,info:3,check:4};
+  const map={roteiro:0,chat:1,discuss:2,local:3,info:4,check:5};
   const btns=document.querySelectorAll('.nb');
   if(btns[map[name]])btns[map[name]].classList.add('active');
   const tb=document.getElementById('tabBar');
   tb.style.display=name==='roteiro'?'flex':'none';
   if(name==='roteiro')showDay(curDay);
+  if(name==='discuss')renderDiscussion();
   if(name==='chat')toLatestChat();else window.scrollTo(0,0);
-  // Auto-request location on first visit to Local tab
   if(name==='local')initMap();else mapLeave();
   if(name==='local'&&!locRequested){locRequested=true;if(geoAllowed||document.getElementById('locSel').value==='')getLoc();}
 }
@@ -2711,6 +2791,203 @@ function confirmDelete(){
   const scrollDay=curDay;
   renderDays();initCarousel();showDay(scrollDay);
   toast('Tarefa excluída');fitTrack();
+}
+
+// ===========================
+// DISCUSSION / GRUPO
+// ===========================
+let discView='fichas';
+function loadDiscData(){try{return JSON.parse(localStorage.getItem('gramado-disc'))||{msgs:[],fichas:[]};}catch(e){return{msgs:[],fichas:[]};}}
+function saveDiscData(d){try{localStorage.setItem('gramado-disc',JSON.stringify(d));}catch(e){}}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+const TIPO_MAP={gastronomia:{icon:'🍷',color:'#8e44ad'},natureza:{icon:'🌿',color:'#27ae60'},compras:{icon:'🛍️',color:'#e67e22'},cultura:{icon:'🎭',color:'#2980b9'},aventura:{icon:'🎿',color:'#16a085'},romance:{icon:'💑',color:'#e74c3c'},outro:{icon:'📌',color:'#7f8c8d'}};
+
+function sendDiscMsg(){
+  const inp=document.getElementById('discMsgInput');
+  const txt=inp.value.trim();if(!txt)return;
+  const cfg=getConfig();
+  const d=loadDiscData();
+  d.msgs.push({id:genId(),author:cfg.name||'Viajante',text:txt,ts:Date.now()});
+  saveDiscData(d);inp.value='';renderDiscussion();
+  const feed=document.getElementById('discFeed');if(feed)feed.scrollTop=feed.scrollHeight;
+}
+
+function openSuggestForm(){document.getElementById('suggestMenu').hidden=false;}
+function closeSuggestForm(){document.getElementById('suggestMenu').hidden=true;}
+
+function checkSuggestDup(name){
+  const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+  const n=norm(name);if(!n)return null;
+  const d=loadDiscData();
+  const dup=d.fichas.find(f=>norm(f.name).includes(n)||n.includes(norm(f.name)));
+  if(dup)return dup;
+  const placeMatch=PLACES.find(p=>norm(p.name).includes(n)||n.includes(norm(p.name)));
+  if(placeMatch)return{name:placeMatch.name,_isPlace:true};
+  const freeMatch=FREE.find(f=>norm(f.n).includes(n)||n.includes(norm(f.n)));
+  if(freeMatch)return{name:freeMatch.n,_isFree:true};
+  return null;
+}
+
+function submitSuggestion(){
+  const nameEl=document.getElementById('sugName');
+  const name=nameEl.value.trim();if(!name){toast('Informe o nome do passeio');return;}
+  const tipo=document.getElementById('sugType').value;
+  const cost=parseFloat(document.getElementById('sugCost').value)||0;
+  const notes=document.getElementById('sugNotes').value.trim();
+  const cfg=getConfig();
+  const dupEl=document.getElementById('discDup');
+  const dup=checkSuggestDup(name);
+  if(dup){
+    if(dup._isPlace||dup._isFree){
+      dupEl.innerHTML='⚠️ <strong>'+dup.name+'</strong> já existe no roteiro como atração '+(dup._isFree?'gratuita':'cadastrada')+'.';
+    }else{
+      dupEl.innerHTML='⚠️ Sugestão similar já existe: <strong>'+dup.name+'</strong>. Deseja adicionar mesmo assim? <button onclick="forceSubmitSuggestion()" style="margin-left:8px;padding:4px 10px;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit;cursor:pointer">Sim, adicionar</button>';
+    }
+    dupEl.hidden=false;
+    if(!dup._isPlace&&!dup._isFree){window._pendingSug={name,tipo,cost,notes};return;}
+    return;
+  }
+  dupEl.hidden=true;
+  doSubmitSuggestion(name,tipo,cost,notes);
+}
+
+function forceSubmitSuggestion(){
+  const s=window._pendingSug;if(!s)return;
+  document.getElementById('discDup').hidden=true;
+  doSubmitSuggestion(s.name,s.tipo,s.cost,s.notes);
+  window._pendingSug=null;
+}
+
+function doSubmitSuggestion(name,tipo,cost,notes){
+  const cfg=getConfig();
+  const d=loadDiscData();
+  d.fichas.push({id:genId(),name:name,tipo:tipo,cost:cost,notes:notes,author:cfg.name||'Viajante',votes:[],inRoteiro:false,assignedDay:null,ts:Date.now()});
+  saveDiscData(d);
+  closeSuggestForm();
+  document.getElementById('sugName').value='';
+  document.getElementById('sugCost').value='';
+  document.getElementById('sugNotes').value='';
+  discView='fichas';renderDiscussion();
+  toast('Sugestão adicionada!');
+}
+
+function voteFicha(fid){
+  const cfg=getConfig();const voter=cfg.name||'Viajante';
+  const d=loadDiscData();
+  const f=d.fichas.find(x=>x.id===fid);if(!f)return;
+  const vi=f.votes.indexOf(voter);
+  if(vi>=0)f.votes.splice(vi,1);else f.votes.push(voter);
+  saveDiscData(d);renderDiscussion();
+}
+
+function addFichaToRoteiro(fid){
+  window._assignFichaId=fid;
+  const opts=document.getElementById('assignDayOpts');
+  opts.innerHTML='';
+  for(const day of Object.keys(DAYS).sort()){
+    const dt=DAYS[day];
+    const btn=document.createElement('button');
+    btn.className='move-opt';
+    btn.textContent=dt.d+' ('+day+'/10)';
+    btn.onclick=()=>assignFichaDay(fid,+day);
+    opts.appendChild(btn);
+  }
+  document.getElementById('assignDayMenu').hidden=false;
+}
+function closeAssignDay(){document.getElementById('assignDayMenu').hidden=true;}
+
+function assignFichaDay(fid,day){
+  const d=loadDiscData();
+  const f=d.fichas.find(x=>x.id===fid);if(!f)return;
+  f.inRoteiro=true;f.assignedDay=day;
+  saveDiscData(d);
+  const tm=TIPO_MAP[f.tipo]||TIPO_MAP.outro;
+  const eff=getEffectiveDays();
+  const dayData=eff[day];
+  if(dayData){
+    const newIdx=dayData.items.length;
+    const k=day+'-ficha-'+f.id;
+    editedItems[k]={t:'',n:tm.icon+' '+f.name+(f.notes?' — '+f.notes:''),d:f.cost?'Custo: ~R$'+f.cost:''};
+    saveEdits();
+  }
+  closeAssignDay();renderDiscussion();
+  toast('Adicionado ao dia '+day+'!');
+}
+
+function removeFichaFromRoteiro(fid){
+  const d=loadDiscData();
+  const f=d.fichas.find(x=>x.id===fid);if(!f)return;
+  if(f.assignedDay){
+    const k=f.assignedDay+'-ficha-'+f.id;
+    delete editedItems[k];saveEdits();
+  }
+  f.inRoteiro=false;f.assignedDay=null;
+  saveDiscData(d);renderDiscussion();
+  toast('Removido do roteiro');
+}
+
+function deleteFicha(fid){
+  const d=loadDiscData();
+  const f=d.fichas.find(x=>x.id===fid);
+  if(f&&f.inRoteiro&&f.assignedDay){
+    const k=f.assignedDay+'-ficha-'+f.id;
+    delete editedItems[k];saveEdits();
+  }
+  d.fichas=d.fichas.filter(x=>x.id!==fid);
+  saveDiscData(d);renderDiscussion();
+  toast('Ficha excluída');
+}
+
+function renderDiscussion(){
+  const area=document.getElementById('discArea');
+  const d=loadDiscData();
+  const cfg=getConfig();const me=cfg.name||'Viajante';
+
+  if(discView==='chat'){
+    let h='<div id="discFeed" class="disc-feed">';
+    if(!d.msgs.length)h+='<p style="text-align:center;color:var(--muted);font-size:.82rem;padding:30px 0">Nenhuma mensagem ainda. Comece a conversa!</p>';
+    d.msgs.forEach(m=>{
+      const isMe=m.author===me;
+      const dt=new Date(m.ts);
+      const time=dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      h+='<div class="disc-msg'+(isMe?' dm-me':'')+'">';
+      h+='<span class="dm-author">'+m.author+'</span>';
+      h+='<span class="dm-text">'+m.text.replace(/</g,'&lt;')+'</span>';
+      h+='<span class="dm-time">'+time+'</span></div>';
+    });
+    h+='</div>';
+    h+='<div class="disc-input-bar"><input id="discMsgInput" placeholder="Mensagem…" onkeydown="if(event.key===\'Enter\')sendDiscMsg()"><button onclick="sendDiscMsg()">Enviar</button></div>';
+    area.innerHTML=h;
+    const feed=document.getElementById('discFeed');if(feed)feed.scrollTop=feed.scrollHeight;
+    return;
+  }
+
+  // Fichas view
+  let h='';
+  if(!d.fichas.length){
+    h='<p style="text-align:center;color:var(--muted);font-size:.82rem;padding:30px 0">Nenhuma sugestão ainda. Toque em <strong>＋ Sugerir passeio</strong> para começar!</p>';
+    area.innerHTML=h;return;
+  }
+  const sorted=[...d.fichas].sort((a,b)=>b.votes.length-a.votes.length||b.ts-a.ts);
+  sorted.forEach(f=>{
+    const tm=TIPO_MAP[f.tipo]||TIPO_MAP.outro;
+    const voted=f.votes.includes(me);
+    h+='<div class="ficha">';
+    h+='<div class="ficha-header"><div class="ficha-icon" style="background:'+tm.color+'">'+tm.icon+'</div><div><strong>'+f.name+'</strong>';
+    if(f.inRoteiro)h+='<span class="ficha-badge">✓ No roteiro'+(f.assignedDay?' — Dia '+f.assignedDay:'')+'</span>';
+    h+='<br><span style="font-size:.7rem;color:var(--muted)">por '+f.author+'</span></div></div>';
+    h+='<div class="ficha-body">';
+    if(f.cost)h+='<div class="ficha-row">💰 Custo estimado: ~R$ '+f.cost.toFixed(0)+'</div>';
+    if(f.notes)h+='<div class="ficha-row">📝 '+f.notes.replace(/</g,'&lt;')+'</div>';
+    h+='</div>';
+    h+='<div class="ficha-footer">';
+    h+='<button class="ficha-vote'+(voted?' ficha-voted':'')+'" onclick="voteFicha(\''+f.id+'\')">👍 '+f.votes.length+'</button>';
+    if(!f.inRoteiro)h+='<button class="ficha-rot-btn" onclick="addFichaToRoteiro(\''+f.id+'\')">＋ Roteiro</button>';
+    else h+='<button class="ficha-rot-btn added" onclick="removeFichaFromRoteiro(\''+f.id+'\')">✓ No roteiro</button>';
+    h+='<button class="ficha-del" onclick="deleteFicha(\''+f.id+'\')">🗑️</button>';
+    h+='</div></div>';
+  });
+  area.innerHTML=h;
 }
 
 // ===========================
